@@ -1,2 +1,12 @@
 .idea
 20261109_fahrplaene_gesamtdeutschland_gtfs/
+
+# Gradle / Kotlin build output
+.gradle/
+.kotlin/
+build/
+
+# DuckDB scratch files
+*.duckdb
+*.duckdb.wal
+*.tmp/
