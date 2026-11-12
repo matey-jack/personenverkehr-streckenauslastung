@@ -52,7 +52,7 @@ The data exploration should help us to find those times and do a data pre-select
 
 First task:
  - look at all the remaining (rail) routes after the first filtering step.
- - group the trips for each route: trips with the same set of stops form a group. For each route list all the trip groups with the number of stops and the number of trips in that group.
+ - group the trips for each route: trips with the same sequence of stops form a group. For each route list all the trip groups with the number of stops and the number of trips in that group.
  
 
 # Open questions
