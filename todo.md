@@ -16,7 +16,7 @@ Increments to implement, test and review one at a time.
 - [ ] Run `./gradlew tripGroups` and review `data/reports/trip_groups.csv`.
 - [ ] Review the two choices made in `TripGroups.kt`:
   - stops are mapped to their parent station (so a different platform doesn't create a new group);
-  - groups are defined by the *ordered* station sequence (each direction is a separate group). The spec says "set of stops".
+  - groups are defined by the *ordered* station sequence (each direction is a separate group), as in the spec ✅
 
 ## 4. Calendar: regular vs. one-off trips
 - [ ] Understand `calendar` / `calendar_dates` in the Delfi data (open question in the spec).
