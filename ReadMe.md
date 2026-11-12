@@ -6,4 +6,8 @@ This project uses German [GTFS data from Delfi]. Since the dataset is 40 GB larg
 
 A condensed and compressed view of the data, however is part of the repository, so that a lot of the code can be run without the download.
 
+## Way of working
+
+I am always writing the spec and docs first, often using present tense even for things that are not implemented yet. There's `todo.md` which breaks the things to implement into increments that I'll test and review individually.
+
 

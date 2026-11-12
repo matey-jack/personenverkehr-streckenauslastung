@@ -28,6 +28,37 @@ Other inputs can be given optionally:
  - max speeds and acceleration/deceleration for specific trains (by type and line)
  - exact distance and max speed information between stations of specific lines
  
-All of those are given in 
+All of those are given in text files whose format we need to define.
+
+# Program architecture
+
+There are several separately runnable programs to prepare the data, especially the parts where its just filtering (and possibly storing in a binary format). 
+Intemediate results are written into files, so that most of the development and running can be done from intermediate files without the need to read the full GTFS data set.
+
+# Basic data filtering
+
+We filter all routes by the route_type, keeping only types 100 to 199 see `Extended GTFS Route Types.md`.
+We then filter all trips, keeping only ones relating to the retained route_ids.
+And then similarly filter stop_times, stops, and so on.
+
+
+# Data exploration
+
+GTFS has a mix of very regular services (like every hour of every day with the exact same stops and travel times) and irregular services (only on specific days or specific times of day, and individual parts of a route or even a longer route or a different set of stops).
+
+We are interested of getting data for the most typical kind of situation – when all the regular trains run – and additionally for the most crowded of hours of the workday (commuter time) or the year (around public holidays or start and end of school vacations).
+
+The data exploration should help us to find those times and do a data pre-selection so that all other data won't we used in most of the app. 
+
+First task:
+ - look at all the remaining (rail) routes after the first filtering step.
+ - group the trips for each route: trips with the same set of stops form a group. For each route list all the trip groups with the number of stops and the number of trips in that group.
+ 
+
+# Open questions
+
+- understand data model for calendar dates, especially: regular trips vs one-offs.
+
+
 
 
