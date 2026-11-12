@@ -1,0 +1,3 @@
+agency_id,agency_name,agency_url,agency_timezone
+1,DB Regio,https://example.org,Europe/Berlin
+2,Stadtbus,https://example.org,Europe/Berlin

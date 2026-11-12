@@ -1,0 +1,7 @@
+stop_id,stop_name,stop_lat,stop_lon,location_type,parent_station
+A,Aheim Hbf,52.0,13.0,1,
+A:1,Aheim Hbf,52.0,13.0,0,A
+A:2,Aheim Hbf,52.0,13.0,0,A
+B,Bdorf,52.1,13.1,0,
+C,Cstadt,52.2,13.2,0,
+X,Bushalt,52.3,13.3,0,
