@@ -30,7 +30,7 @@ Each pipeline step is a separate Gradle task (`./gradlew tasks --group pipeline`
 
 Paths can be overridden, e.g. `./gradlew filterRail -Pgtfs=/path/to/gtfs -Pout=data/rail`.
 
-`./gradlew test` runs the tests against a tiny hand-made GTFS data set in `src/test/resources/mini_gtfs`.
+`./gradlew test` runs the tests against a tiny hand-made GTFS data set in `src/test/resources/mini_gtfs`. GitHub Actions runs them on every push and pull request (`.github/workflows/tests.yml`).
 
 Data conventions in the Parquet files:
 - All GTFS columns are kept as text, so IDs keep any leading zeros. Exceptions: `route_type` and `stop_sequence` are integers.
