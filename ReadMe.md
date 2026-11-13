@@ -12,10 +12,10 @@ I am always writing the spec and docs first, often using present tense even for 
 
 ## Technology
 
-- **Kotlin** (on the JVM, Java 21) for all programs: data preparation, the train-physics model, fitting, and later serving the visualizations.
+- **Kotlin** (on the JVM, Java 25) for all programs: data preparation, the train-physics model, fitting, and later serving the visualizations.
 - **[DuckDB](https://duckdb.org/)** (embedded, via JDBC) for filtering the GTFS CSV files and for exploration queries. It runs in memory; there is no database file.
 - **[Parquet](https://parquet.apache.org/)** files for intermediate results (compressed, columnar, readable by DuckDB, Python/Polars, pandas, …). Small human-facing reports are CSV.
-- **Gradle** with the wrapper (`./gradlew`), so no separate Gradle installation is needed. If no JDK 21 is installed, Gradle downloads one automatically.
+- **Gradle** with the wrapper (`./gradlew`), so no separate Gradle installation is needed. If no JDK 25 is installed, Gradle downloads one automatically.
 
 Why not H2: it is row-oriented and built for transactional workloads, slow at bulk imports and large aggregations, and its file format changes between major versions, which is bad for data files committed to the repository.
 

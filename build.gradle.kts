@@ -1,5 +1,5 @@
 plugins {
-    kotlin("jvm") version "2.4.10"
+    kotlin("jvm") version "2.4.21"
     // Formatter and linter; `./gradlew ktlintFormat` fixes most findings, `check` runs `ktlintCheck`.
     id("org.jlleitschuh.gradle.ktlint") version "14.2.0"
 }
@@ -12,13 +12,13 @@ dependencies {
     implementation("org.duckdb:duckdb_jdbc:2.0.0.1")
 
     testImplementation(kotlin("test"))
-    testImplementation(platform("org.junit:junit-bom:5.14.3"))
+    testImplementation(platform("org.junit:junit-bom:6.1.3"))
     testImplementation("org.junit.jupiter:junit-jupiter")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 kotlin {
-    jvmToolchain(21)
+    jvmToolchain(25)
     compilerOptions {
         allWarningsAsErrors.set(true)
         extraWarnings.set(true) // additional checks such as unused variables and redundant code
