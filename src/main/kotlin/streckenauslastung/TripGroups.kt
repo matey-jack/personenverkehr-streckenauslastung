@@ -1,3 +1,5 @@
+@file:Suppress("ktlint:standard:wrapping") // keeps inline SQL strings compact, see .editorconfig
+
 package streckenauslastung
 
 import java.nio.file.Files

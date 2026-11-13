@@ -1,0 +1,24 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+
+[*.{kt,kts}]
+indent_style = space
+indent_size = 4
+# Kotlin coding conventions (https://kotlinlang.org/docs/coding-conventions.html);
+# less line-wrapping than ktlint's default "ktlint_official" style.
+ktlint_code_style = intellij_idea
+# The code passes multi-line SQL strings inline as call arguments and keeps short
+# bodies on one line; these rules would wrap all of that onto extra lines.
+# The "wrapping" rule cannot be disabled here (other rules depend on it), so files with
+# inline SQL suppress it with @file:Suppress("ktlint:standard:wrapping").
+ktlint_standard_argument-list-wrapping = disabled
+ktlint_standard_function-signature = disabled
+ktlint_standard_statement-wrapping = disabled
+ktlint_standard_chain-method-continuation = disabled
+ktlint_standard_multiline-if-else = disabled
+ktlint_standard_if-else-wrapping = disabled
+ktlint_standard_trailing-comma-on-call-site = disabled
