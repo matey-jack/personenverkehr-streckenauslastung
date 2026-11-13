@@ -1,0 +1,7 @@
+[versions]
+ktlint = "1.8.0"
+
+[libraries]
+# Not used as a dependency. It's only here so that Dependabot sees the ktlint version and keeps it
+# up to date; build.gradle.kts passes the version to the ktlint Gradle plugin.
+ktlint-cli = { module = "com.pinterest.ktlint:ktlint-cli", version.ref = "ktlint" }
