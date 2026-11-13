@@ -30,7 +30,13 @@ Each pipeline step is a separate Gradle task (`./gradlew tasks --group pipeline`
 
 Paths can be overridden, e.g. `./gradlew filterRail -Pgtfs=/path/to/gtfs -Pout=data/rail`.
 
-`./gradlew test` runs the tests against a tiny hand-made GTFS data set in `src/test/resources/mini_gtfs`. GitHub Actions runs them on every push and pull request (`.github/workflows/tests.yml`).
+`./gradlew test` runs the tests against a tiny hand-made GTFS data set in `src/test/resources/mini_gtfs`.
+
+`./gradlew check` runs the tests plus static checks:
+- [ktlint](https://pinterest.github.io/ktlint/) for formatting and style (configured in `.editorconfig`). `./gradlew ktlintFormat` fixes most findings automatically.
+- The Kotlin compiler treats all warnings as errors, with its extra checks (such as unused variables) switched on.
+
+GitHub Actions runs `./gradlew check` on every push and pull request (`.github/workflows/tests.yml`). When Claude Code finishes a turn in which Kotlin or Gradle files changed, a Stop hook (`.claude/hooks/gradle-check.sh`) runs it too and has Claude fix any failure.
 
 Data conventions in the Parquet files:
 - All GTFS columns are kept as text, so IDs keep any leading zeros. Exceptions: `route_type` and `stop_sequence` are integers.

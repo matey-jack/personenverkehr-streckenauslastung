@@ -1,5 +1,7 @@
 plugins {
     kotlin("jvm") version "2.4.10"
+    // Formatter and linter; `./gradlew ktlintFormat` fixes most findings, `check` runs `ktlintCheck`.
+    id("org.jlleitschuh.gradle.ktlint") version "14.2.0"
 }
 
 repositories {
@@ -17,6 +19,14 @@ dependencies {
 
 kotlin {
     jvmToolchain(21)
+    compilerOptions {
+        allWarningsAsErrors.set(true)
+        extraWarnings.set(true) // additional checks such as unused variables and redundant code
+    }
+}
+
+ktlint {
+    version.set("1.8.0")
 }
 
 tasks.test {
@@ -36,16 +46,22 @@ fun registerStep(name: String, mainClass: String, description: String, args: () 
         args(args())
     }
 
-registerStep("filterRail", "streckenauslastung.FilterRailKt",
-    "Step 1: filter the full GTFS data set down to rail routes and write Parquet files.") {
+registerStep(
+    "filterRail",
+    "streckenauslastung.FilterRailKt",
+    "Step 1: filter the full GTFS data set down to rail routes and write Parquet files.",
+) {
     listOf(
         (findProperty("gtfs") ?: "20261109_fahrplaene_gesamtdeutschland_gtfs").toString(),
         (findProperty("out") ?: "data/rail").toString(),
     )
 }
 
-registerStep("tripGroups", "streckenauslastung.TripGroupsKt",
-    "Exploration: group the trips of each rail route by their sequence of stations.") {
+registerStep(
+    "tripGroups",
+    "streckenauslastung.TripGroupsKt",
+    "Exploration: group the trips of each rail route by their sequence of stations.",
+) {
     listOf(
         (findProperty("rail") ?: "data/rail").toString(),
         (findProperty("out") ?: "data/reports/trip_groups.csv").toString(),

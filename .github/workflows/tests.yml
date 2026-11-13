@@ -28,12 +28,15 @@ jobs:
       # Caches Gradle dependencies and validates the wrapper JAR's checksum.
       - uses: gradle/actions/setup-gradle@v6
 
-      - name: Run unit tests
-        run: ./gradlew test
+      # ktlint, compiler with warnings as errors, and unit tests.
+      - name: Lint, compile and test
+        run: ./gradlew check
 
       - name: Upload test report
         if: failure()
         uses: actions/upload-artifact@v7
         with:
-          name: test-report
-          path: build/reports/tests/test/
+          name: reports
+          path: |
+            build/reports/tests/test/
+            build/reports/ktlint/

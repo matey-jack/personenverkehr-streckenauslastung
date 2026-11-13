@@ -1,11 +1,11 @@
 package streckenauslastung
 
+import org.junit.jupiter.api.io.TempDir
 import java.nio.file.Path
 import kotlin.io.path.readLines
 import kotlin.io.path.toPath
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import org.junit.jupiter.api.io.TempDir
 
 class PipelineTest {
     private val gtfs: Path = javaClass.getResource("/mini_gtfs/routes.txt")!!.toURI().toPath().parent
