@@ -17,6 +17,10 @@ import java.nio.file.Path
  *
  * Output CSV columns: route_id, route_short_name, route_type, group_no, num_stops, num_trips,
  * first_station, last_station, stations (" > "-separated station names).
+ *
+ * Within a route, groups are numbered (group_no) by most trips first, then most stops; ties are
+ * broken alphabetically by first station, then by the full station list (and finally by station
+ * IDs, for same-named stations), so the numbering is the same on every run.
  */
 fun tripGroups(railDir: Path, outFile: Path) {
     fun p(name: String) = sqlPath(railDir.resolve("$name.parquet"))
@@ -56,7 +60,11 @@ fun tripGroups(railDir: Path, outFile: Path) {
         db.exec("""
             COPY (
                 SELECT g.route_id, r.route_short_name, r.route_type,
-                       row_number() OVER (PARTITION BY g.route_id ORDER BY g.num_trips DESC, len(g.stations) DESC) AS group_no,
+                       row_number() OVER (
+                           PARTITION BY g.route_id
+                           -- name and id tie-breakers make group_no deterministic (e.g. both directions of a line)
+                           ORDER BY g.num_trips DESC, len(g.stations) DESC, n.first_station, n.stations, g.stations
+                       ) AS group_no,
                        len(g.stations) AS num_stops,
                        g.num_trips,
                        n.first_station, n.last_station, n.stations
