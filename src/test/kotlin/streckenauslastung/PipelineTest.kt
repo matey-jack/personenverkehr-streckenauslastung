@@ -53,4 +53,16 @@ class PipelineTest {
             top.readLines(),
         )
     }
+
+    @Test
+    fun `coreRouteCheck compares the top group with the stations most trips serve`(@TempDir tmp: Path) {
+        filterRail(gtfs, tmp.resolve("rail"))
+        val out = tmp.resolve("core_route_check.csv")
+        coreRouteCheck(tmp.resolve("rail"), out)
+        // Two of three trips form the top group; the third skips Bdorf, which still is a majority station.
+        assertEquals(
+            "R1,RE1,106,equal,equal,867,2,0.67,0.67,0.00,0.33,0.67,3,3,Aheim Hbf,Cstadt,,",
+            out.readLines()[1],
+        )
+    }
 }

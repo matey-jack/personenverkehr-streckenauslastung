@@ -75,3 +75,14 @@ registerStep(
         (findProperty("topOut") ?: "data/reports/trip_groups_top.csv").toString(),
     )
 }
+
+registerStep(
+    "coreRouteCheck",
+    "streckenauslastung.CoreRouteCheckKt",
+    "Exploration: check whether the most frequent trip group of each route qualifies as its core route.",
+) {
+    listOf(
+        (findProperty("rail") ?: "data/rail").toString(),
+        (findProperty("out") ?: "data/reports/core_route_check.csv").toString(),
+    )
+}
