@@ -34,7 +34,8 @@ class PipelineTest {
     fun `tripGroups groups trips by station sequence`(@TempDir tmp: Path) {
         filterRail(gtfs, tmp.resolve("rail"))
         val out = tmp.resolve("trip_groups.csv")
-        tripGroups(tmp.resolve("rail"), out)
+        val top = tmp.resolve("trip_groups_top.csv")
+        tripGroups(tmp.resolve("rail"), out, top)
         val lines = out.readLines()
         assertEquals(
             "route_id,route_short_name,route_type,group_no,num_stops,num_trips,first_station,last_station,stations",
@@ -44,5 +45,12 @@ class PipelineTest {
         assertEquals("R1,RE1,106,1,3,2,Aheim Hbf,Cstadt,Aheim Hbf > Bdorf > Cstadt", lines[1])
         assertEquals("R1,RE1,106,2,2,1,Cstadt,Aheim Hbf,Cstadt > Aheim Hbf", lines[2])
         assertEquals(3, lines.size)
+        assertEquals(
+            listOf(
+                "route_id,route_short_name,route_type,num_stops,num_trips,first_station,last_station,stations",
+                "R1,RE1,106,3,2,Aheim Hbf,Cstadt,Aheim Hbf > Bdorf > Cstadt",
+            ),
+            top.readLines(),
+        )
     }
 }

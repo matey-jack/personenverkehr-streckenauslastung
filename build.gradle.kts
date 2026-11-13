@@ -72,5 +72,6 @@ registerStep(
     listOf(
         (findProperty("rail") ?: "data/rail").toString(),
         (findProperty("out") ?: "data/reports/trip_groups.csv").toString(),
+        (findProperty("topOut") ?: "data/reports/trip_groups_top.csv").toString(),
     )
 }

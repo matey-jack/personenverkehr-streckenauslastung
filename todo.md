@@ -13,7 +13,7 @@ Increments to implement, test and review one at a time.
 - [ ] Commit the condensed data in `data/rail/`.
 
 ## 3. Data exploration: trip groups (implemented, not yet run on the full data set)
-- [ ] Run `./gradlew tripGroups` and review `data/reports/trip_groups.csv`.
+- [ ] Run `./gradlew tripGroups` and review `data/reports/trip_groups.csv` and `trip_groups_top.csv`.
 - [ ] Review the two choices made in `TripGroups.kt`:
   - stops are mapped to their parent station (so a different platform doesn't create a new group);
   - groups are defined by the *ordered* station sequence (each direction is a separate group), as in the spec ✅

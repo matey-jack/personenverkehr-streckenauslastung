@@ -21,10 +21,14 @@ import java.nio.file.Path
  * Within a route, groups are numbered (group_no) by most trips first, then most stops; ties are
  * broken alphabetically by first station, then by the full station list (and finally by station
  * IDs, for same-named stations), so the numbering is the same on every run.
+ * Rows are sorted by route_type, route_short_name, then route_id and group_no.
+ *
+ * [topFile] gets the same columns without group_no, but only the most frequent group
+ * (group_no 1) of each route.
  */
-fun tripGroups(railDir: Path, outFile: Path) {
+fun tripGroups(railDir: Path, outFile: Path, topFile: Path) {
     fun p(name: String) = sqlPath(railDir.resolve("$name.parquet"))
-    outFile.toAbsolutePath().parent?.let { Files.createDirectories(it) }
+    for (f in listOf(outFile, topFile)) f.toAbsolutePath().parent?.let { Files.createDirectories(it) }
     openDuckDb().use { db ->
         db.exec("""
             CREATE TABLE station_of AS
@@ -58,29 +62,33 @@ fun tripGroups(railDir: Path, outFile: Path) {
             GROUP BY u.gid
         """)
         db.exec("""
-            COPY (
-                SELECT g.route_id, r.route_short_name, r.route_type,
-                       row_number() OVER (
-                           PARTITION BY g.route_id
-                           -- name and id tie-breakers make group_no deterministic (e.g. both directions of a line)
-                           ORDER BY g.num_trips DESC, len(g.stations) DESC, n.first_station, n.stations, g.stations
-                       ) AS group_no,
-                       len(g.stations) AS num_stops,
-                       g.num_trips,
-                       n.first_station, n.last_station, n.stations
-                FROM groups g
-                JOIN ${p("routes")} r USING (route_id)
-                JOIN group_names n USING (gid)
-                ORDER BY g.route_id, group_no
-            ) TO ${sqlPath(outFile)} (FORMAT csv, HEADER)
+            CREATE TABLE result AS
+            SELECT g.route_id, r.route_short_name, r.route_type,
+                   row_number() OVER (
+                       PARTITION BY g.route_id
+                       -- name and id tie-breakers make group_no deterministic (e.g. both directions of a line)
+                       ORDER BY g.num_trips DESC, len(g.stations) DESC, n.first_station, n.stations, g.stations
+                   ) AS group_no,
+                   len(g.stations) AS num_stops,
+                   g.num_trips,
+                   n.first_station, n.last_station, n.stations
+            FROM groups g
+            JOIN ${p("routes")} r USING (route_id)
+            JOIN group_names n USING (gid)
+        """)
+        val order = "ORDER BY route_type, route_short_name, route_id, group_no"
+        db.exec("COPY (SELECT * FROM result $order) TO ${sqlPath(outFile)} (FORMAT csv, HEADER)")
+        db.exec("""
+            COPY (SELECT * EXCLUDE (group_no) FROM result WHERE group_no = 1 $order)
+            TO ${sqlPath(topFile)} (FORMAT csv, HEADER)
         """)
         val routes = db.queryLong("SELECT count(DISTINCT route_id) FROM groups")
         val groups = db.queryLong("SELECT count(*) FROM groups")
-        println("%,d routes, %,d trip groups -> %s".format(routes, groups, outFile))
+        println("%,d routes, %,d trip groups -> %s, %s".format(routes, groups, outFile, topFile))
     }
 }
 
 fun main(args: Array<String>) {
-    require(args.size == 2) { "usage: TripGroups <rail-parquet-dir> <out-csv>" }
-    tripGroups(Path.of(args[0]), Path.of(args[1]))
+    require(args.size == 3) { "usage: TripGroups <rail-parquet-dir> <out-csv> <top-out-csv>" }
+    tripGroups(Path.of(args[0]), Path.of(args[1]), Path.of(args[2]))
 }

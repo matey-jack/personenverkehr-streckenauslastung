@@ -26,7 +26,7 @@ Each pipeline step is a separate Gradle task (`./gradlew tasks --group pipeline`
 | Task | Input | Output |
 |---|---|---|
 | `./gradlew filterRail` | `20261109_fahrplaene_gesamtdeutschland_gtfs/*.txt` | `data/rail/*.parquet`: routes with `route_type` 100–199 and their trips, stop_times, stops (incl. parent stations), calendar, calendar_dates, agency |
-| `./gradlew tripGroups` | `data/rail/*.parquet` | `data/reports/trip_groups.csv`: for each route, the groups of trips with the same sequence of stations |
+| `./gradlew tripGroups` | `data/rail/*.parquet` | `data/reports/trip_groups.csv`: for each route, the groups of trips with the same sequence of stations; `data/reports/trip_groups_top.csv`: only the most frequent group of each route |
 
 Paths can be overridden, e.g. `./gradlew filterRail -Pgtfs=/path/to/gtfs -Pout=data/rail`.
 
