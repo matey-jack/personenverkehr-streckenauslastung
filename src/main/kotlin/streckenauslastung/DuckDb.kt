@@ -12,5 +12,9 @@ fun sqlPath(path: Path): String = "'" + path.toAbsolutePath().normalize().toStri
 
 fun Connection.exec(sql: String) = createStatement().use { it.execute(sql) }
 
-fun Connection.queryLong(sql: String): Long =
-    createStatement().use { st -> st.executeQuery(sql).use { rs -> rs.next(); rs.getLong(1) } }
+fun Connection.queryLong(sql: String): Long = createStatement().use { st ->
+    st.executeQuery(sql).use { rs ->
+        rs.next()
+        rs.getLong(1)
+    }
+}

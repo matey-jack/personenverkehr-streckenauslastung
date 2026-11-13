@@ -56,18 +56,24 @@ fun filterRail(gtfsDir: Path, outDir: Path) {
         WHERE stop_id IN (SELECT stop_id FROM used)
            OR stop_id IN (SELECT parent_station FROM all_stops WHERE stop_id IN (SELECT stop_id FROM used))
     """)
-    if (hasFile("calendar")) copy("calendar", """
-        SELECT * FROM ${csv("calendar")}
-        WHERE service_id IN (SELECT service_id FROM ${out("trips")})
-    """)
-    if (hasFile("calendar_dates")) copy("calendar_dates", """
-        SELECT * FROM ${csv("calendar_dates")}
-        WHERE service_id IN (SELECT service_id FROM ${out("trips")})
-    """)
-    if (hasFile("agency")) copy("agency", """
-        SELECT * FROM ${csv("agency")}
-        WHERE agency_id IN (SELECT agency_id FROM ${out("routes")})
-    """)
+    if (hasFile("calendar")) {
+        copy("calendar", """
+            SELECT * FROM ${csv("calendar")}
+            WHERE service_id IN (SELECT service_id FROM ${out("trips")})
+        """)
+    }
+    if (hasFile("calendar_dates")) {
+        copy("calendar_dates", """
+            SELECT * FROM ${csv("calendar_dates")}
+            WHERE service_id IN (SELECT service_id FROM ${out("trips")})
+        """)
+    }
+    if (hasFile("agency")) {
+        copy("agency", """
+            SELECT * FROM ${csv("agency")}
+            WHERE agency_id IN (SELECT agency_id FROM ${out("routes")})
+        """)
+    }
 }
 
 /** SQL expression converting a GTFS time "H:MM:SS" (hours may be >= 24) to seconds, NULL if empty. */
