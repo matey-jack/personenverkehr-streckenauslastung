@@ -53,8 +53,9 @@ fun tripGroups(railDir: Path, outFile: Path, topFile: Path) {
  *  - `station_ids`: the list of station IDs behind the `stations` names;
  *  - `num_trip_days`: the trips of the group, each counted once per day it runs;
  * and the table `station_names` (station_id, station_name).
+ * Trips running on fewer than [minDays] days are left out.
  */
-fun createTripGroupTable(db: Connection, railDir: Path) {
+fun createTripGroupTable(db: Connection, railDir: Path, minDays: Int = 0) {
     fun p(name: String) = sqlPath(railDir.resolve("$name.parquet"))
     db.exec("""
         CREATE TABLE station_of AS
@@ -106,6 +107,7 @@ fun createTripGroupTable(db: Connection, railDir: Path) {
         SELECT row_number() OVER () AS gid, t.route_id, ts.stations, count(*) AS num_trips,
                coalesce(sum(sd.num_days), 0)::BIGINT AS num_trip_days
         FROM ${p("trips")} t JOIN trip_seq ts USING (trip_id) LEFT JOIN service_days sd USING (service_id)
+        WHERE coalesce(sd.num_days, 0) >= $minDays
         GROUP BY t.route_id, ts.stations
     """)
     db.exec("""

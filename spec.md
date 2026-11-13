@@ -75,8 +75,22 @@ in most of the app.
 ## "Core Routes"
 
 A route often has a few trips that are prolonged on either or both ends, often during early or late hours of the day.
-We define a "core route" to mean the sequence of stations that usually is the most frequent trip on that route and that
-contains stations that are also contained in most other trips on the route.
+A "core route" is a set of stations that is representative for the trips of the route.
+
+Provisional definition:
+
+- A "trip-day" is one trip on one day it runs. All frequencies are counted in trip-days, so that a trip which runs on
+  a single day weighs less than one that runs daily.
+- A "pattern" is the set of stations served by a trip, regardless of direction and order.
+- The "majority stations" of a route are the stations served on more than half of its trip-days.
+- The "difference" of a pattern is the number of its stations that are not majority stations, plus the number of
+  majority stations it lacks.
+- Each route has one or two core routes: its most frequent pattern, and the pattern with the smallest difference
+  (the most frequent one of those, if several have it). Often both are the same pattern, which then is the only
+  core route. A route without any majority station only has its most frequent pattern as core route.
+- Two core routes of the same route get the suffixes `:a` (most frequent) and `:b` (smallest difference) on the
+  route_id, and `a` and `b` on the route_short_name. If the route_short_name ends with a letter, the suffixes on it
+  are `-1` and `-2` instead.
 
 ## Ideas on meaningfully grouping the Core Routes
 

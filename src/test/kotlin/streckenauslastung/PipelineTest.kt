@@ -55,13 +55,27 @@ class PipelineTest {
     }
 
     @Test
-    fun `coreRouteCheck compares the top group with the stations most trips serve`(@TempDir tmp: Path) {
+    fun `coreRoutes finds the most frequent pattern`(@TempDir tmp: Path) {
+        filterRail(gtfs, tmp.resolve("rail"))
+        val out = tmp.resolve("core_routes.csv")
+        coreRoutes(tmp.resolve("rail"), out)
+        assertEquals(
+            listOf(
+                "route_id,route_short_name,route_type,share,verdict,num_stops,first_station,last_station,stations",
+                "R1,RE1,106,0.67,equal,3,Aheim Hbf,Cstadt,Aheim Hbf > Bdorf > Cstadt",
+            ),
+            out.readLines(),
+        )
+    }
+
+    @Test
+    fun `coreRouteCheck compares the most frequent patterns with the stations most trips serve`(@TempDir tmp: Path) {
         filterRail(gtfs, tmp.resolve("rail"))
         val out = tmp.resolve("core_route_check.csv")
-        coreRouteCheck(tmp.resolve("rail"), out)
-        // Two of three trips form the top group; the third skips Bdorf, which still is a majority station.
+        coreRouteCheck(tmp.resolve("rail"), out, minDays = 1)
+        // Two of three trips form the top pattern; the third skips Bdorf, which still is a majority station.
         assertEquals(
-            "R1,RE1,106,equal,equal,867,2,0.67,0.67,0.00,0.33,0.67,3,3,Aheim Hbf,Cstadt,,",
+            "R1,RE1,106,867,2,3,equal,0.67,Aheim Hbf,Cstadt,shorter -1,0.33,Cstadt,Aheim Hbf,1,equal,,",
             out.readLines()[1],
         )
     }

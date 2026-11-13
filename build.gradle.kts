@@ -77,12 +77,24 @@ registerStep(
 }
 
 registerStep(
+    "coreRoutes",
+    "streckenauslastung.CoreRoutesKt",
+    "Find the core routes of each rail route.",
+) {
+    listOf(
+        (findProperty("rail") ?: "data/rail").toString(),
+        (findProperty("out") ?: "data/reports/core_routes.csv").toString(),
+    )
+}
+
+registerStep(
     "coreRouteCheck",
     "streckenauslastung.CoreRouteCheckKt",
-    "Exploration: check whether the most frequent trip group of each route qualifies as its core route.",
+    "Exploration: compare the most frequent trips of each route with the stations most of its trips serve.",
 ) {
     listOf(
         (findProperty("rail") ?: "data/rail").toString(),
         (findProperty("out") ?: "data/reports/core_route_check.csv").toString(),
+        (findProperty("minDays") ?: "1").toString(),
     )
 }
