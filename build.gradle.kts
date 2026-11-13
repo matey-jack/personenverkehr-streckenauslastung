@@ -29,8 +29,13 @@ ktlint {
     version.set("1.8.0")
 }
 
+// DuckDB's JDBC driver loads a native library. Since Java 24 that prints a warning unless native
+// access is enabled, and future Java releases will block it (https://openjdk.org/jeps/472).
+val enableNativeAccess = "--enable-native-access=ALL-UNNAMED"
+
 tasks.test {
     useJUnitPlatform()
+    jvmArgs(enableNativeAccess)
 }
 
 // Each step of the pipeline is a separately runnable program (see ReadMe.md, "Program architecture").
@@ -43,6 +48,7 @@ fun registerStep(name: String, mainClass: String, description: String, args: () 
         this.mainClass.set(mainClass)
         workingDir = rootDir
         maxHeapSize = "4g"
+        jvmArgs(enableNativeAccess)
         args(args())
     }
 
