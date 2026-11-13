@@ -1,0 +1,21 @@
+# Keeps libraries, Gradle plugins, Kotlin, Gradle itself and the GitHub Actions on their latest
+# stable versions. The JDK is not a dependency here: it stays on the latest LTS and is upgraded
+# by hand (see ReadMe-development.md).
+version: 2
+updates:
+  - package-ecosystem: gradle
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      # One PR per week for all minor and patch updates; each major update gets its own PR.
+      gradle-minor-and-patch:
+        update-types: [minor, patch]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      github-actions:
+        patterns: ["*"]

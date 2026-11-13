@@ -26,7 +26,8 @@ kotlin {
 }
 
 ktlint {
-    version.set("1.8.0")
+    // Set in gradle/libs.versions.toml, where Dependabot can update it.
+    version.set(libs.versions.ktlint)
 }
 
 // DuckDB's JDBC driver loads a native library. Since Java 24 that prints a warning unless native

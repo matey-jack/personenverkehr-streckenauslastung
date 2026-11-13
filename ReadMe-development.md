@@ -13,6 +13,12 @@ This project keeps a linear history: we don't do merges, and there are no merge 
 
 This applies to Claude Code sessions as well.
 
+## Dependency versions
+
+- Libraries, Gradle plugins, Kotlin and Gradle itself: always the latest stable version. Dependabot (`.github/dependabot.yml`) opens a weekly PR with all minor and patch updates, and a separate PR for each major update. The ktlint version is set in `gradle/libs.versions.toml`, the one place where Dependabot can see it.
+- GitHub Actions: also kept up to date by Dependabot, in one weekly PR.
+- JDK: the latest LTS release. Dependabot doesn't touch it; upgrade it by hand every few years, when a new LTS comes out (`jvmToolchain(...)` in `build.gradle.kts`, `java-version` in `.github/workflows/tests.yml`, and the ReadMe).
+
 ## Checks
 
 `./gradlew check` runs the tests plus static checks:
