@@ -23,7 +23,10 @@ class PipelineTest {
             assertEquals(1, count("calendar_dates"))
             assertEquals(1, count("agency"))
             val st = sqlPath(tmp.resolve("stop_times.parquet"))
-            assertEquals(24 * 3600L + 600, db.queryLong("SELECT arrival_secs FROM $st WHERE trip_id = 'T1' AND stop_sequence = 3"))
+            assertEquals(
+                24 * 3600L + 600,
+                db.queryLong("SELECT arrival_secs FROM $st WHERE trip_id = 'T1' AND stop_sequence = 3"),
+            )
         }
     }
 
@@ -33,7 +36,10 @@ class PipelineTest {
         val out = tmp.resolve("trip_groups.csv")
         tripGroups(tmp.resolve("rail"), out)
         val lines = out.readLines()
-        assertEquals("route_id,route_short_name,route_type,group_no,num_stops,num_trips,first_station,last_station,stations", lines[0])
+        assertEquals(
+            "route_id,route_short_name,route_type,group_no,num_stops,num_trips,first_station,last_station,stations",
+            lines[0],
+        )
         // T1 and T2 use different platforms at Aheim but form one group; T3 runs the other way.
         assertEquals("R1,RE1,106,1,3,2,Aheim Hbf,Cstadt,Aheim Hbf > Bdorf > Cstadt", lines[1])
         assertEquals("R1,RE1,106,2,2,1,Cstadt,Aheim Hbf,Cstadt > Aheim Hbf", lines[2])
