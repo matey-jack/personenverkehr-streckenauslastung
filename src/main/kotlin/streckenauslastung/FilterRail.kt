@@ -7,7 +7,7 @@ import java.nio.file.Path
 import kotlin.io.path.exists
 
 /**
- * Step 1 – basic data filtering (see spec.txt, "Basic data filtering").
+ * Step 1 – basic data filtering (see spec.md, "Basic data filtering").
  *
  * Keeps only routes with route_type 100..199 (rail, see "Extended GTFS Route Types.md"),
  * then the trips, stop_times, stops, calendar data and agencies that belong to them.

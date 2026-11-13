@@ -6,7 +6,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 
 /**
- * Data exploration, first task (see spec.txt, "Data exploration"):
+ * Data exploration, first task (see spec.md, "Data exploration"):
  * for each rail route, group its trips by the stations they serve and count the trips per group.
  *
  * Choices made here (to be reviewed):
