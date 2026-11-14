@@ -70,6 +70,18 @@ and end of school vacations).
 The data exploration should help us find those times and do a data pre-selection so that all other data won't be used
 in most of the app.
 
+## Regular trips vs. one-offs
+
+GTFS gives the days a trip runs through its service: a weekly pattern between a start and an end date (`calendar`),
+plus single dates that are added or removed (`calendar_dates`).
+
+In the Delfi data set of 2026-11-09 every service covers the same seven weeks, 2026-10-24 to 2026-12-12. Of its 9,422
+rail services, 3,505 have no weekly pattern at all and run only on the dates added for them. Such services are
+one-offs and construction timetables, but also regular trips that Delfi publishes as a list of dates.
+
+So the number of trips says little about how typical a kind of trip is; the number of days they run does (see
+"trip-day" under "Core Routes").
+
 # Extracting meaningful "typical" routes and trips
 
 ## "Core Routes"
@@ -104,11 +116,3 @@ As a navigation aid, the station names in routes should be clickable.
 
 And below all the hub stations we list all "isolated core routes" – those which do not start, intermediate stop, or end 
 at any hub station.
-
-# Open questions
-
-- understand data model for calendar dates, especially: regular trips vs one-offs.
-
-
-
-

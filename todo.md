@@ -19,7 +19,7 @@ Increments to implement, test and review one at a time.
   - groups are defined by the *ordered* station sequence (each direction is a separate group), as in the spec ✅
 
 ## 4. Calendar: regular vs. one-off trips
-- [ ] Understand `calendar` / `calendar_dates` in the Delfi data (open question in the spec).
+- Understand `calendar` / `calendar_dates` in the Delfi data ✅
 - [ ] For each trip, count the days it runs. Find a "typical" weekday and the busiest days and hours.
 
 ## Later
