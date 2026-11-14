@@ -48,7 +48,7 @@ fun tripGroups(railDir: Path, outFile: Path, topFile: Path) {
     }
 }
 
-/** Names for stations that the data names without their town, by station ID. */
+/** Names given to stations by station ID, in place of those in the data (see gtfs_findings.md, "Station names"). */
 private val stationNameFixes = mapOf(
     "de:08111:6115" to "Stuttgart Hbf",
     "de:08111:6118" to "Stuttgart Hbf (tief)",
@@ -57,8 +57,8 @@ private val stationNameFixes = mapOf(
 )
 
 /**
- * Stations that the data breaks down into several station IDs, for example one for the underground
- * platforms or one per data source. Each ID on the left counts as the station on the right.
+ * Each station ID on the left counts as the station on the right (see gtfs_findings.md, "A station
+ * can have several station IDs").
  */
 private val stationParts = mapOf(
     "de:08111:6118" to "de:08111:6115", // Stuttgart Hbf (tief)
@@ -77,9 +77,8 @@ private val stationParts = mapOf(
 )
 
 /**
- * The SQL expression for the station name given the stop name [stopName]:
- *  - without the "S " or "S+U " that stop names start with where S-Bahn or U-Bahn trains call;
- *  - with "Hbf" for "Hauptbahnhof", and without a comma before it.
+ * The SQL expression for the station name given the stop name [stopName]: without an "S " or "S+U "
+ * in front, and with "Hbf" for "Hauptbahnhof" and no comma before it.
  */
 private fun normalizedName(stopName: String) =
     """regexp_replace(regexp_replace(regexp_replace($stopName, '^S(\+U)? ', ''), 'Hauptbahnhof', 'Hbf', 'g'), ', Hbf', ' Hbf', 'g')"""

@@ -14,6 +14,12 @@ What the Delfi data set of 2026-11-09 turned out to contain, where that differs 
 - Tram-train stops in front of a main station are stations of their own: "KA Hauptbahnhof (Vorplatz)", "Heilbronn Hbf/Willy-Brandt-Pl.", "Chemnitz, Hbf Bahnhofstr". So are "Frankfurt (Main) Flughafen Fernbahnhof" and "Regionalbahnhof". These stay separate.
 - About 55 Czech stations appear once with a numeric ID and once with a `cz:` ID, for example "Decin hl.n." and "Liberec". These stay separate as well.
 
+## Station names
+
+- A few stations are named without their town: Stuttgart's main station is just "Hauptbahnhof", its underground part "Hauptbahnhof (tief)", München's "Hauptbahnhof (U, Tram)", and the station of Brunnen (Oberbayern) just "Bahnhof".
+- Names start with "S " or "S+U " where S-Bahn or U-Bahn trains call, mostly in Berlin: "S+U Berlin Hauptbahnhof".
+- Main stations are spelled in four ways: "Kassel Hauptbahnhof", "Cottbus, Hauptbahnhof", "Hamburg Hbf", "Eschweiler, Hbf".
+
 ## Long-distance routes barely have a typical trip
 
 Routes of type 101 and 102 have up to about 200 different station patterns each, and the most frequent one often covers only 5 to 15% of the trip-days. A core route says much less about such a route than about a regional one.
