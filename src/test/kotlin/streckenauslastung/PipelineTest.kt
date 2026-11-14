@@ -120,13 +120,19 @@ class PipelineTest {
         val overview = hubOverview(listOf(re1, re2, ice, s1a, s1b), names)
 
         assertEquals(listOf("A", "C", "D"), overview.hubs.map { it.stationId })
-        assertEquals(listOf(listOf(re1, re2), listOf(re1, ice), listOf(re2, ice)), overview.hubs.map { it.ending })
-        assertEquals(listOf(listOf(ice), emptyList(), emptyList()), overview.hubs.map { it.stopping })
+        // A comes first for the ICE stopping there, so RE2 and the ICE run the other way round.
+        val re2FromA = re2.copy(stationIds = listOf("A", "D"))
+        val iceFromC = ice.copy(stationIds = listOf("C", "A", "D"))
+        assertEquals(
+            listOf(listOf(re1, re2FromA), listOf(re1, iceFromC), listOf(re2FromA, iceFromC)),
+            overview.hubs.map { it.ending },
+        )
+        assertEquals(listOf(listOf(iceFromC), emptyList(), emptyList()), overview.hubs.map { it.stopping })
         assertEquals(listOf(s1a, s1b), overview.isolated)
 
         val page = hubStationsPage(overview, names)
         assertContains(page, "<details id=\"hub1\">\n<summary>Station A <small>2 routes starting or ending, 1 stopping")
-        // Under hub A, RE2 starts at A, which is not a link to itself; D is a link to its own section.
+        // Under hub A, A is not a link to itself; D is a link to its own section.
         assertContains(page, "<td>Station A</td><td>–</td><td><a href=\"#hub3\">Station D</a></td>")
     }
 }

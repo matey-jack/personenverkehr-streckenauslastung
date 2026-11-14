@@ -4,49 +4,68 @@ import java.nio.file.Files
 import java.nio.file.Path
 
 /**
- * A core route of the route [routeId] as listed on the page. It has no direction: both of its ends
- * are a start and an end.
+ * A core route of the route [routeId] as listed on the page, where it is simply called a "route".
+ * [stationIds] run in the direction given by [hubOverview].
  */
-internal class ListedRoute(
+internal data class ListedRoute(
     val routeId: String,
     val shortName: String,
     val type: Int,
     val stationIds: List<String>,
 ) {
     val ends = setOf(stationIds.first(), stationIds.last())
+
+    /** The stations where the route stops without starting or ending there. */
+    val stops = stationIds.toSet() - ends
 }
 
 /**
  * A station where core routes of more than one route start or end. The two core routes of one
  * route mostly share their ends, so they count once.
  */
-internal class Hub(
-    val stationId: String,
-    val ending: List<ListedRoute>,
-    val stopping: List<ListedRoute>,
-) {
-    /** The number of routes with a core route starting or ending here. */
-    val numRoutes = ending.distinctBy { it.routeId }.size
-}
+internal class Hub(val stationId: String, val ending: List<ListedRoute>, val stopping: List<ListedRoute>)
 
-/** [hubs] with the most routes starting or ending there first; [isolated] routes touch no hub. */
+/**
+ * [hubs] are ordered by most core routes starting or ending there, then most core routes stopping
+ * there, then name. [isolated] core routes neither start, stop nor end at a hub.
+ *
+ * Every core route runs from the end that comes first in the order of [hubs] to the other end,
+ * where a station that is no hub comes after all hubs. Between two such stations it keeps the
+ * direction it was given in.
+ */
 internal class HubOverview(val hubs: List<Hub>, val isolated: List<ListedRoute>)
 
 /** Groups [routes] by hub station (see spec.md, "Ideas on meaningfully grouping the Core Routes"). */
 internal fun hubOverview(routes: List<ListedRoute>, stationNames: Map<String, String>): HubOverview {
-    val ending = LinkedHashMap<String, MutableList<ListedRoute>>()
-    for (route in routes) for (end in route.ends) ending.getOrPut(end) { ArrayList() }.add(route)
-    val hubIds = ending.filterValues { ends -> ends.distinctBy { it.routeId }.size > 1 }.keys
-    val stopping = HashMap<String, MutableList<ListedRoute>>()
-    for (route in routes) {
-        for (station in route.stationIds.toSet() - route.ends) {
-            if (station in hubIds) stopping.getOrPut(station) { ArrayList() }.add(route)
+    fun byStation(routes: List<ListedRoute>, stations: (ListedRoute) -> Set<String>) =
+        HashMap<String, MutableList<ListedRoute>>().also { map ->
+            for (route in routes) for (station in stations(route)) map.getOrPut(station) { ArrayList() }.add(route)
         }
+
+    val ending = byStation(routes) { it.ends }
+    val stopping = byStation(routes) { it.stops }
+    val hubIds = ending
+        .filterValues { ends -> ends.distinctBy { it.routeId }.size > 1 }
+        .keys
+        .sortedWith(
+            compareBy(
+                { -ending.getValue(it).size },
+                { -stopping[it].orEmpty().size },
+                { stationNames.getValue(it) },
+                { it },
+            ),
+        )
+    val ranks = hubIds.withIndex().associate { (i, id) -> id to i }
+
+    fun rank(stationId: String) = ranks[stationId] ?: hubIds.size
+    val directed = routes.map { route ->
+        val backwards = rank(route.stationIds.last()) < rank(route.stationIds.first())
+        if (backwards) route.copy(stationIds = route.stationIds.reversed()) else route
     }
-    val hubs = hubIds
-        .map { Hub(it, ending.getValue(it), stopping[it].orEmpty()) }
-        .sortedWith(compareBy({ -it.numRoutes }, { stationNames.getValue(it.stationId) }, { it.stationId }))
-    return HubOverview(hubs, routes.filter { route -> route.stationIds.none { it in hubIds } })
+    val directedEnding = byStation(directed) { it.ends }
+    val directedStopping = byStation(directed) { it.stops }
+    val hubs = hubIds.map { Hub(it, directedEnding.getValue(it), directedStopping[it].orEmpty()) }
+    return HubOverview(hubs, directed.filter { route -> route.stationIds.none { it in ranks } })
 }
 
 /**
@@ -138,12 +157,11 @@ internal fun hubStationsPage(overview: HubOverview, stationNames: Map<String, St
         return if (link && anchor != null) "<a href=\"#$anchor\">$name</a>" else name
     }
 
-    /** One table row per route; a route ending at [hubId] is shown starting there. */
+    /** One table row per route; the station [hubId] is no link, as the table is in its section. */
     fun StringBuilder.routeTable(routes: List<ListedRoute>, hubId: String? = null) {
         append("<table>\n")
         for (route in routes) {
-            val (first, last) = route.stationIds.first() to route.stationIds.last()
-            val (start, end) = if (last == hubId) last to first else first to last
+            val (start, end) = route.stationIds.first() to route.stationIds.last()
             val type = routeTypeNames[route.type]?.let { "$it <small>${route.type}</small>" } ?: route.type.toString()
             append("<tr><td class=\"name\">${html(route.shortName)}</td><td class=\"type\">$type</td>")
             append("<td>${station(start, link = start != hubId)}</td><td>–</td>")
@@ -155,21 +173,21 @@ internal fun hubStationsPage(overview: HubOverview, stationNames: Map<String, St
 
     return buildString {
         append("<!DOCTYPE html>\n<html lang=\"de\">\n<head>\n<meta charset=\"utf-8\">\n")
-        append("<title>Hub stations and their core routes</title>\n<style>$STYLE</style>\n</head>\n<body>\n")
+        append("<title>Hub stations and their routes</title>\n<style>$STYLE</style>\n</head>\n<body>\n")
         append("<nav>\n<input id=\"filter\" type=\"search\" placeholder=\"Filter stations\">\n<ol>\n")
         for (hub in overview.hubs) {
             append("<li><a href=\"#${anchors[hub.stationId]}\">${station(hub.stationId, link = false)}</a>")
-            append(" <small>${hub.numRoutes}</small></li>\n")
+            append(" <small>${hub.ending.size} + ${hub.stopping.size}</small></li>\n")
         }
-        append("<li><a href=\"#isolated\">Isolated core routes</a> <small>${overview.isolated.size}</small></li>\n")
-        append("</ol>\n</nav>\n<main>\n<header>\n<h1>Hub stations and their core routes</h1>\n<p>Navigation:\n")
+        append("<li><a href=\"#isolated\">Isolated routes</a> <small>${overview.isolated.size}</small></li>\n")
+        append("</ol>\n</nav>\n<main>\n<header>\n<h1>Hub stations and their routes</h1>\n<p>Navigation:\n")
         append("<label><input type=\"radio\" name=\"navigation\" value=\"sidebar\" checked> station sidebar</label>\n")
         append("<label><input type=\"radio\" name=\"navigation\" value=\"collapsible\"> collapsible stations</label>\n")
         append("</p>\n</header>\n")
         for (hub in overview.hubs) {
             append("<details id=\"${anchors[hub.stationId]}\">\n<summary>${station(hub.stationId, link = false)} ")
             append(
-                "<small>${hub.numRoutes} routes starting or ending, ${hub.stopping.size} stopping</small></summary>\n",
+                "<small>${hub.ending.size} routes starting or ending, ${hub.stopping.size} stopping</small></summary>\n",
             )
             append("<h3>Starting or ending here</h3>\n")
             routeTable(hub.ending, hub.stationId)
@@ -179,7 +197,7 @@ internal fun hubStationsPage(overview: HubOverview, stationNames: Map<String, St
             }
             append("</details>\n")
         }
-        append("<details id=\"isolated\">\n<summary>Isolated core routes ")
+        append("<details id=\"isolated\">\n<summary>Isolated routes ")
         append("<small>${overview.isolated.size} touching no hub station</small></summary>\n")
         routeTable(overview.isolated)
         append("</details>\n</main>\n<script>$SCRIPT</script>\n</body>\n</html>\n")
@@ -189,7 +207,7 @@ internal fun hubStationsPage(overview: HubOverview, stationNames: Map<String, St
 /**
  * Data exploration (see spec.md, "Ideas on meaningfully grouping the Core Routes"): writes an HTML
  * page of the hub stations with their core routes, followed by the isolated core routes.
- * The core routes are those of spec.md, "Core Routes", in the direction of their most frequent trip group.
+ * The core routes are those of spec.md, "Core Routes".
  */
 fun hubStations(railDir: Path, outFile: Path) {
     outFile.toAbsolutePath().parent?.let { Files.createDirectories(it) }
