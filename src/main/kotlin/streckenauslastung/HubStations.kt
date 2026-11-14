@@ -20,14 +20,23 @@ internal data class ListedRoute(
 }
 
 /**
- * A station where core routes of more than one route start or end. The two core routes of one
- * route mostly share their ends, so they count once.
+ * A hub station. The rank of a station is the number of core routes starting or ending there.
+ * A core route is connected to the stations where it starts, stops or ends, and it is dangling
+ * as long as none of them is a hub. A station is a hub if
+ *  - core routes of more than one route start or end there, or
+ *  - core routes of more than one route start, stop or end there, and one of them is connected
+ *    to no hub of a higher rank.
+ *
+ * The two core routes of one route mostly share their ends, hence "more than one route".
  */
-internal class Hub(val stationId: String, val ending: List<ListedRoute>, val stopping: List<ListedRoute>)
+internal class Hub(val stationId: String, val ending: List<ListedRoute>, val stopping: List<ListedRoute>) {
+    val rank = ending.size
+}
 
 /**
- * [hubs] are ordered by most core routes starting or ending there, then most core routes stopping
- * there, then name. [isolated] core routes neither start, stop nor end at a hub.
+ * [hubs] are ordered by rank, then most core routes stopping there, then name. [isolated] core
+ * routes are still dangling, which means that they share no station with a core route of another
+ * route.
  *
  * Every core route runs from the end that comes first in the order of [hubs] to the other end,
  * where a station that is no hub comes after all hubs. Between two such stations it keeps the
@@ -42,30 +51,47 @@ internal fun hubOverview(routes: List<ListedRoute>, stationNames: Map<String, St
             for (route in routes) for (station in stations(route)) map.getOrPut(station) { ArrayList() }.add(route)
         }
 
+    fun List<ListedRoute>.ofSeveralRoutes() = distinctBy { it.routeId }.size > 1
+
     val ending = byStation(routes) { it.ends }
     val stopping = byStation(routes) { it.stops }
-    val hubIds = ending
-        .filterValues { ends -> ends.distinctBy { it.routeId }.size > 1 }
-        .keys
-        .sortedWith(
-            compareBy(
-                { -ending.getValue(it).size },
-                { -stopping[it].orEmpty().size },
-                { stationNames.getValue(it) },
-                { it },
-            ),
-        )
-    val ranks = hubIds.withIndex().associate { (i, id) -> id to i }
+    val calling = byStation(routes) { it.stationIds.toSet() }
 
-    fun rank(stationId: String) = ranks[stationId] ?: hubIds.size
+    fun rank(station: String) = ending[station].orEmpty().size
+    val bySize = calling.keys.sortedWith(
+        compareBy(
+            { -rank(it) },
+            { -stopping[it].orEmpty().size },
+            { stationNames.getValue(it) },
+            { it },
+        ),
+    )
+    val hubIds = ArrayList<String>()
+    val connected = HashSet<ListedRoute>()
+    // All stations of one rank are decided together, before any of their routes count as
+    // connected, so that stations of similar size are treated alike: if a dangling route runs
+    // from A to B, where another route stops but no other route ends, both A and B become hubs.
+    // Deciding station by station would make only the first of them a hub.
+    for (stationsOfRank in bySize.groupBy(::rank).values) {
+        val hubsOfRank = stationsOfRank.filter { station ->
+            val callingHere = calling.getValue(station)
+            val linksDangling = callingHere.ofSeveralRoutes() && callingHere.any { it !in connected }
+            ending[station].orEmpty().ofSeveralRoutes() || linksDangling
+        }
+        hubIds += hubsOfRank
+        for (hub in hubsOfRank) connected += calling.getValue(hub)
+    }
+    val positions = hubIds.withIndex().associate { (i, id) -> id to i }
+
+    fun position(stationId: String) = positions[stationId] ?: hubIds.size
     val directed = routes.map { route ->
-        val backwards = rank(route.stationIds.last()) < rank(route.stationIds.first())
+        val backwards = position(route.stationIds.last()) < position(route.stationIds.first())
         if (backwards) route.copy(stationIds = route.stationIds.reversed()) else route
     }
     val directedEnding = byStation(directed) { it.ends }
     val directedStopping = byStation(directed) { it.stops }
-    val hubs = hubIds.map { Hub(it, directedEnding.getValue(it), directedStopping[it].orEmpty()) }
-    return HubOverview(hubs, directed.filter { route -> route.stationIds.none { it in ranks } })
+    val hubs = hubIds.map { Hub(it, directedEnding[it].orEmpty(), directedStopping[it].orEmpty()) }
+    return HubOverview(hubs, directed.filter { route -> route.stationIds.none { it in positions } })
 }
 
 /**
@@ -177,7 +203,7 @@ internal fun hubStationsPage(overview: HubOverview, stationNames: Map<String, St
         append("<nav>\n<input id=\"filter\" type=\"search\" placeholder=\"Filter stations\">\n<ol>\n")
         for (hub in overview.hubs) {
             append("<li><a href=\"#${anchors[hub.stationId]}\">${station(hub.stationId, link = false)}</a>")
-            append(" <small>${hub.ending.size} + ${hub.stopping.size}</small></li>\n")
+            append(" <small>${hub.rank} + ${hub.stopping.size}</small></li>\n")
         }
         append("<li><a href=\"#isolated\">Isolated routes</a> <small>${overview.isolated.size}</small></li>\n")
         append("</ol>\n</nav>\n<main>\n<header>\n<h1>Hub stations and their routes</h1>\n<p>Navigation:\n")
@@ -187,10 +213,12 @@ internal fun hubStationsPage(overview: HubOverview, stationNames: Map<String, St
         for (hub in overview.hubs) {
             append("<details id=\"${anchors[hub.stationId]}\">\n<summary>${station(hub.stationId, link = false)} ")
             append(
-                "<small>${hub.ending.size} routes starting or ending, ${hub.stopping.size} stopping</small></summary>\n",
+                "<small>${hub.rank} routes starting or ending, ${hub.stopping.size} stopping</small></summary>\n",
             )
-            append("<h3>Starting or ending here</h3>\n")
-            routeTable(hub.ending, hub.stationId)
+            if (hub.ending.isNotEmpty()) {
+                append("<h3>Starting or ending here</h3>\n")
+                routeTable(hub.ending, hub.stationId)
+            }
             if (hub.stopping.isNotEmpty()) {
                 append("<h3>Stopping here</h3>\n")
                 routeTable(hub.stopping)
@@ -220,6 +248,9 @@ fun hubStations(railDir: Path, outFile: Path) {
         "%,d core routes, %,d hub stations, %,d isolated core routes -> %s"
             .format(routes.size, overview.hubs.size, overview.isolated.size, outFile),
     )
+    for ((rank, hubs) in overview.hubs.groupBy { minOf(it.rank, 2) }.toSortedMap()) {
+        println("  %,5d  hub stations of rank %s".format(hubs.size, if (rank == 2) "2 or higher" else "$rank"))
+    }
 }
 
 fun main(args: Array<String>) {

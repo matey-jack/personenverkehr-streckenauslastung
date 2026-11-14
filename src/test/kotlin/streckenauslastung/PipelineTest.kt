@@ -110,29 +110,52 @@ class PipelineTest {
 
     @Test
     fun `hubOverview finds hubs, stopping routes and isolated routes`() {
-        val names = listOf("A", "B", "C", "D", "E", "F", "G").associateWith { "Station $it" }
+        val names = "ABCDEFGHIJKLMNOPQR".map { it.toString() }.associateWith { "Station $it" }
         val re1 = ListedRoute("r1", "RE1", 106, listOf("A", "B", "C"))
         val re2 = ListedRoute("r2", "RE2", 106, listOf("D", "A"))
         val ice = ListedRoute("r3", "ICE", 101, listOf("D", "A", "C"))
-        // Both core routes of S1 end at E, which makes E no hub.
+        // Both core routes of S1 end at E, which makes E no hub. S1a ends at F, where RB9 stops,
+        // which makes F a hub.
         val s1a = ListedRoute("r4", "S1a", 109, listOf("E", "F"))
         val s1b = ListedRoute("r4", "S1b", 109, listOf("E", "F", "G"))
-        val overview = hubOverview(listOf(re1, re2, ice, s1a, s1b), names)
+        val rb9 = ListedRoute("r5", "RB9", 106, listOf("I", "F", "J", "P"))
+        // RB7 ends at B, where RE1 stops, which makes B a hub.
+        val rb7 = ListedRoute("r6", "RB7", 106, listOf("H", "B"))
+        // J has the same rank as F, so RB9 is still dangling there, which makes J a hub as well.
+        val rb5 = ListedRoute("r7", "RB5", 106, listOf("J", "D"))
+        // RB8 and RB6 only cross at M, where neither ends: a hub of rank 0.
+        val rb8 = ListedRoute("r8", "RB8", 106, listOf("K", "M", "L"))
+        val rb6 = ListedRoute("r9", "RB6", 106, listOf("N", "M", "O"))
+        val rb4 = ListedRoute("r10", "RB4", 106, listOf("Q", "R"))
+        val overview = hubOverview(listOf(re1, re2, ice, s1a, s1b, rb9, rb7, rb5, rb8, rb6, rb4), names)
 
-        assertEquals(listOf("A", "C", "D"), overview.hubs.map { it.stationId })
-        // A comes first for the ICE stopping there, so RE2 and the ICE run the other way round.
-        val re2FromA = re2.copy(stationIds = listOf("A", "D"))
-        val iceFromC = ice.copy(stationIds = listOf("C", "A", "D"))
+        assertEquals(listOf("D", "A", "C", "F", "B", "J", "M"), overview.hubs.map { it.stationId })
+        // Routes run from their end that comes first among the hubs.
+        val rb5FromD = rb5.copy(stationIds = listOf("D", "J"))
+        val s1aFromF = s1a.copy(stationIds = listOf("F", "E"))
+        val rb7FromB = rb7.copy(stationIds = listOf("B", "H"))
         assertEquals(
-            listOf(listOf(re1, re2FromA), listOf(re1, iceFromC), listOf(re2FromA, iceFromC)),
+            listOf(
+                listOf(re2, ice, rb5FromD),
+                listOf(re1, re2),
+                listOf(re1, ice),
+                listOf(s1aFromF),
+                listOf(rb7FromB),
+                listOf(rb5FromD),
+                emptyList(),
+            ),
             overview.hubs.map { it.ending },
         )
-        assertEquals(listOf(listOf(iceFromC), emptyList(), emptyList()), overview.hubs.map { it.stopping })
-        assertEquals(listOf(s1a, s1b), overview.isolated)
+        assertEquals(
+            listOf(emptyList(), listOf(ice), emptyList(), listOf(s1b, rb9), listOf(re1), listOf(rb9), listOf(rb8, rb6)),
+            overview.hubs.map { it.stopping },
+        )
+        assertEquals(listOf(rb4), overview.isolated)
 
         val page = hubStationsPage(overview, names)
-        assertContains(page, "<details id=\"hub1\">\n<summary>Station A <small>2 routes starting or ending, 1 stopping")
+        assertContains(page, "<details id=\"hub2\">\n<summary>Station A <small>2 routes starting or ending, 1 stopping")
         // Under hub A, A is not a link to itself; D is a link to its own section.
-        assertContains(page, "<td>Station A</td><td>–</td><td><a href=\"#hub3\">Station D</a></td>")
+        assertContains(page, "<td><a href=\"#hub1\">Station D</a></td><td>–</td><td>Station A</td>")
+        assertContains(page, "0 routes starting or ending, 2 stopping</small></summary>\n<h3>Stopping here</h3>")
     }
 }
