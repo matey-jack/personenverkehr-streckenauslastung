@@ -34,6 +34,8 @@ Each pipeline step is a separate Gradle task (`./gradlew tasks --group pipeline`
 
 Paths can be overridden, e.g. `./gradlew filterRail -Pgtfs=/path/to/gtfs -Pout=data/rail`.
 
+On every push to `main`, GitHub Actions writes the HTML reports and deploys them to GitHub Pages, with the hub stations page as start page (`.github/workflows/pages.yml`).
+
 `./gradlew test` runs the tests against a tiny hand-made GTFS data set in `src/test/resources/mini_gtfs`.
 
 Static checks, CI and the rules for working on the code (for example: no merges) are described in [ReadMe-development.md](ReadMe-development.md).
