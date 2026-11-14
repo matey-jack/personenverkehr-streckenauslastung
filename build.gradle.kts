@@ -10,6 +10,7 @@ repositories {
 
 dependencies {
     implementation("org.duckdb:duckdb_jdbc:2.0.0.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-html-jvm:0.12.0")
 
     testImplementation(kotlin("test"))
     testImplementation(platform("org.junit:junit-bom:6.1.3"))

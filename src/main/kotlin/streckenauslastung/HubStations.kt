@@ -1,5 +1,36 @@
 package streckenauslastung
 
+import kotlinx.html.FlowContent
+import kotlinx.html.FlowOrPhrasingContent
+import kotlinx.html.InputType
+import kotlinx.html.a
+import kotlinx.html.body
+import kotlinx.html.details
+import kotlinx.html.h1
+import kotlinx.html.h3
+import kotlinx.html.head
+import kotlinx.html.header
+import kotlinx.html.html
+import kotlinx.html.id
+import kotlinx.html.input
+import kotlinx.html.label
+import kotlinx.html.lang
+import kotlinx.html.li
+import kotlinx.html.main
+import kotlinx.html.meta
+import kotlinx.html.nav
+import kotlinx.html.ol
+import kotlinx.html.p
+import kotlinx.html.script
+import kotlinx.html.small
+import kotlinx.html.stream.createHTML
+import kotlinx.html.style
+import kotlinx.html.summary
+import kotlinx.html.table
+import kotlinx.html.td
+import kotlinx.html.title
+import kotlinx.html.tr
+import kotlinx.html.unsafe
 import java.nio.file.Files
 import java.nio.file.Path
 
@@ -120,105 +151,123 @@ private val routeTypeNames = mapOf(
     109 to "Suburban",
 )
 
-private fun html(text: String) =
-    text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;")
-
 /** Rounded to minutes: "47 min", or "1:05 h" from an hour on. */
 private fun duration(secs: Long): String {
     val minutes = (secs + 30) / 60
     return if (minutes < 60) "$minutes min" else "%d:%02d h".format(minutes / 60, minutes % 60)
 }
 
-private const val STYLE = """
-:root { color-scheme: light dark; }
-body { font-family: system-ui, sans-serif; font-size: 14px; margin: 0; }
-main { padding: 0.5em 1.5em 50vh; }
-header label { margin-right: 1em; }
-nav { display: none; }
-body.sidebar nav {
-  display: block; position: fixed; top: 0; bottom: 0; left: 0; width: 19em;
-  overflow-y: auto; padding: 0.5em; box-sizing: border-box; border-right: 1px solid #8886;
-}
-body.sidebar main { margin-left: 19em; }
-nav input { width: 100%; box-sizing: border-box; }
-nav ol { list-style: none; padding: 0; }
-nav li { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-nav a { text-decoration: none; }
-small { opacity: 0.65; }
-details { border-top: 1px solid #8886; padding: 0.3em 0; }
-summary { font-size: 1.15em; font-weight: 600; cursor: pointer; }
-details:target > summary { background: #fc06; }
-h3 { font-size: 1em; margin: 0.6em 0 0.2em 1em; }
-table { border-collapse: collapse; margin-left: 1em; }
-td { padding: 1px 1em 1px 0; }
-td.name { font-weight: 600; min-width: 5em; }
-td.type { min-width: 10em; }
-td.stops { cursor: help; }
-"""
+private fun resource(name: String) = ListedRoute::class.java.getResource(name)!!.readText()
 
-/** The script of the page, kept in `src/main/resources`. */
-private val script = ListedRoute::class.java.getResource("hub_stations.js")!!.readText()
-
-/** Renders the overview as a self-contained HTML page. */
+/** Renders the overview as a self-contained HTML page; its style and script are in `src/main/resources`. */
 internal fun hubStationsPage(overview: HubOverview, stationNames: Map<String, String>): String {
     val anchors = overview.hubs.withIndex().associate { (i, hub) -> hub.stationId to "hub${i + 1}" }
 
-    fun station(id: String, link: Boolean = true): String {
-        val name = html(stationNames.getValue(id))
+    /** The name of a station, as a link to its section unless it is no hub or the section is that of [hubId]. */
+    fun FlowOrPhrasingContent.station(id: String, hubId: String? = null) {
+        val name = stationNames.getValue(id)
         val anchor = anchors[id]
-        return if (link && anchor != null) "<a href=\"#$anchor\">$name</a>" else name
+        if (anchor != null && id != hubId) a("#$anchor") { +name } else +name
     }
 
-    /** One table row per route; the station [hubId] is no link, as the table is in its section. */
-    fun StringBuilder.routeTable(routes: List<ListedRoute>, hubId: String? = null) {
-        append("<table>\n")
+    /** One table row per route. */
+    fun FlowContent.routeTable(routes: List<ListedRoute>, hubId: String? = null) = table {
         for (route in routes) {
-            val (start, end) = route.stationIds.first() to route.stationIds.last()
-            val type = routeTypeNames[route.type]?.let { "$it <small>${route.type}</small>" } ?: route.type.toString()
-            append("<tr><td class=\"name\">${html(route.shortName)}</td><td class=\"type\">$type</td>")
-            append("<td>${station(start, link = start != hubId)}</td><td>–</td>")
-            append("<td>${station(end, link = end != hubId)}</td>")
-            val stations = route.stationIds.joinToString("&#10;") { html(stationNames.getValue(it)) }
-            val travelTime = route.travelSecs?.let { ", ${duration(it)}" } ?: ""
-            append("<td class=\"stops\" title=\"$stations\">")
-            append("<small>${route.stationIds.size} stops$travelTime</small></td></tr>\n")
+            tr {
+                td("name") { +route.shortName }
+                td("type") {
+                    routeTypeNames[route.type]?.let { +"$it " }
+                    small { +route.type.toString() }
+                }
+                td { station(route.stationIds.first(), hubId) }
+                td { +"–" }
+                td { station(route.stationIds.last(), hubId) }
+                td("stops") {
+                    title = route.stationIds.joinToString("\n") { stationNames.getValue(it) }
+                    val travelTime = route.travelSecs?.let { ", ${duration(it)}" } ?: ""
+                    small { +"${route.stationIds.size} stops$travelTime" }
+                }
+            }
         }
-        append("</table>\n")
     }
 
-    return buildString {
-        append("<!DOCTYPE html>\n<html lang=\"de\">\n<head>\n<meta charset=\"utf-8\">\n")
-        append("<title>Hub stations and their routes</title>\n<style>$STYLE</style>\n</head>\n<body>\n")
-        append("<nav>\n<input id=\"filter\" type=\"search\" placeholder=\"Filter stations\">\n<ol>\n")
-        for (hub in overview.hubs) {
-            append("<li><a href=\"#${anchors[hub.stationId]}\">${station(hub.stationId, link = false)}</a>")
-            append(" <small>${hub.rank} + ${hub.stopping.size}</small></li>\n")
+    val page = createHTML().html {
+        lang = "de"
+        head {
+            meta(charset = "utf-8")
+            title("Hub stations and their routes")
+            style { unsafe { raw(resource("hub_stations.css")) } }
         }
-        append("<li><a href=\"#isolated\">Isolated routes</a> <small>${overview.isolated.size}</small></li>\n")
-        append("</ol>\n</nav>\n<main>\n<header>\n<h1>Hub stations and their routes</h1>\n<p>Navigation:\n")
-        append("<label><input type=\"radio\" name=\"navigation\" value=\"sidebar\" checked> station sidebar</label>\n")
-        append("<label><input type=\"radio\" name=\"navigation\" value=\"collapsible\"> collapsible stations</label>\n")
-        append("</p>\n</header>\n")
-        for (hub in overview.hubs) {
-            append("<details id=\"${anchors[hub.stationId]}\">\n<summary>${station(hub.stationId, link = false)} ")
-            append(
-                "<small>${hub.rank} routes starting or ending, ${hub.stopping.size} stopping</small></summary>\n",
-            )
-            if (hub.ending.isNotEmpty()) {
-                append("<h3>Starting or ending here</h3>\n")
-                routeTable(hub.ending, hub.stationId)
+        body {
+            nav {
+                input(InputType.search) {
+                    id = "filter"
+                    placeholder = "Filter stations"
+                }
+                ol {
+                    for (hub in overview.hubs) {
+                        li {
+                            a("#${anchors[hub.stationId]}") { +stationNames.getValue(hub.stationId) }
+                            +" "
+                            small { +"${hub.rank} + ${hub.stopping.size}" }
+                        }
+                    }
+                    li {
+                        a("#isolated") { +"Isolated routes" }
+                        +" "
+                        small { +overview.isolated.size.toString() }
+                    }
+                }
             }
-            if (hub.stopping.isNotEmpty()) {
-                append("<h3>Stopping here</h3>\n")
-                routeTable(hub.stopping)
+            main {
+                header {
+                    h1 { +"Hub stations and their routes" }
+                    p {
+                        +"Navigation: "
+                        for ((mode, text) in listOf(
+                            "sidebar" to "station sidebar",
+                            "collapsible" to "collapsible stations",
+                        )) {
+                            label {
+                                input(InputType.radio, name = "navigation") {
+                                    value = mode
+                                    checked = mode == "sidebar"
+                                }
+                                +" $text"
+                            }
+                        }
+                    }
+                }
+                for (hub in overview.hubs) {
+                    details {
+                        id = anchors.getValue(hub.stationId)
+                        summary {
+                            +"${stationNames.getValue(hub.stationId)} "
+                            small { +"${hub.rank} routes starting or ending, ${hub.stopping.size} stopping" }
+                        }
+                        if (hub.ending.isNotEmpty()) {
+                            h3 { +"Starting or ending here" }
+                            routeTable(hub.ending, hub.stationId)
+                        }
+                        if (hub.stopping.isNotEmpty()) {
+                            h3 { +"Stopping here" }
+                            routeTable(hub.stopping)
+                        }
+                    }
+                }
+                details {
+                    id = "isolated"
+                    summary {
+                        +"Isolated routes "
+                        small { +"${overview.isolated.size} touching no hub station" }
+                    }
+                    routeTable(overview.isolated)
+                }
             }
-            append("</details>\n")
+            script { unsafe { raw(resource("hub_stations.js")) } }
         }
-        append("<details id=\"isolated\">\n<summary>Isolated routes ")
-        append("<small>${overview.isolated.size} touching no hub station</small></summary>\n")
-        routeTable(overview.isolated)
-        append("</details>\n</main>\n<script>$script</script>\n</body>\n</html>\n")
     }
+    return "<!DOCTYPE html>\n$page"
 }
 
 /**

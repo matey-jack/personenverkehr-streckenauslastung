@@ -87,13 +87,13 @@ class PipelineTest {
         filterRail(gtfs, tmp.resolve("rail"))
         val out = tmp.resolve("hub_stations.html")
         hubStations(tmp.resolve("rail"), out)
-        val page = out.readText()
+        val page = withoutLayout(out.readText())
         assertContains(page, "1 touching no hub station")
         assertContains(
             page,
             "<td class=\"name\">RE1</td><td class=\"type\">Regional <small>106</small></td>" +
                 "<td>Aheim Hbf</td><td>–</td><td>Cstadt</td>" +
-                "<td class=\"stops\" title=\"Aheim Hbf&#10;Bdorf&#10;Cstadt\"><small>3 stops, 20 min</small></td>",
+                "<td class=\"stops\" title=\"Aheim Hbf\nBdorf\nCstadt\"><small>3 stops, 20 min</small></td>",
         )
     }
 
@@ -153,10 +153,13 @@ class PipelineTest {
         )
         assertEquals(listOf(rb4), overview.isolated)
 
-        val page = hubStationsPage(overview, names)
-        assertContains(page, "<details id=\"hub2\">\n<summary>Station A <small>2 routes starting or ending, 1 stopping")
+        val page = withoutLayout(hubStationsPage(overview, names))
+        assertContains(page, "<details id=\"hub2\"><summary>Station A <small>2 routes starting or ending, 1 stopping")
         // Under hub A, A is not a link to itself; D is a link to its own section.
         assertContains(page, "<td><a href=\"#hub1\">Station D</a></td><td>–</td><td>Station A</td>")
-        assertContains(page, "0 routes starting or ending, 2 stopping</small></summary>\n<h3>Stopping here</h3>")
+        assertContains(page, "0 routes starting or ending, 2 stopping</small></summary><h3>Stopping here</h3>")
     }
+
+    /** The page without the line breaks and indentation between its tags. */
+    private fun withoutLayout(page: String) = page.replace(Regex(">\\s+<"), "><")
 }
