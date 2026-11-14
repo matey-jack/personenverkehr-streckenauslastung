@@ -49,7 +49,12 @@ fun tripGroups(railDir: Path, outFile: Path, topFile: Path) {
 }
 
 /** Names for stations that the data names without their town, by station ID. */
-private val stationNameFixes = mapOf("de:08111:6115" to "Stuttgart Hbf")
+private val stationNameFixes = mapOf(
+    "de:08111:6115" to "Stuttgart Hbf",
+    "de:08111:6118" to "Stuttgart Hbf (tief)",
+    "de:09162:6" to "München Hbf (tief)",
+    "de:09185:90261" to "Brunnen(Oberbayern)",
+)
 
 /**
  * The SQL expression for the station name given the stop name [stopName]:
