@@ -32,7 +32,12 @@ Questions about the data are answered with Kotlin code in the repository, not wi
 ## Checks
 
 `./gradlew check` runs the tests plus static checks:
-- [ktlint](https://pinterest.github.io/ktlint/) for formatting and style (configured in `.editorconfig`). `./gradlew ktlintFormat` fixes most findings automatically. Two it can't fix: a condition mixing `&&` and `||` needs named sub-conditions or parentheses, and an argument list that doesn't fit on one line needs every argument on its own line.
+- [ktlint](https://pinterest.github.io/ktlint/) for formatting and style (configured in `.editorconfig`). 
+  * `./gradlew ktlintFormat` fixes most findings automatically. Two it can't fix: 
+  * a condition mixing `&&` and `||` needs named sub-conditions or parentheses, and an argument list that doesn't fit 
+    on one line needs every argument on its own line. 
+  * It also wraps a line that is too long in awkward places, and may need a second run to finish; shorten such a line 
+    by hand first, with a named value or a helper function.
 - The Kotlin compiler treats all warnings as errors, with its extra checks (such as unused variables) switched on.
 
 GitHub Actions runs `./gradlew check` on every push and pull request (`.github/workflows/tests.yml`). When Claude Code finishes a turn in which Kotlin or Gradle files changed, a Stop hook (`.claude/hooks/gradle-check.sh`) runs it too and has Claude fix any failure.

@@ -6,21 +6,25 @@ Increments to implement, test and review one at a time.
 - Kotlin/Gradle project with DuckDB, Parquet as the intermediate format.
 - Test fixture `src/test/resources/mini_gtfs`.
 
-## 2. Basic data filtering (implemented, not yet run on the full data set)
-- [ ] Run `./gradlew filterRail` on the full Delfi data set. Note the run time and output sizes.
-- [ ] Check that `route_type` really is 100–199 for all trains in the Delfi data. Some data sets use the basic GTFS type 2 (rail) instead; if so, include it.
-- [ ] Decide whether the resulting Parquet files are small enough to commit (GitHub limit: 100 MB per file). If not: further condense (e.g. drop unused columns, pre-select the time period) or use Git LFS.
-- [ ] Commit the condensed data in `data/rail/`.
+## 2. Basic data filtering 
 
-## 3. Data exploration: trip groups (implemented, not yet run on the full data set)
-- [ ] Run `./gradlew tripGroups` and review `data/reports/trip_groups.csv` and `trip_groups_top.csv`.
-- [ ] Review the two choices made in `TripGroups.kt`:
-  - stops are mapped to their parent station (so a different platform doesn't create a new group);
-  - groups are defined by the *ordered* station sequence (each direction is a separate group), as in the spec ✅
+All done, the project can now work without the actual full GTFS files present.
+The parquet files have everything we need and are committed in Git.
+
+## 3. Data exploration: trip groups 
+
+- [x] stops are mapped to their parent station (so a different platform doesn't create a new group);
+- [x] groups are defined by the *ordered* station sequence (each direction is a separate group), as in the spec ✅
 
 ## 4. Calendar: regular vs. one-off trips
-- Understand `calendar` / `calendar_dates` in the Delfi data ✅
+- [x] Understand `calendar` / `calendar_dates` in the Delfi data ✅
 - [ ] For each trip, count the days it runs. Find a "typical" weekday and the busiest days and hours.
+
+## 5. Reconstructing lines (implemented for the five testing routes)
+- [ ] Review `data/reports/lines.html`.
+- [ ] Run it for more core routes. Neither kind of warning has occurred on real data yet.
+- [ ] Decide what to do about trains on separate tracks other than the S-Bahn of Berlin and Hamburg: the other S-Bahn networks still fill lines.
+- [x] RE2 shares its line with long-distance routes (17, 18) and the FEX. Keep it as a testing route? ✅
 
 ## Later
 - Path finding for trains (which stations are passed without stopping).

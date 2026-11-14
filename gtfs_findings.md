@@ -35,3 +35,13 @@ Some routes of type 100 are served at street stops, for example line 20 in Regen
 ## Leaving out rarely-run trips changes little
 
 Once frequencies are counted in trip-days, ignoring trips that run on only a few days hardly changes which pattern is the most frequent or the closest to the majority stations: the most frequent pattern equals the majority stations on 76% of the routes without a minimum and on 81% with a minimum of 20 days. The minimum removes whole routes, though: 134 of 1,129 at 20 days. `./gradlew coreRouteCheck -PminDays=…` shows the effect.
+
+## Reconstructing lines
+
+What the five testing routes of `spec.md`, "Reconstructing the line", show about its rules:
+
+- Trips that take another way between two stations of a line are common around junctions. Without the rule for detours, the RB33 line gets Werder (Havel), Potsdam Golm and Potsdam Park Sanssouci between Pirschheide and Charlottenhof, and the RE2 line gets Flughafen BER and Lichtenberg. The numbers of the rule matter little: with a factor of 1.2 and 2 minutes per stop the lines are the same.
+- Trains stand before a terminus: RB33 takes much longer over its last hop into Potsdam Hbf than the trains passing through. That is why the rule for detours allows the 3 minutes for the stop at the end of a hop as well.
+- Some trip always stops at both of two neighbouring stations, so no pair is ordered by travel time only, and no trip goes against the order of a line.
+- The S-Bahn of Berlin would add 18 stations to the RE2 line between Königs Wusterhausen and Jungfernheide, among them those of the Ringbahn.
+- A station where no core route stops is often served only at the edge of the day: the only train stopping at every station of the RE2 line leaves Cottbus at 03:42.
