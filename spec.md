@@ -167,6 +167,13 @@ This includes finding all the other relevant routes, including those that have o
 
 TODO: put the algorithm description here
 
+Routes we use for testing (TODO: add the route_ids):
+ - RE50 Erfurt – Meiningen
+ - RB21 Erfurt – Gera
+ - RE6a Hennigsdorf – Wittenberge
+ - RB33 Potsdam – Jüterbog
+ - RE2 Cottbus – Nauen
+
 Things to be designed:
  - does it make sense to make a timetable for an entire day, so the user can scroll through the time axis? This would 
    spare us the work of deciding which time to pick as a representative! 
