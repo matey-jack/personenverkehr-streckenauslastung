@@ -8,19 +8,28 @@ body { font-family: system-ui, sans-serif; font-size: 14px; margin: 0; }
 main { padding: 0.5em 1.5em 50vh; }
 nav {
   position: fixed; top: 0; bottom: 0; left: 0; width: 19em;
-  overflow-y: auto; padding: 0.5em; box-sizing: border-box; border-right: 1px solid #8886;
+  overflow-y: auto; padding: 0 0.5em 0.5em; box-sizing: border-box; border-right: 1px solid #8886;
 }
 main { margin-left: 19em; }
-nav input { width: 100%; box-sizing: border-box; }
+/* The z-index keeps the sticky parts above the translucent text, which would otherwise be painted over them. */
+nav input { position: sticky; top: 0; z-index: 1; width: 100%; box-sizing: border-box; margin-top: 0.5em; }
 nav ol { list-style: none; padding: 0; }
 nav li { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 nav a { text-decoration: none; }
 small { opacity: 0.65; }
 section { border-top: 1px solid #8886; padding: 0.3em 0; }
-h2 { font-size: 1.15em; margin: 0; padding: 0.1em 0.3em; background: #fc06; }
-section:target > h2 { background: #fc0c; }
+/* The colour of the sticky heading lies on an opaque layer. */
+h2 {
+  position: sticky; top: 0; z-index: 2; cursor: pointer;
+  font-size: 1.15em; margin: 0; padding: 0.1em 0.3em; background: linear-gradient(#fc06, #fc06), Canvas;
+}
+section:target > h2 { background: linear-gradient(#fc0c, #fc0c), Canvas; }
 tr:hover { background: #fc03; }
-h3 { font-size: 1em; margin: 0.6em 0 0.2em 1em; }
+/* Sticks below the heading of its section, whose height the script provides. */
+h3 {
+  position: sticky; top: var(--heading-height, 0px); z-index: 1;
+  font-size: 1em; margin: 0.6em 0 0; padding: 0 0 0.2em 1em; background: Canvas;
+}
 table { border-collapse: collapse; margin-left: 1em; }
 td { padding: 1px 1em 1px 0; }
 td:first-child { padding-left: 0.3em; }
@@ -91918,6 +91927,20 @@ Peißenberg"><small>5 stops, 23 min</small></td>
   document.querySelectorAll('nav li').forEach(li => {
     li.hidden = !li.textContent.toLowerCase().includes(text);
   });
+});
+
+// The height of a section heading changes with the window width, as its text wraps. Heights are not
+// rounded to whole pixels, which would leave a gap below the heading.
+const headings = new ResizeObserver(entries => {
+  for (const entry of entries) {
+    const height = entry.target.getBoundingClientRect().height;
+    entry.target.parentElement.style.setProperty('--heading-height', height + 'px');
+  }
+});
+document.querySelectorAll('h2').forEach(heading => {
+  headings.observe(heading);
+  // A click on the heading, which may be sticking far down its section, scrolls back to the top of the section.
+  heading.addEventListener('click', () => heading.parentElement.scrollIntoView());
 });
 </script>
   </body>
