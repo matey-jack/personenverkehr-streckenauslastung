@@ -386,15 +386,15 @@ internal fun timedTrains(
         val mostStops = trains.size == ofCore
         val best = compareByDescending<Stretch> { if (mostStops) stops(it) else gain(it) }
             .thenByDescending { if (mostStops) gain(it) else stops(it) }
-            .thenByDescending { coreOf(it.run) != null }
             .thenBy(naturalOrder) { routeById.getValue(it.run.routeId).shortName }
             // The IDs as tie-breakers make the result the same on every run.
             .thenBy { it.run.routeId }
             .thenBy { it.run.stations.joinToString() }
-        val useful = stretches.filter { gain(it) > 0 }
-        // A train against the listed direction only gets its turn if no other one helps.
-        val next = useful.filter { it.forward }.minWithOrNull(best) ?: useful.minWithOrNull(best) ?: break
-        add(next)
+        // Trains of core routes come first: their trips are the typical ones. Among those and among
+        // the others, a train against the listed direction only gets its turn if no other one helps.
+        val useful = stretches.filter { gain(it) > 0 }.groupBy { (coreOf(it.run) != null) to it.forward }
+        val turns = listOf(true to true, true to false, false to true, false to false)
+        add(turns.firstNotNullOfOrNull { useful[it]?.minWithOrNull(best) } ?: break)
     }
     return trains
 }

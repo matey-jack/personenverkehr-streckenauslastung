@@ -227,8 +227,11 @@ stands there for two minutes or more.
 - The first timed train is that of the core route, in the direction in which the line is listed.
 - If it leaves stations untimed, the next one is the train with the most stops on the line that stops at one of them.
 - Up to two more follow as long as stations are untimed: each time the train that stops at the most of them.
-- A train running against the listed direction is only picked if no other one stops at an untimed station.
-- Among equal trains, one of a core route comes first, then the smaller route name.
+- Trains of core routes are picked first, because their trips are the typical ones: another train is only picked if
+  no train of a core route stops at an untimed station.
+- Among the trains of core routes, and among the others, a train running against the listed direction is only picked
+  if no train in the listed direction stops at an untimed station.
+- Among equal trains, the one with the smaller route name comes first.
 
 Relevant routes of one line that share their route_short_name get the suffixes `-1`, `-2`, … on it, in the order of
 their route_id. The suffix of a core route follows it: `S8-2a`.

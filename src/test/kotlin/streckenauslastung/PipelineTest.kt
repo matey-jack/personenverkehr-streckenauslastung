@@ -195,7 +195,7 @@ class PipelineTest {
     }
 
     @Test
-    fun `timedTrains times the core route first, then the trains that stop at the most stations`() {
+    fun `timedTrains times the core route first, then trains of core routes, then other trains`() {
         val line = Line("ABCDEF".map { it.toString() }, List(6) { 0.0 }, emptyList())
         val scope = CoreRoute("re", "RE1", pattern("AF", 10), Difference(pattern("AF", 10), emptySet()))
         val routes = listOf("re", "rb", "s", "back", "short").associateWith {
@@ -210,7 +210,7 @@ class PipelineTest {
                 listOf<Long?>(28800, null),
                 TripTimes(listOf<Long?>(null, 30000), listOf<Long?>(28800, null)),
             )
-        // Stops at the most stations, and waits at C for three minutes.
+        // Stops at the most stations, and waits at C for three minutes. Its trips belong to no core route.
         val rb = Run(
             "rb",
             "ABCD".map { it.toString() },
@@ -220,16 +220,26 @@ class PipelineTest {
         )
         // The only train stopping at E runs against the listed direction.
         val back = run("back", "FED", 0, 240, 480)
-        // Stops nowhere that RB does not, so it is never picked.
+        // Stops nowhere that the others do not, so it is never picked.
         val short = run("short", "BCD", 0, 300, 700)
-        val index = RunIndex(listOf(re, rb, back, short), DetourRule())
+        // The trips of a core route: they go first, although RB stops at more stations.
+        val s = run("s", "BC", 0, 300)
+        val sCore = CoreRoute("s", "S1", pattern("BC", 10), Difference(pattern("BC", 10), emptySet()))
+        val index = RunIndex(listOf(re, rb, back, short, s), DetourRule())
 
-        val trains = timedTrains(line, scope, index, routes) { if (it === re) scope else null }
-        assertEquals(listOf("re", "rb", "back"), trains.map { it.route.id })
+        val trains = timedTrains(line, scope, index, routes) { run ->
+            when (run) {
+                re -> scope
+                s -> sCore
+                else -> null
+            }
+        }
+        assertEquals(listOf("re", "s", "rb", "back"), trains.map { it.route.id })
         assertEquals(listOf("0", "", "", "", "", "20"), line.stations.map { trains[0].minutes(it) })
-        assertEquals(listOf("0", "5", "10–13", "17", "", ""), line.stations.map { trains[1].minutes(it) })
+        assertEquals(listOf("", "0", "5", "", "", ""), line.stations.map { trains[1].minutes(it) })
+        assertEquals(listOf("0", "5", "10–13", "17", "", ""), line.stations.map { trains[2].minutes(it) })
         // It counts from its own first station on the line, F.
-        assertEquals(listOf("", "", "", "8", "4", "0"), line.stations.map { trains[2].minutes(it) })
+        assertEquals(listOf("", "", "", "8", "4", "0"), line.stations.map { trains[3].minutes(it) })
     }
 
     @Test
