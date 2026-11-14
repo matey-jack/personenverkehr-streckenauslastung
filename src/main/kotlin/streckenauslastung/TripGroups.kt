@@ -48,6 +48,12 @@ fun tripGroups(railDir: Path, outFile: Path, topFile: Path) {
     }
 }
 
+/** Names for stations that the data names without their town, by station ID. */
+private val stationNameFixes = mapOf("de:08111:6115" to "Stuttgart Hauptbahnhof")
+
+/** Station names start with "S " or "S+U " where S-Bahn or U-Bahn trains call; station names are given without it. */
+private const val TRANSPORT_MODE_PREFIX = """^S(\+U)? """
+
 /**
  * Creates the table `trip_groups` with the columns of the trip groups CSV plus
  *  - `station_ids`: the list of station IDs behind the `stations` names;
@@ -65,10 +71,20 @@ fun createTripGroupTable(db: Connection, railDir: Path, minDays: Int = 0) {
                coalesce(nullif(regexp_extract(parent_or_self, '^[a-z]{2}:[0-9]+:[0-9]+'), ''), parent_or_self) AS station_id
         FROM (SELECT *, coalesce(nullif(parent_station, ''), stop_id) AS parent_or_self FROM ${p("stops")})
     """)
+    val fixedNames = stationNameFixes.entries.joinToString { (id, name) -> "('$id', '$name')" }
     db.exec("""
         CREATE TABLE station_names AS
-        SELECT station_id, coalesce(min(stop_name) FILTER (stop_id = station_id), min(stop_name)) AS station_name
-        FROM station_of GROUP BY station_id
+        SELECT station_id,
+               coalesce(
+                   any_value(fixed_name),
+                   regexp_replace(
+                       coalesce(min(stop_name) FILTER (stop_id = station_id), min(stop_name)),
+                       '$TRANSPORT_MODE_PREFIX',
+                       ''
+                   )
+               ) AS station_name
+        FROM station_of LEFT JOIN (VALUES $fixedNames) fixed(station_id, fixed_name) USING (station_id)
+        GROUP BY station_id
     """)
     db.exec("""
         CREATE TABLE trip_seq AS

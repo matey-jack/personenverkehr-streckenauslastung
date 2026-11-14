@@ -5,27 +5,24 @@ import kotlinx.html.FlowOrPhrasingContent
 import kotlinx.html.InputType
 import kotlinx.html.a
 import kotlinx.html.body
-import kotlinx.html.details
 import kotlinx.html.h1
+import kotlinx.html.h2
 import kotlinx.html.h3
 import kotlinx.html.head
-import kotlinx.html.header
 import kotlinx.html.html
 import kotlinx.html.id
 import kotlinx.html.input
-import kotlinx.html.label
 import kotlinx.html.lang
 import kotlinx.html.li
 import kotlinx.html.main
 import kotlinx.html.meta
 import kotlinx.html.nav
 import kotlinx.html.ol
-import kotlinx.html.p
 import kotlinx.html.script
+import kotlinx.html.section
 import kotlinx.html.small
 import kotlinx.html.stream.createHTML
 import kotlinx.html.style
-import kotlinx.html.summary
 import kotlinx.html.table
 import kotlinx.html.td
 import kotlinx.html.title
@@ -52,29 +49,18 @@ internal data class ListedRoute(
     val stops = stationIds.toSet() - ends
 }
 
-/**
- * A hub station. The rank of a station is the number of core routes starting or ending there.
- * A core route is connected to the stations where it starts, stops or ends, and it is dangling
- * as long as none of them is a hub. A station is a hub if
- *  - core routes of more than one route start or end there, or
- *  - core routes of more than one route start, stop or end there, and one of them is connected
- *    to no hub of a higher rank.
- *
- * The two core routes of one route mostly share their ends, hence "more than one route".
- */
-internal class Hub(val stationId: String, val ending: List<ListedRoute>, val stopping: List<ListedRoute>) {
-    val rank = ending.size
-}
+/** Stations with a rank of their own (see spec.md), by station ID. This one is Berlin Hauptbahnhof. */
+private val assignedRanks = mapOf("de:11000:900003201" to 20)
 
-/**
- * [hubs] are ordered by rank, then most core routes stopping there, then name. [isolated] core
- * routes are still dangling, which means that they share no station with a core route of another
- * route.
- *
- * Every core route runs from the end that comes first in the order of [hubs] to the other end,
- * where a station that is no hub comes after all hubs. Between two such stations it keeps the
- * direction it was given in.
- */
+/** A hub station with the core routes [ending] and [stopping] there (see spec.md for the terms). */
+internal class Hub(
+    val stationId: String,
+    val rank: Int,
+    val ending: List<ListedRoute>,
+    val stopping: List<ListedRoute>,
+)
+
+/** The [hubs] in their order and the [isolated] core routes, all in their direction as listed. */
 internal class HubOverview(val hubs: List<Hub>, val isolated: List<ListedRoute>)
 
 /** Groups [routes] by hub station (see spec.md, "Ideas on meaningfully grouping the Core Routes"). */
@@ -90,7 +76,7 @@ internal fun hubOverview(routes: List<ListedRoute>, stationNames: Map<String, St
     val stopping = byStation(routes) { it.stops }
     val calling = byStation(routes) { it.stationIds.toSet() }
 
-    fun rank(station: String) = ending[station].orEmpty().size
+    fun rank(station: String) = assignedRanks[station] ?: ending[station].orEmpty().size
     val bySize = calling.keys.sortedWith(
         compareBy(
             { -rank(it) },
@@ -123,7 +109,7 @@ internal fun hubOverview(routes: List<ListedRoute>, stationNames: Map<String, St
     }
     val directedEnding = byStation(directed) { it.ends }
     val directedStopping = byStation(directed) { it.stops }
-    val hubs = hubIds.map { Hub(it, directedEnding[it].orEmpty(), directedStopping[it].orEmpty()) }
+    val hubs = hubIds.map { Hub(it, rank(it), directedEnding[it].orEmpty(), directedStopping[it].orEmpty()) }
     return HubOverview(hubs, directed.filter { route -> route.stationIds.none { it in positions } })
 }
 
@@ -209,7 +195,7 @@ internal fun hubStationsPage(overview: HubOverview, stationNames: Map<String, St
                         li {
                             a("#${anchors[hub.stationId]}") { +stationNames.getValue(hub.stationId) }
                             +" "
-                            small { +"${hub.rank} + ${hub.stopping.size}" }
+                            small { +"${hub.ending.size} + ${hub.stopping.size}" }
                         }
                     }
                     li {
@@ -220,30 +206,13 @@ internal fun hubStationsPage(overview: HubOverview, stationNames: Map<String, St
                 }
             }
             main {
-                header {
-                    h1 { +"Hub stations and their routes" }
-                    p {
-                        +"Navigation: "
-                        for ((mode, text) in listOf(
-                            "sidebar" to "station sidebar",
-                            "collapsible" to "collapsible stations",
-                        )) {
-                            label {
-                                input(InputType.radio, name = "navigation") {
-                                    value = mode
-                                    checked = mode == "sidebar"
-                                }
-                                +" $text"
-                            }
-                        }
-                    }
-                }
+                h1 { +"Hub stations and their routes" }
                 for (hub in overview.hubs) {
-                    details {
+                    section {
                         id = anchors.getValue(hub.stationId)
-                        summary {
+                        h2 {
                             +"${stationNames.getValue(hub.stationId)} "
-                            small { +"${hub.rank} routes starting or ending, ${hub.stopping.size} stopping" }
+                            small { +"${hub.ending.size} routes starting or ending, ${hub.stopping.size} stopping" }
                         }
                         if (hub.ending.isNotEmpty()) {
                             h3 { +"Starting or ending here" }
@@ -255,9 +224,9 @@ internal fun hubStationsPage(overview: HubOverview, stationNames: Map<String, St
                         }
                     }
                 }
-                details {
+                section {
                     id = "isolated"
-                    summary {
+                    h2 {
                         +"Isolated routes "
                         small { +"${overview.isolated.size} touching no hub station" }
                     }

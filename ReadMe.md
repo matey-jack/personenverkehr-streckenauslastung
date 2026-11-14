@@ -30,7 +30,7 @@ Each pipeline step is a separate Gradle task (`./gradlew tasks --group pipeline`
 | `./gradlew tripGroups` | `data/rail/*.parquet` | `data/reports/trip_groups.csv`: for each route, the groups of trips with the same sequence of stations; `data/reports/trip_groups_top.csv`: only the most frequent group of each route |
 | `./gradlew coreRoutes` | `data/rail/*.parquet` | `data/reports/core_routes.csv`: the core routes of each route (columns are described in `CoreRoutes.kt`) |
 | `./gradlew coreRouteCheck` | `data/rail/*.parquet` | `data/reports/core_route_check.csv`: for each route, how its two most frequent station patterns compare with the stations most of its trips serve (columns are described in `CoreRouteCheck.kt`). `-PminDays=5` ignores trips running on fewer than 5 days |
-| `./gradlew hubStations` | `data/rail/*.parquet` | `data/reports/hub_stations.html`: a page to browse the core routes by hub station, with a switch between two ways of navigating it |
+| `./gradlew hubStations` | `data/rail/*.parquet` | `data/reports/hub_stations.html`: a page to browse the core routes by hub station |
 
 Paths can be overridden, e.g. `./gradlew filterRail -Pgtfs=/path/to/gtfs -Pout=data/rail`.
 

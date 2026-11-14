@@ -154,10 +154,10 @@ class PipelineTest {
         assertEquals(listOf(rb4), overview.isolated)
 
         val page = withoutLayout(hubStationsPage(overview, names))
-        assertContains(page, "<details id=\"hub2\"><summary>Station A <small>2 routes starting or ending, 1 stopping")
+        assertContains(page, "<section id=\"hub2\"><h2>Station A <small>2 routes starting or ending, 1 stopping")
         // Under hub A, A is not a link to itself; D is a link to its own section.
         assertContains(page, "<td><a href=\"#hub1\">Station D</a></td><td>–</td><td>Station A</td>")
-        assertContains(page, "0 routes starting or ending, 2 stopping</small></summary><h3>Stopping here</h3>")
+        assertContains(page, "0 routes starting or ending, 2 stopping</small></h2><h3>Stopping here</h3>")
     }
 
     /** The page without the line breaks and indentation between its tags. */

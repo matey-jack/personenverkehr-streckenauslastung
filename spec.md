@@ -106,13 +106,31 @@ Provisional definition:
 
 ## Ideas on meaningfully grouping the Core Routes
 
-For each station, collect all core routes that end or start there. 
-If a station has more than one core route added that way, call the station a "hub station".
+The two core routes of a route mostly share their ends. So below, "several routes" means core routes of more than one
+route.
 
-Then we can create an overview page which lists hub stations by number of associated core routes.
-With each hub station we list those core routes, and below those also list core routes merely stopping at that station.
-The core route is listed by route short name (maybe type and route long name), start and end station.
-As a navigation aid, the station names in routes should be clickable.
+- A core route is "connected" to the stations where it starts, stops or ends.
+- The "rank" of a station is the number of core routes starting or ending there.
+  Berlin Hauptbahnhof gets a capital bonus: its rank is 20.
+- A station is a "hub station" if
+  - core routes of several routes start or end there, or
+  - core routes of several routes are connected to it, and one of them is connected to no hub station of a higher
+    rank.
+- A core route is "dangling" as long as it is connected to no hub station, while the hub stations are found from the
+  highest rank down. A core route that is still dangling in the end is an "isolated core route". It shares no station
+  with a core route of another route.
 
-And below all the hub stations we list all "isolated core routes" – those which do not start, intermediate stop, or end 
-at any hub station.
+Only hub stations of a higher rank count in the second rule, so that stations of similar size are treated alike: if a
+dangling core route runs from A to B, where another route stops but no other route ends, both A and B are hub stations.
+
+Hub stations are ordered by rank, then by the number of core routes stopping there, then by name. Each core route is
+given the direction from its end that comes first in this order to its other end, where a station that is no hub
+station comes after all hub stations.
+
+An overview page lists the hub stations in this order.
+With each hub station we list the core routes starting or ending there, and below those the core routes merely stopping
+at that station.
+The core route is listed by route short name, route type, start and end station.
+As a navigation aid, the station names in routes are clickable.
+
+And below all the hub stations we list all isolated core routes.
