@@ -31,6 +31,41 @@ beneath the visualization lists all the critical points below a given threshold 
 capacity. (A lot of short critical points means the line is used over capacity, because a delay of one train would
 affect one or more other trains.)
 
+## Data Model for the Graphical Timetable
+
+(Für die deutschen Leser: 'line' ist eine Strecke, nicht eine Linie. Letztere heißen 'route' im GTFS.)
+
+The line is the actual physical infrastructure which has all the stations where trains can stop, whether a trip does 
+stop there or not. Our timetables are line-based and since the GTFS dataset doesn't give us any line information, we'll 
+derive that from the trip data. 
+
+First task: design the algorithm / ruleset to reconstruct the line data (sequence of all possible stops) from the trip 
+data given one core route that defines the scope of this specific timetable. This includes finding all the other 
+relevant routes, including those that have only non-core trips running on that line. 
+
+TODO: put the algorithm description here
+
+Graphical Timetable:
+ - the scope is one core route: start and end of that core route, and the line (or sequence of lines if the route 
+   passes through junctions) it runs on.
+ - the timetable includes all other routes running on those lines or parts of them. 
+ - for now, we start with routes that don't share track with long-distance trains, so there is much less guessing about 
+   the behavior of trains between stops. 
+ - the shape of the time-position diagram shows which stations a train stops at.
+ - use green lines for RB, RSB, and S-Bahn trains; red lines for RE and IRE trains; black lines for others.
+ - label each line with the route_short_name.
+ - routes that branch on or off the line are drawn starting from the station they first or last stop on that line, labeled with an arrow and the route's terminal in that direction. 
+ - while the core route defines the scope in the space-dimension, the time-dimension will use the exact data of trips 
+   of this route and others that use the line.
+ 
+Things to be designed:
+ - given a (core) route, which other routes share part of its line?
+ - does it make sense to make a timetable for an entire day, so the user can scroll through the time axis? This would 
+   spare us the work of deciding which time to pick as a representative! 
+ - it still leaves us the work of picking a representative day... unless we prepare the data in a way that the user can 
+   pick. But the date picker should show at least a color code for how many trips there are on the line compared to the 
+   median over all days. 
+
 # Inputs
 
 The basic input data is a GTFS data set for all of Germany. From this relevant train data has to be extracted. Possibly
