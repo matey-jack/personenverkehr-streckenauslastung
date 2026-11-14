@@ -17,7 +17,6 @@ Increments to implement, test and review one at a time.
 - [ ] Review the two choices made in `TripGroups.kt`:
   - stops are mapped to their parent station (so a different platform doesn't create a new group);
   - groups are defined by the *ordered* station sequence (each direction is a separate group), as in the spec ✅
-- [ ] Some large stations are broken down using different station IDs, e.g. "Stuttgart Hbf" and "Stuttgart Hbf (tief)". Treat them as one station where that matters.
 
 ## 4. Calendar: regular vs. one-off trips
 - Understand `calendar` / `calendar_dates` in the Delfi data ✅

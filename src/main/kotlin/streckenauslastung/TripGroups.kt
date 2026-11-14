@@ -57,6 +57,26 @@ private val stationNameFixes = mapOf(
 )
 
 /**
+ * Stations that the data breaks down into several station IDs, for example one for the underground
+ * platforms or one per data source. Each ID on the left counts as the station on the right.
+ */
+private val stationParts = mapOf(
+    "de:08111:6118" to "de:08111:6115", // Stuttgart Hbf (tief)
+    "de:09162:6" to "de:09162:100", // München Hbf (U, Tram)
+    "de:06412:7010" to "de:06412:10", // Frankfurt (Main) Hbf tief
+    "de:14713:8098205" to "de:14713:8010205", // Leipzig Hbf
+    "de:11000:900003200" to "de:11000:900003201", // Berlin Hbf
+    "de:13003:899" to "de:13003:1489", // Rostock Hbf
+    "de:02000:80953" to "de:02000:8002553", // Altona, part of Hamburg-Altona
+    "de:02000:49950" to "de:02000:8000147", // Harburg, part of Hamburg-Harburg
+    "de:13072:295" to "de:13072:2295", // Güstrow Bahnhof
+    "de:13073:11256" to "de:13073:10310", // Altefähr Bahnhof
+    "de:13003:840" to "de:13003:795", // Rostock Lichtenhagen
+    "ch:23005:6" to "ch:1:sloid:90", // Basel Bad Bf (FlixTrain)
+    "de:01054:66969" to "de:01054:66926", // Niebüll neg
+)
+
+/**
  * The SQL expression for the station name given the stop name [stopName]:
  *  - without the "S " or "S+U " that stop names start with where S-Bahn or U-Bahn trains call;
  *  - with "Hbf" for "Hauptbahnhof", and without a comma before it.
@@ -75,22 +95,26 @@ private fun normalizedName(stopName: String) =
  */
 fun createTripGroupTable(db: Connection, railDir: Path, minDays: Int = 0) {
     fun p(name: String) = sqlPath(railDir.resolve("$name.parquet"))
+    val parts = stationParts.entries.joinToString { (part, station) -> "('$part', '$station')" }
+    // own_id is the station ID as the data gives it, station_id that of the station it is a part of.
     db.exec("""
         CREATE TABLE station_of AS
-        SELECT stop_id, stop_name,
-               coalesce(nullif(regexp_extract(parent_or_self, '^[a-z]{2}:[0-9]+:[0-9]+'), ''), parent_or_self) AS station_id
-        FROM (SELECT *, coalesce(nullif(parent_station, ''), stop_id) AS parent_or_self FROM ${p("stops")})
+        SELECT stop_id, stop_name, own_id, coalesce(whole_id, own_id) AS station_id
+        FROM (
+            SELECT *, coalesce(nullif(regexp_extract(parent_or_self, '^[a-z]{2}:[0-9]+:[0-9]+'), ''), parent_or_self) AS own_id
+            FROM (SELECT *, coalesce(nullif(parent_station, ''), stop_id) AS parent_or_self FROM ${p("stops")})
+        ) LEFT JOIN (VALUES $parts) parts(own_id, whole_id) USING (own_id)
     """)
     val fixedNames = stationNameFixes.entries.joinToString { (id, name) -> "('$id', '$name')" }
     db.exec("""
         CREATE TABLE station_names AS
-        SELECT station_id,
+        SELECT own_id AS station_id,
                coalesce(
                    any_value(fixed_name),
-                   ${normalizedName("coalesce(min(stop_name) FILTER (stop_id = station_id), min(stop_name))")}
+                   ${normalizedName("coalesce(min(stop_name) FILTER (stop_id = own_id), min(stop_name))")}
                ) AS station_name
-        FROM station_of LEFT JOIN (VALUES $fixedNames) fixed(station_id, fixed_name) USING (station_id)
-        GROUP BY station_id
+        FROM station_of LEFT JOIN (VALUES $fixedNames) fixed(own_id, fixed_name) USING (own_id)
+        GROUP BY own_id
     """)
     db.exec("""
         CREATE TABLE trip_seq AS

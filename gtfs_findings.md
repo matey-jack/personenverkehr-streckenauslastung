@@ -8,6 +8,12 @@ What the Delfi data set of 2026-11-09 turned out to contain, where that differs 
 - One route can bundle unrelated sections. RS3 contains trips Achern–Ottenhöfen as well as trips around Ulm; RB45 contains Limburg–Gießen and Gießen–Fulda.
 - A short branch section can be the most frequent trip of a route whose other trips run elsewhere: Seebrugg–Titisee on Freiburg's S1, probably the portion of trains that split at Titisee, published as trips of its own.
 
+## A station can have several station IDs
+
+- Large stations have a separate ID for their underground platforms, where other lines call than above ground: "Hauptbahnhof (tief)" in Stuttgart, "Hauptbahnhof (U, Tram)" in München, "Frankfurt (Main) Hauptbahnhof tief". Other stations simply appear under two IDs, with the same name (Leipzig Hbf, Rostock Hbf) or a different one ("Altona" and "Hamburg-Altona"). `stationParts` in `TripGroups.kt` joins these.
+- Tram-train stops in front of a main station are stations of their own: "KA Hauptbahnhof (Vorplatz)", "Heilbronn Hbf/Willy-Brandt-Pl.", "Chemnitz, Hbf Bahnhofstr". So are "Frankfurt (Main) Flughafen Fernbahnhof" and "Regionalbahnhof". These stay separate.
+- About 55 Czech stations appear once with a numeric ID and once with a `cz:` ID, for example "Decin hl.n." and "Liberec". These stay separate as well.
+
 ## Long-distance routes barely have a typical trip
 
 Routes of type 101 and 102 have up to about 200 different station patterns each, and the most frequent one often covers only 5 to 15% of the trip-days. A core route says much less about such a route than about a regional one.

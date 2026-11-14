@@ -494,7 +494,7 @@ de:rlp:rb63:_106,RB63,106,1908,1,6,equal,1.00,"Bensheim, Bahnhof",Worms Hbf,,,,,
 5587108_106,RB64,106,1782,3,11,equal,0.99,Bad St Peter-Ording,Husum,shorter -3,0.00,Tönning,Bad St Peter-Ording,1,equal,,
 de:nrw:rb64:_106,RB64,106,2597,8,15,equal,0.67,Münster Hbf,Enschede,shorter -4,0.17,Münster Hbf,"Gronau, Bahnhof",1,equal,,
 de:rlp:rb64:_106,RB64,106,1659,4,8,equal,0.90,Pirmasens Hbf,Kaiserslautern Hbf,shorter -1,0.09,Kaiserslautern Hbf,"Pirmasens, Nord",1,equal,,
-161995_106,RB65,106,1070,2,5,equal,0.94,Niebüll neg,Dagebüll Mole,longer +1,0.06,Dagebüll Mole,Niebüll,1,equal,,
+161995_106,RB65,106,1070,1,5,equal,1.00,Niebüll,Dagebüll Mole,,,,,1,equal,,
 3108826_106,RB65,106,70,4,6,equal,0.81,Bingen Hbf,"Bad Kreuznach, Bahnhof",different +2 -4,0.07,Bingen Hbf,"Bad Kreuznach, Bahnhof",1,equal,,
 3694958_106,RB65,106,2655,2,8,equal,0.99,Münster Hbf,"Rheine, Bahnhof",shorter -1,0.01,Münster Haltep.  Zentrum Nord,"Rheine, Bahnhof",1,equal,,
 5023150_106,RB65,106,1952,5,17,equal,0.84,Zittau Bahnhof,Cottbus Hbf,shorter -5,0.10,Görlitz Bahnhof,Cottbus Hbf,1,equal,,
@@ -867,7 +867,7 @@ de:NAHSH:RE86:_106,RE86,106,1,1,3,equal,1.00,Lübeck Hbf,Lübeck-Travemünde Str
 de:NAHSH:RE8X:_106,RE8X,106,137,3,8,shorter -5,0.49,Hamburg Hbf,Lübeck Hbf,equal,0.48,Lübeck-Travemünde Strand,Hamburg Hbf,2,equal,,Lübeck-Dänischburg IKEA | Lübeck-Kücknitz | Lübeck-Travemünde Hafen | Lübeck-Travemünde Skandinavienkai | Lübeck-Travemünde Strand
 162180_106,RE9,106,798,15,6,equal,0.65,Kassel Bahnhof Wilhelmshöhe,Leinefelde,shorter -3,0.11,Eichenberg Bahnhof,Leinefelde,1,equal,,
 4281481_106,RE9,106,2241,33,25,equal,0.39,München Hbf,Ulm Hbf,shorter -7,0.29,Augsburg Hbf,Ulm Hbf,1,equal,,
-4740563_106,RE9,106,3354,17,7,different +3 -6,0.35,Lietzow Bahnhof,Ostseebad Binz,longer +4,0.13,Ostseebad Binz,Stralsund Hbf,9,shorter -1,Ostseebad Binz | Prora Bahnhof | Prora Ost,Bergen Bahnhof | Rambin Bahnhof | Samtens Bahnhof | Stralsund Hbf | Stralsund Rügendammbahnhof | Teschenhagen Bahnhof
+4740563_106,RE9,106,3354,12,8,different +3 -7,0.35,Lietzow Bahnhof,Ostseebad Binz,longer +10,0.24,Rostock Hbf,Lietzow Bahnhof,9,equal,Ostseebad Binz | Prora Bahnhof | Prora Ost,Altefähr Bahnhof | Bergen Bahnhof | Rambin Bahnhof | Samtens Bahnhof | Stralsund Hbf | Stralsund Rügendammbahnhof | Teschenhagen Bahnhof
 7149190_106,RE9,106,1,1,27,equal,1.00,München Hbf,Ulm Hbf,,,,,1,equal,,
 de:VBN:RE9:_106,RE9,106,1000,13,13,equal,0.61,Osnabrück Hbf,Bremerhaven-Lehe,shorter -3,0.28,Osnabrück Hbf,Bremen Hbf,1,equal,,
 de:VBN:RE9:_D_106,RE9,106,984,8,10,equal,0.89,Osnabrück Hbf,Bremen Hbf,longer +1,0.05,Bremen Hbf,Osnabrück Hbf,1,equal,,
@@ -963,7 +963,7 @@ de:nasa:14|S|MDSB_S1:DBRegio_109,S1,109,4148,3,17,equal,0.84,Leipzig Miltitzer A
 de:nasa:15|S|MD_S1:DBRegio_109,S1,109,2250,10,28,equal,0.64,Schönebeck-Bad Salzelmen,"Wittenberge, Bahnhof",shorter -8,0.20,Schönebeck-Bad Salzelmen,Stendal Hbf,1,equal,,
 de:nrw:s1:_109,S1,109,7806,23,27,longer +4,0.32,Dortmund Hbf,Düsseldorf Hbf,shorter -12,0.29,Dortmund Hbf,Essen Hbf,1,longer +4,Essen Frohnhausen S | Essen West S | Mülheim Hbf | Mülheim Styrum S,
 de:rmv:00001314:_109,S1,109,6373,31,23,equal,0.33,Frankfurt (Main) Höchst Bahnhof,Rödermark-Ober-Roden Bahnhof,longer +9,0.17,Rödermark-Ober-Roden Bahnhof,Wiesbaden Hbf,1,equal,,
-de:vmv-mbh:13|S1:_109,S1,109,6514,2,10,equal,0.55,Rostock Hbf,Warnemünde,different +1 -1,0.45,Warnemünde,Rostock Hbf,1,equal,,
+de:vmv-mbh:13|S1:_109,S1,109,6514,1,10,equal,1.00,Rostock Hbf,Warnemünde,,,,,1,equal,,
 de:vvo:10-1:_109,S1,109,5368,36,30,equal,0.40,Meißen S-Bf. Triebischtal,Bad Schandau Nationalparkbahnhof,longer +3,0.26,Schöna Bahnhof,Meißen S-Bf. Triebischtal,1,equal,,
 de:vvs:10001_:_109,S1,109,6852,22,29,equal,0.52,Kirchheim (T),Herrenberg,shorter -4,0.28,Herrenberg,Plochingen,1,equal,,
 1710909_109,S10,109,1771,17,16,longer +1,0.33,Freiburg Hbf,Villingen Bahnhof/ZOB,different +1 -1,0.16,Freiburg Hbf,Donaueschingen Bahnhof,1,longer +1,Marbach West,
@@ -979,7 +979,7 @@ de:VBB:11000000|S-Bahn|S15:S15-ZI_109,S15,109,4964,1,3,equal,1.00,Gesundbrunnen 
 de:VBB:11000000|S-Bahn|S15:S15-Z_109,S15,109,6483,2,3,equal,0.98,Berlin Hbf,Gesundbrunnen Bhf (Berlin),shorter -1,0.02,Wedding (Berlin),Berlin Hbf,1,equal,,
 de:nrw:s19:_109,S19,109,6292,57,19,equal,0.36,"Düren, Bf",Troisdorf Bf,longer +4,0.14,Hennef Blankenberg Bf,"Düren, Bf",1,equal,,
 162601_109,S2,109,3836,22,21,equal,0.50,Leipzig-Connewitz,Dessau Hbf,different +7 -7,0.15,Lutherstadt Wittenberg Hbf,Leipzig-Connewitz,1,equal,,
-162844_109,S2,109,1093,9,13,equal,0.65,Bergedorf,Diebsteich,different +1 -1,0.17,Altona,Bergedorf,1,equal,,
+162844_109,S2,109,1093,9,13,equal,0.65,Bergedorf,Diebsteich,different +1 -1,0.17,Hamburg-Altona,Bergedorf,1,equal,,
 3448385_109,S2,109,2051,17,28,equal,0.72,Haste/Bahnhof,Nienburg(Weser),shorter -15,0.22,Hannover Hbf,Nienburg(Weser),1,equal,,
 de:VBB:11000000|S-Bahn|S2:S2-WII_109,S2,109,104,5,7,equal,0.60,Bernau Bhf,Blankenburg (Berlin),different +8 -7,0.17,Priesterweg (Berlin),Blankenfelde (TF) Bhf,1,equal,,
 de:VBB:11000000|S-Bahn|S2:S2-WI_109,S2,109,5177,15,22,equal,0.92,Buch (Berlin),Lichtenrade (Berlin),shorter -3,0.02,Marienfelde (Berlin),Buch (Berlin),1,equal,,
@@ -990,7 +990,7 @@ de:kvv:00S02_:_109,S2,109,436,17,47,equal,0.32,Mörsch Bach-West,Spöck Richard-
 de:nrw:s2:_109,S2,109,5169,18,9,longer +5,0.40,Essen Hbf,Dortmund Hbf,longer +2,0.27,Recklinghausen Hbf,Dortmund Hbf,8,equal,Essen Hbf | Essen Kray Nord Bf | Gelsenkirchen Hbf | Gelsenkirchen Rotthausen | Herne Wanne-Eickel Hbf,
 de:rlp:s2:_109,S2,109,2487,58,39,equal,0.49,"Mosbach, Bahnhof",Kaiserslautern Hbf,longer +9,0.05,"Osterburken, Bahnhof",Kaiserslautern Hbf,1,equal,,
 de:rmv:00001315:_109,S2,109,7202,22,26,longer +1,0.27,Dietzenbach Bahnhof,Niedernhausen Bahnhof,equal,0.26,Niedernhausen Bahnhof,Dietzenbach Bahnhof,2,equal,Frankfurt (Main) Griesheim Bahnhof,
-de:vmv-mbh:13|S2:_D_109,S2,109,1690,8,16,longer +1,0.42,Warnemünde,Güstrow Bahnhof,longer +1,0.41,Güstrow Bahnhof,Warnemünde,1,longer +1,Rostock S Lichtenhagen,
+de:vmv-mbh:13|S2:_D_109,S2,109,1690,5,17,equal,0.83,Warnemünde,Güstrow Bahnhof,shorter -7,0.11,Warnemünde,Rostock Hbf,1,equal,,
 de:vvo:10-2:_109,S2,109,3906,14,17,equal,0.63,Pirna Bahnhof,Dresden Flughafen,shorter -9,0.30,Dresden Flughafen,Dresden Hbf,1,equal,,
 de:vvs:10002_:_109,S2,109,6761,13,27,equal,0.95,Schorndorf,Filderstadt,shorter -6,0.02,Vaihingen,Schorndorf,1,equal,,
 de:beg:S20M:_109,S20,109,603,3,8,equal,0.90,Pasing,Höllriegelskreuth,shorter -3,0.05,Solln,Pasing,1,equal,,
@@ -1014,7 +1014,7 @@ de:nasa:14|S|MDSB_S3:DBRegio_109,S3,109,4726,36,33,longer +5,0.36,Halle-Nietlebe
 de:nrw:s3:_109,S3,109,4031,5,13,equal,0.68,Hattingen Mitte,Oberhausen Hbf,shorter -6,0.28,Essen Hbf,Hattingen Mitte,1,equal,,
 de:rlp:s3:_109,S3,109,5474,92,26,longer +3,0.15,Germersheim,Karlsruhe Hbf,different +7 -24,0.15,Karlsruhe Hbf,Germersheim,22,equal,Bruchsal Gew. Bildungszentrum | Untergrombach | Weingarten (Baden),
 de:rmv:00001316:_109,S3,109,4280,5,18,equal,0.95,Bad Soden (Taunus) Bahnhof,Frankfurt (Main) Südbahnhof,shorter -7,0.03,Frankfurt (Main) Südbahnhof,Frankfurt (Main) Rödelheim Bahnhof,1,equal,,
-de:vmv-mbh:13|S3:_109,S3,109,1717,8,17,longer +1,0.41,Warnemünde,Güstrow Bahnhof,longer +1,0.40,Güstrow Bahnhof,Warnemünde,1,longer +1,Rostock S Lichtenhagen,
+de:vmv-mbh:13|S3:_109,S3,109,1717,5,18,equal,0.82,Warnemünde,Güstrow Bahnhof,shorter -8,0.12,Warnemünde,Rostock Hbf,1,equal,,
 de:vvo:10-3:_109,S3,109,1018,5,6,equal,0.42,Tharandt Bahnhof,Dresden S-Bf. Plauen,longer +1,0.30,Dresden Hbf,Tharandt Bahnhof,1,equal,,
 de:vvs:10003_:_109,S3,109,6568,12,18,equal,0.86,Backnang,Vaihingen,longer +5,0.12,Flughafen/Messe,Backnang,1,equal,,
 7137843_109,S30,109,544,1,7,equal,1.00,Leipzig Hbf,Schkeuditz,,,,,1,equal,,
@@ -1025,7 +1025,7 @@ de:rlp:s33:_109,S33,109,2617,25,11,equal,0.66,Bruchsal,Germersheim,shorter -6,0.
 162620_109,S4,109,3974,33,24,equal,0.40,Eilenburg Ost,Wurzen,shorter -4,0.16,Wurzen,Taucha (b. Leipzig),1,equal,,
 3448393_109,S4,109,3507,15,12,shorter -2,0.49,Hannover Hbf,Bennemühlen,longer +5,0.47,Bennemühlen,Hildesheim Hbf,3,equal,,Hildesheim Hbf | Sarstedt
 7142166_109,S4,109,8797,77,17,longer +17,0.15,Öhringen-Cappel,Schwaigern(Württ) West,different +32 -17,0.11,Karlsruhe Albtalbahnhof,Flehingen,4,equal,Affaltrach | Bitzfeld | Bretzfeld | Ellhofen | Eschenau (b Heilbronn) | Heilbronn Trappensee (S-Bahn) | Scheppach | Sülzbach | Sülzbach Schule | Weinsberg | Weinsberg West | Weinsberg/Ellhofen Gewerbegebiet | Wieslensdorf | Willsbach | Öhringen Hbf | Öhringen West | Öhringen-Cappel,
-de:beg:S4M:_109,S4,109,6005,33,23,shorter -12,0.12,Pasing,Geltendorf,longer +1,0.09,Trudering,Geltendorf,3,equal,,Berg am Laim | Donnersbergerbrücke | Hackerbrücke | Hirschgarten | Isartor | Karlsplatz (Stachus) | Leuchtenbergring | Marienplatz | München Hbf (tief) | Ostbahnhof | Rosenheimer Platz | Trudering
+de:beg:S4M:_109,S4,109,6005,33,23,shorter -12,0.12,Pasing,Geltendorf,longer +1,0.09,Trudering,Geltendorf,3,equal,,Berg am Laim | Donnersbergerbrücke | Hackerbrücke | Hirschgarten | Isartor | Karlsplatz (Stachus) | Leuchtenbergring | Marienplatz | München Hbf | Ostbahnhof | Rosenheimer Platz | Trudering
 de:beg:S4N:_109,S4,109,4418,4,14,equal,0.77,Nürnberg Hbf,Ansbach,longer +4,0.21,Crailsheim Bahnhof,Nürnberg Hbf,1,equal,,
 de:nrw:s4:_109,S4,109,4986,5,19,equal,0.73,"Unna, Bahnhof",Dortmund Lütgendortmund,shorter -2,0.22,Dortmund Lütgendortmund,"Königsborn, Bahnhof",1,equal,,
 de:rlp:s4:_109,S4,109,202,16,19,different +8 -12,0.20,Bruchsal,Mannheim Hbf,longer +36,0.19,"Osterburken, Bahnhof",Bruchsal,9,shorter -7,"Bad Schönborn Süd | Bad Schönborn-Kronau | Kirchheim/Rohrbach, Bf | Rot-Malsch, Bahnhof | St. Ilgen, Bahnhof | Stettfeld-Weiher | Ubstadt-Weiher | Wiesloch-Walldorf, Bf","Berghausen (Pfalz) Bahnhof | Germersheim | Heiligenstein, Bahnhof | LU Rheingönheim, Bahnhof | LU-Mundenheim, Bahnhof | Limburgerhof, Bahnhof | Lingenfeld Bahnhof | Ludwigshafen Hbf | Schifferstadt, Bahnhof | Schifferstadt, Südbahnhof | Speyer Hbf/ZOB | Speyer, Nord/West"
@@ -1064,7 +1064,7 @@ de:beg:S5M:_109,S5,109,5867,26,22,equal,0.20,Pasing,Aying,longer +3,0.18,Kreuzst
 de:beg:S5N:_109,S5,109,152,1,2,equal,1.00,Allersberg (Rothsee),Nürnberg Hbf,,,,,1,equal,,
 de:nasa:14|S|MDSB_S5:DBRegio_109,S5,109,1866,41,23,longer +2,0.37,Halle-Trotha,Gößnitz,equal,0.25,Halle-Trotha,Altenburg,2,equal,Gößnitz | Lehndorf (Altenburg),
 de:nrw:s5:_109,S5,109,3914,2,8,equal,0.55,Hagen Hbf,Dortmund Hbf,shorter -3,0.45,Dortmund Hbf,Witten Hbf,1,equal,,
-de:rmv:00001319:_109,S5,109,6413,7,17,equal,0.63,Friedrichsdorf Bahnhof,Frankfurt (Main) Südbahnhof,shorter -2,0.35,Frankfurt (Main) Südbahnhof,Bad Homburg v.d.H. Bahnhof,1,equal,,
+de:rmv:00001319:_109,S5,109,6413,6,17,equal,0.63,Friedrichsdorf Bahnhof,Frankfurt (Main) Südbahnhof,shorter -2,0.35,Frankfurt (Main) Südbahnhof,Bad Homburg v.d.H. Bahnhof,1,equal,,
 de:vvs:10005_:_109,S5,109,6557,10,12,equal,0.85,Schwabstraße,Bietigheim,shorter -3,0.14,Schwabstraße,Ludwigsburg,1,equal,,
 3448391_109,S51,109,406,3,8,equal,0.76,"Hameln, Bahnhof",Seelze Bahnhof,different +1 -3,0.15,Hannover Messe / Laatzen,Seelze Bahnhof,1,equal,,
 7142170_109,S51,109,1902,15,43,equal,0.29,Germersheim,Berghausen (Baden),longer +3,0.22,Germersheim,Söllingen (b. Karlsruhe),1,equal,,
@@ -1095,7 +1095,7 @@ de:nrw:s68:_109,S68,109,252,1,8,equal,1.00,Wuppertal Vohwinkel Bf,Düsseldorf Hb
 1940932_109,S7,109,1570,7,13,equal,0.54,Ehrwald Zugspitzbahn,Pfronten-Steinach,shorter -1,0.18,Ehrwald Zugspitzbahn,Pfronten-Steinach,1,equal,,
 3448395_109,S7,109,2085,5,11,equal,0.99,Hannover Hbf,Celle Bahnhof,shorter -3,0.00,Celle Bahnhof,Hannover Hbf,1,equal,,
 5587097_109,S7,109,5013,7,13,equal,0.88,Wuppertal Hbf,Solingen Hbf,shorter -6,0.08,Solingen Hbf,Remscheid Lennep Bf,1,equal,,
-7138187_109,S7,109,10175,7,13,different +5 -3,0.26,Bergedorf,Altona,different +3 -3,0.23,Altona,Bergedorf,4,longer +3,Jungfernstieg | Königstraße | Landungsbrücken | Reeperbahn | Stadthausbrücke,Aumühle | Reinbek | Wohltorf
+7138187_109,S7,109,10175,7,13,different +5 -3,0.26,Bergedorf,Hamburg-Altona,different +3 -3,0.23,Hamburg-Altona,Bergedorf,4,longer +3,Jungfernstieg | Königstraße | Landungsbrücken | Reeperbahn | Stadthausbrücke,Aumühle | Reinbek | Wohltorf
 7142173_109,S7,109,1670,14,24,equal,0.62,KA Tullastraße/Alter Schlachthof,Achern Bahnhof,different +5 -6,0.10,KA Tullastraße/Alter Schlachthof,Achern Bahnhof,1,equal,,
 de:VBB:11000000|S-Bahn|S7:S7-HI_109,S7,109,272,10,10,equal,0.79,Potsdam Hbf,Zoologischer Garten Bhf (Berlin),shorter -6,0.07,Westkreuz (Berlin),Zoologischer Garten Bhf (Berlin),1,equal,,
 de:VBB:11000000|S-Bahn|S7:S7-H_109,S7,109,405,5,10,equal,0.82,Potsdam Hbf,Zoologischer Garten Bhf (Berlin),longer +1,0.12,Potsdam Hbf,Tiergarten (Berlin),1,equal,,
@@ -1114,7 +1114,7 @@ de:VBB:11000000|S-Bahn|S8:S8-N_109,S8,109,6465,38,19,longer +4,0.24,Birkenwerder
 de:beg:S8M:_109,S8,109,8527,39,31,longer +1,0.23,Flughafen München,Herrsching,equal,0.23,Herrsching,Flughafen München,2,equal,Laim,
 de:nasa:15|S|MDSB_S8:_109,S8,109,3759,12,6,equal,0.53,Bitterfeld,Halle (Saale) Hbf,longer +7,0.24,Halle (Saale) Hbf,Lutherstadt Wittenberg Hbf,1,equal,,
 de:nrw:s8:_109,S8,109,5535,20,27,equal,0.49,Wuppertal Oberbarmen Bf,MG Hbf /Europaplatz,longer +11,0.32,MG Hbf /Europaplatz,Hagen Hbf,1,equal,,
-de:rmv:00001323:_109,S8,109,5701,23,25,equal,0.45,Wiesbaden Hbf,Offenbach (Main)-Offenbach Ost Ostbahnhof,longer +4,0.27,Wiesbaden Hbf,Hanau Hbf,1,equal,,
+de:rmv:00001323:_109,S8,109,5701,22,25,equal,0.45,Wiesbaden Hbf,Offenbach (Main)-Offenbach Ost Ostbahnhof,longer +4,0.27,Wiesbaden Hbf,Hanau Hbf,1,equal,,
 de:vvo:1-8:_109,S8,109,2576,9,11,equal,0.43,Dresden Bahnhof Neustadt,Kamenz Bahnhof,longer +2,0.30,Dresden Hbf,Kamenz Bahnhof,1,equal,,
 7142176_109,S81,109,90,5,42,longer +11,0.28,Karlsruhe Hbf,Bondorf,equal,0.28,Freudenstadt Hbf,Karlsruhe Hbf,2,equal,"Bittelbronn Bahnhof | Bondorf | Dornstetten Aach | Dornstetten Bahnhof | Ergenzingen Bahnhof | Eutingen im Gäu Bahnhof | Eutingen im Gäu Nord | Grüntal-Wittlensweiler | Hochdorf, Bahnhof | Horb Heiligenfeld | Schopfloch Bahnhof",
 de:VBB:11000000|S-Bahn|S85:S85-MI_109,S85,109,560,14,5,equal,0.48,Flughafen BER,Altglienicke (Berlin),different +3 -5,0.23,Pankow (Berlin),Schönhauser Allee (Berlin),1,equal,,
@@ -1126,5 +1126,5 @@ de:VBB:11000000|S-Bahn|S9:S9-C_109,S9,109,6818,35,30,equal,0.79,Spandau Bhf (Ber
 de:nasa:15|S|MDSB_S9:_109,S9,109,1317,6,11,equal,0.93,Eilenburg,Halle (Saale) Hbf,different +1 -5,0.04,Halle (Saale) Hbf,Delitzsch unt Bf,1,equal,,
 de:nrw:s9:_109,S9,109,4570,40,24,longer +4,0.32,Haltern am See Bf,Wuppertal Hbf,longer +17,0.31,Recklinghausen Hbf,Hagen Hbf,8,shorter -3,Gelsenkirchen Hassel Bf | Haltern am See Bf | Marl Mitte | Marl-Hamm Bf,
 de:nvbw:92V09_:_109,S9,109,2037,18,25,equal,0.63,"Groß-Rohrheim, Bahnhof",Karlsruhe Hbf,shorter -6,0.17,"Groß-Rohrheim, Bahnhof",Waghäusel Bahnhof,1,equal,,
-de:rmv:00001324:_109,S9,109,4279,28,26,equal,0.74,Wiesbaden Hbf,Hanau Hbf,shorter -7,0.10,Hanau Hbf,Kelsterbach Bahnhof,1,equal,,
+de:rmv:00001324:_109,S9,109,4279,27,26,equal,0.74,Wiesbaden Hbf,Hanau Hbf,shorter -7,0.10,Hanau Hbf,Kelsterbach Bahnhof,1,equal,,
 7149815_109,SEV3,109,1,1,6,equal,1.00,Hannover Hbf,Lehrte,,,,,1,equal,,
