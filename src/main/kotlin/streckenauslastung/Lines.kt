@@ -30,6 +30,7 @@ import kotlinx.html.unsafe
 import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.math.roundToInt
+import kotlin.math.sign
 
 /** The core routes used for testing (see spec.md, "Reconstructing the line"), by their route_id. */
 internal val testRouteIds = listOf(
@@ -40,16 +41,20 @@ internal val testRouteIds = listOf(
     "de:VBB:11000000|R-Bahn|RE2:DB_106",
 )
 
+/** The seconds since midnight at which one trip arrives at and departs from each of its stops, null where unknown. */
+internal class TripTimes(val arrivals: List<Long?>, val departures: List<Long?>)
+
 /**
  * All trips of the route [routeId] that stop at the same [stations] in the same order. [arrivals]
  * and [departures] are the seconds at each stop of the fastest of these trips, null where the data
- * has no time.
+ * has no time. [medianTrip] is their median trip (see spec.md, "Reconstructing the line").
  */
 internal class Run(
     val routeId: String,
     val stations: List<String>,
     val arrivals: List<Long?>,
     val departures: List<Long?>,
+    val medianTrip: TripTimes,
 ) {
     /** The seconds from leaving stop [from] to reaching the later stop [to], both given by index. */
     fun secs(from: Int, to: Int): Long? {
@@ -64,12 +69,16 @@ internal class Run(
         return if (before + after > 0) before.toDouble() / (before + after) else null
     }
 
-    /** The same trips seen in the other direction of the line: time runs backwards, so it is negated. */
+    /**
+     * The same trips seen in the other direction of the line: time runs backwards, so it is negated.
+     * The [medianTrip] is only meant to be read in the direction of travel and stays as it is.
+     */
     fun reversed() = Run(
         routeId,
         stations.reversed(),
         departures.reversed().map { it?.unaryMinus() },
         arrivals.reversed().map { it?.unaryMinus() },
+        medianTrip,
     )
 }
 
@@ -281,16 +290,121 @@ internal fun runsUsing(line: Line, index: RunIndex): Map<String, List<Run>> {
 }
 
 /**
+ * The stops [from] to [to] of [run], given by index, between which the trips use the line and keep
+ * one direction along it: [forward] if that is the direction in which the line is listed.
+ */
+internal class Stretch(val run: Run, val from: Int, val to: Int, val forward: Boolean) {
+    val stations: List<String> get() = run.stations.subList(from, to + 1)
+}
+
+/** The longest stretch of [run] on the line, the first one of several; null if it never uses the line. */
+internal fun longestStretch(run: Run, place: Map<String, Int>, index: RunIndex): Stretch? {
+    var best: Stretch? = null
+    var from = 0
+    var direction = 0
+    for (i in run.stations.indices) {
+        // The direction of the step to the next stop, 0 if the trips do not use the line on it.
+        val step = run.stations.getOrNull(i + 1)?.let { next ->
+            val here = place[run.stations[i]]
+            val there = place[next]
+            if (here == null || there == null || index.isDetour(run, i, i + 1)) 0 else (there - here).sign
+        } ?: 0
+        if (step != 0 && (direction == 0 || step == direction)) {
+            direction = step
+            continue
+        }
+        if (i > from && (best == null || i - from > best.to - best.from)) best = Stretch(run, from, i, direction > 0)
+        // Where the trips turn around, the next stretch starts at this stop.
+        from = if (step != 0) i else i + 1
+        direction = step
+    }
+    return best
+}
+
+/** At most this many trains are timed on a line besides that of its core route. */
+internal const val ADDITIONAL_TRAINS = 3
+
+/**
+ * A train whose times are shown along the line (see spec.md, "Reconstructing the line"): the median
+ * trip of the run of [stretch]. [core] is the core route its trips belong to, if any.
+ */
+internal class TimedTrain(val stretch: Stretch, val route: Route, val core: CoreRoute?) {
+    private val times = stretch.run.medianTrip
+
+    /** The seconds since midnight at which the train leaves its first station on the line. */
+    val departureSecs: Long? = times.departures[stretch.from]
+
+    /**
+     * The minutes after [departureSecs] at which the train arrives at [station], with those at
+     * which it leaves again if it dwells for two minutes or more; empty if it does not stop there.
+     */
+    fun minutes(station: String): String {
+        val stop = stretch.from + stretch.stations.indexOf(station)
+        val start = departureSecs
+        if (stop < stretch.from || start == null) return ""
+        if (stop == stretch.from) return "0"
+
+        fun minute(secs: Long) = ((secs - start) / 60.0).roundToInt()
+        val arrival = times.arrivals[stop] ?: return ""
+        val departure = times.departures[stop]
+        val dwells = stop < stretch.to && departure != null && departure - arrival >= 120
+        return if (dwells) "${minute(arrival)}–${minute(departure)}" else minute(arrival).toString()
+    }
+}
+
+/**
+ * The trains to time on [line]: that of the core route [scope] first, if its trips have times, then
+ * up to [ADDITIONAL_TRAINS] more. [coreOf] gives the core route that the trips of a run belong to.
+ */
+internal fun timedTrains(
+    line: Line,
+    scope: CoreRoute,
+    index: RunIndex,
+    routeById: Map<String, Route>,
+    coreOf: (Run) -> CoreRoute?,
+): List<TimedTrain> {
+    val place = line.stations.withIndex().associate { (i, station) -> station to i }
+    val stretches = index.runs
+        .mapNotNull { longestStretch(it, place, index) }
+        .filter { it.run.medianTrip.departures[it.from] != null && it.run.routeId in routeById }
+
+    fun train(stretch: Stretch) = TimedTrain(stretch, routeById.getValue(stretch.run.routeId), coreOf(stretch.run))
+    val trains = ArrayList<TimedTrain>()
+    val timed = HashSet<String>()
+
+    fun add(stretch: Stretch) {
+        trains += train(stretch)
+        timed += stretch.stations
+    }
+    stretches.filter { it.forward && coreOf(it.run) === scope }.maxByOrNull { it.to - it.from }?.let(::add)
+    val ofCore = trains.size
+    while (trains.size < ofCore + ADDITIONAL_TRAINS && !timed.containsAll(line.stations)) {
+        fun gain(stretch: Stretch) = stretch.stations.count { it !in timed }
+
+        fun stops(stretch: Stretch) = stretch.to - stretch.from
+        // The first train is the one with the most stops, the later ones fill what is left.
+        val mostStops = trains.size == ofCore
+        val best = compareByDescending<Stretch> { if (mostStops) stops(it) else gain(it) }
+            .thenByDescending { if (mostStops) gain(it) else stops(it) }
+            .thenByDescending { coreOf(it.run) != null }
+            .thenBy(naturalOrder) { routeById.getValue(it.run.routeId).shortName }
+            // The IDs as tie-breakers make the result the same on every run.
+            .thenBy { it.run.routeId }
+            .thenBy { it.run.stations.joinToString() }
+        val useful = stretches.filter { gain(it) > 0 }
+        // A train against the listed direction only gets its turn if no other one helps.
+        val next = useful.filter { it.forward }.minWithOrNull(best) ?: useful.minWithOrNull(best) ?: break
+        add(next)
+    }
+    return trains
+}
+
+/**
  * A station of a line with what stops there: [core] are the core routes with a trip using the line
  * here, [other] the routes where only trips of no such core route do. Both are in the order of the
  * routes.
  */
-internal class LineStop(
-    val stationId: String,
-    val positionSecs: Double,
-    val core: List<CoreRoute>,
-    val other: List<Route>,
-)
+internal class LineStop(val stationId: String, val core: List<CoreRoute>, val other: List<Route>)
 
 /** Sorts names with numbers by the value of the numbers: RE3 comes before RE16. */
 internal val naturalOrder: Comparator<String> = compareBy { name ->
@@ -298,12 +412,13 @@ internal val naturalOrder: Comparator<String> = compareBy { name ->
 }
 
 /**
- * The reconstructed line of the core route [core]: its [stops] and [unplaced] stations.
- * [routeOf] gives the route of each core route.
+ * The reconstructed line of the core route [core]: its [stops], the [trains] timed along it and
+ * the warnings about it. [routeOf] gives the route of each core route.
  */
 internal class LineReport(
     val core: CoreRoute,
     val stops: List<LineStop>,
+    val trains: List<TimedTrain>,
     val timeOrdered: List<TimeOrdered>,
     val againstOrder: List<AgainstOrder>,
     val routeOf: Map<CoreRoute, Route>,
@@ -330,6 +445,9 @@ internal class LineReport(
 
     /** The name of the route [route] on this line. */
     fun label(route: Route) = routeLabels.getValue(route)
+
+    /** The name of [train] on this line: that of its core route or, if its trips belong to none, of its route. */
+    fun label(train: TimedTrain) = train.core?.let(::label) ?: label(train.route)
 
     /** The name of the core route [core] on this line. */
     fun label(core: CoreRoute): String {
@@ -361,14 +479,15 @@ internal fun lineReport(coreRouteId: String, routes: List<Route>, index: RunInde
 
     /** The core route that the trips of the run belong to, if any. */
     fun Run.coreRoute() = routeById[routeId]?.coreRoutes?.firstOrNull { it.pattern.stations == stations.toSet() }
-    val stops = line.stations.mapIndexed { i, station ->
+    val stops = line.stations.map { station ->
         val runs = using.getValue(station)
         val cores = runs.mapNotNull { it.coreRoute() }.toSet()
         val otherIds = runs.map { it.routeId }.toSet() - cores.map { routeOf.getValue(it).id }.toSet()
         // Filtering keeps the order of the routes.
-        LineStop(station, line.positions[i], routeOf.keys.filter { it in cores }, routes.filter { it.id in otherIds })
+        LineStop(station, routeOf.keys.filter { it in cores }, routes.filter { it.id in otherIds })
     }
-    return LineReport(core, stops, line.timeOrdered, againstOrder(line, index), routeOf)
+    val trains = timedTrains(line, core, index, routeById) { it.coreRoute() }
+    return LineReport(core, stops, trains, line.timeOrdered, againstOrder(line, index), routeOf)
 }
 
 /** The runs of rail routes, and the agency names of the routes by route_id. */
@@ -388,31 +507,59 @@ internal fun loadRuns(railDir: Path): RailRuns {
     val agencies = HashMap<String, String>()
     openDuckDb().use { db ->
         createTripGroupTable(db, railDir)
+        // fast_rank 1 marks the fastest trip of a run, median_rank 1 its median trip: the fastest
+        // one that at least half of the trip-days do not exceed in travel time.
         db.forEachRow("""
-            SELECT t.route_id, s.stations, arg_min(s.arrivals, s.travel_secs), arg_min(s.departures, s.travel_secs)
-            FROM (
-                SELECT st.trip_id,
-                       list(so.station_id ORDER BY st.stop_sequence) AS stations,
-                       list(st.arrival_secs ORDER BY st.stop_sequence) AS arrivals,
-                       list(st.departure_secs ORDER BY st.stop_sequence) AS departures,
-                       max(st.arrival_secs) - min(st.departure_secs) AS travel_secs
-                FROM ${p("stop_times")} st JOIN station_of so USING (stop_id)
-                GROUP BY st.trip_id
-            ) s JOIN ${p("trips")} t USING (trip_id) JOIN service_days sd USING (service_id)
-            GROUP BY t.route_id, s.stations
-            ORDER BY t.route_id, s.stations
+            WITH trip AS (
+                SELECT t.route_id, t.trip_id, s.stations, s.arrivals, s.departures, s.travel_secs, sd.num_days
+                FROM (
+                    SELECT st.trip_id,
+                           list(so.station_id ORDER BY st.stop_sequence) AS stations,
+                           list(st.arrival_secs ORDER BY st.stop_sequence) AS arrivals,
+                           list(st.departure_secs ORDER BY st.stop_sequence) AS departures,
+                           max(st.arrival_secs) - min(st.departure_secs) AS travel_secs
+                    FROM ${p("stop_times")} st JOIN station_of so USING (stop_id)
+                    GROUP BY st.trip_id
+                ) s JOIN ${p("trips")} t USING (trip_id) JOIN service_days sd USING (service_id)
+            ), summed AS (
+                SELECT *,
+                       sum(num_days) OVER fastest_first AS days_so_far,
+                       sum(num_days) OVER (PARTITION BY route_id, stations) AS days,
+                       row_number() OVER fastest_first AS fast_rank
+                FROM trip
+                WINDOW fastest_first AS (PARTITION BY route_id, stations ORDER BY travel_secs, trip_id)
+            ), ranked AS (
+                SELECT *, row_number() OVER (
+                           PARTITION BY route_id, stations
+                           ORDER BY days_so_far < (days + 1) // 2, travel_secs, trip_id
+                       ) AS median_rank
+                FROM summed
+            )
+            SELECT route_id, stations,
+                   any_value(arrivals) FILTER (fast_rank = 1), any_value(departures) FILTER (fast_rank = 1),
+                   any_value(arrivals) FILTER (median_rank = 1), any_value(departures) FILTER (median_rank = 1)
+            FROM ranked
+            GROUP BY route_id, stations
+            ORDER BY route_id, stations
         """) { rs ->
             val stations = (rs.getArray(2).array as Array<*>).map { it.toString() }
-            val arrivals = secsList(rs.getArray(3), stations.size)
-            val departures = secsList(rs.getArray(4), stations.size)
             // Two stops in a row at the same station are one stop, from the first arrival to the last departure.
             val firsts = stations.indices.filter { it == 0 || stations[it] != stations[it - 1] }
             val lasts = stations.indices.filter { it == stations.lastIndex || stations[it] != stations[it + 1] }
+
+            fun arrivals(column: Int) = secsList(rs.getArray(column), stations.size).let { all ->
+                firsts.map { all[it] }
+            }
+
+            fun departures(column: Int) = secsList(rs.getArray(column), stations.size).let { all ->
+                lasts.map { all[it] }
+            }
             runs += Run(
                 rs.getString(1),
                 firsts.map { stations[it] },
-                firsts.map { arrivals[it] },
-                lasts.map { departures[it] },
+                arrivals(3),
+                departures(4),
+                TripTimes(arrivals(5), departures(6)),
             )
         }
         db.forEachRow("""
@@ -442,6 +589,9 @@ internal fun linesPage(
     fun station(id: String) = stationNames.getValue(id)
 
     fun percent(share: Double) = "${(share * 100).roundToInt()}%"
+
+    /** The time of day as on a station clock, also for trips running past midnight. */
+    fun clock(secs: Long?) = if (secs == null) "" else "%02d:%02d".format(secs / 3600 % 24, secs / 60 % 60)
 
     /** A table row for something named [name] that stops at [stations] stations of the line. */
     fun TABLE.routeRow(name: String, pattern: Pattern, route: Route, stations: Int) = tr {
@@ -478,14 +628,19 @@ internal fun linesPage(
                     table("line") {
                         tr {
                             th { +"Station" }
-                            th { +"Minutes" }
+                            for (train in report.trains) {
+                                th(classes = "time") {
+                                    +"${report.label(train)} "
+                                    small { +clock(train.departureSecs) }
+                                }
+                            }
                             th { +"Routes with a core stop" }
                             th { +"Routes with other trips stopping" }
                         }
                         for (stop in report.stops) {
                             tr(if (stop.stationId in coreStations) "core" else null) {
                                 td("name") { +stationNames.getValue(stop.stationId) }
-                                td("position") { +(stop.positionSecs / 60).roundToInt().toString() }
+                                for (train in report.trains) td("time") { +train.minutes(stop.stationId) }
                                 td { +names(stop.core.map(report::label)) }
                                 td { +names(stop.other.map(report::label)) }
                             }

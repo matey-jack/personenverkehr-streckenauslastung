@@ -31,7 +31,7 @@ Each pipeline step is a separate Gradle task (`./gradlew tasks --group pipeline`
 | `./gradlew coreRoutes` | `data/rail/*.parquet` | `data/reports/core_routes.csv`: the core routes of each route (columns are described in `CoreRoutes.kt`) |
 | `./gradlew coreRouteCheck` | `data/rail/*.parquet` | `data/reports/core_route_check.csv`: for each route, how its two most frequent station patterns compare with the stations most of its trips serve (columns are described in `CoreRouteCheck.kt`). `-PminDays=5` ignores trips running on fewer than 5 days |
 | `./gradlew hubStations` | `data/rail/*.parquet` | `data/reports/hub_stations.html`: a page to browse the core routes by hub station |
-| `./gradlew lines` | `data/rail/*.parquet` | `data/reports/lines.html`: for each testing route, its reconstructed line with warnings about an uncertain order, and the routes stopping at each station. `-PstopAllowance=180` and `-PdetourFactor=1.5` set the numbers in the rule for detours |
+| `./gradlew lines` | `data/rail/*.parquet` | `data/reports/lines.html`: for each testing route, its reconstructed line with the times of a few real trains and warnings about an uncertain order, and the routes stopping at each station. `-PstopAllowance=180` and `-PdetourFactor=1.5` set the numbers in the rule for detours |
 
 Paths can be overridden, e.g. `./gradlew filterRail -Pgtfs=/path/to/gtfs -Pout=data/rail`.
 

@@ -212,11 +212,23 @@ Routes we use for testing, with the route_id of their core route:
  - RB33 Potsdam – Jüterbog: `4740564_106`
  - RE2 Cottbus – Nauen: `de:VBB:11000000|R-Bahn|RE2:DB_106`
 
-A test page lists the reconstructed line of each of them, and at each station its position in minutes and what stops
-there: the core routes with a trip using the line there, and the routes where only other trips do. Below the line it
-lists the warnings, with the strong ones set apart, then all these core routes, and then the additional routes: those
-of which only other trips use the line. Both lists are sorted by name. Tabs switch between the agencies of the testing
-routes.
+A test page lists the reconstructed line of each of them, and at each station the times of the timed trains and what
+stops there: the core routes with a trip using the line there, and the routes where only other trips do. Below the
+line it lists the warnings, with the strong ones set apart, then all these core routes, and then the additional
+routes: those of which only other trips use the line. Both lists are sorted by name. Tabs switch between the agencies
+of the testing routes.
+
+The "timed trains" show how long real trains take along the line. Each is the "median trip" of some trips of one
+route with the same stops in the same order: the fastest of them that at least half of their trip-days do not exceed
+in travel time. A train is timed on its longest stretch of stops between which it uses the line and keeps one
+direction. Its column is headed by its name and the time of day at which it leaves its first station of the stretch,
+and gives the minutes after that at which it arrives at each station, and also those at which it leaves again if it
+stands there for two minutes or more.
+- The first timed train is that of the core route, in the direction in which the line is listed.
+- If it leaves stations untimed, the next one is the train with the most stops on the line that stops at one of them.
+- Up to two more follow as long as stations are untimed: each time the train that stops at the most of them.
+- A train running against the listed direction is only picked if no other one stops at an untimed station.
+- Among equal trains, one of a core route comes first, then the smaller route name.
 
 Relevant routes of one line that share their route_short_name get the suffixes `-1`, `-2`, … on it, in the order of
 their route_id. The suffix of a core route follows it: `S8-2a`.

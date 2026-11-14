@@ -108,7 +108,7 @@ class PipelineTest {
         assertContains(page, "<h2>RE1 Aheim Hbf – Cstadt <small>3 stations, 3 of them in the core route</small></h2>")
         assertContains(
             page,
-            "<tr class=\"core\"><td class=\"name\">Bdorf</td><td class=\"position\">8</td><td>RE1</td><td></td></tr>",
+            "<tr class=\"core\"><td class=\"name\">Bdorf</td><td class=\"time\">8</td><td>RE1</td><td></td></tr>",
         )
         assertContains(page, "<td class=\"name\">RE1</td><td>Aheim Hbf – Cstadt</td><td>DB Regio</td>")
     }
@@ -117,9 +117,14 @@ class PipelineTest {
     private fun pattern(stations: String, tripDays: Long) =
         Pattern(stations.map { it.toString() }, stations.length, "", "", "").also { it.tripDays = tripDays }
 
-    /** A run stopping at the stations named by the letters of [stations] at the seconds [times], without dwelling. */
-    private fun run(routeId: String, stations: String, vararg times: Long) =
-        Run(routeId, stations.map { it.toString() }, times.toList(), times.toList())
+    /**
+     * A run stopping at the stations named by the letters of [stations] at the seconds [times], without
+     * dwelling. Its median trip has the same times.
+     */
+    private fun run(routeId: String, stations: String, vararg times: Long): Run {
+        val secs = times.toList()
+        return Run(routeId, stations.map { it.toString() }, secs, secs, TripTimes(secs, secs))
+    }
 
     @Test
     fun `reconstructLine inserts the stations of other routes`() {
@@ -170,7 +175,16 @@ class PipelineTest {
 
         val names = "ABCD".map { it.toString() }.associateWith { "Station $it" }
         val page = withoutLayout(linesPage(listOf(report), names, emptyMap()))
-        assertContains(page, "<td class=\"name\">Station C</td><td class=\"position\">5</td>")
+        // R1 passes B and C, so R2 and R3 are timed as well. R4 stops nowhere new.
+        assertContains(
+            page,
+            "<th>Station</th><th class=\"time\">R1 <small>00:00</small></th>" +
+                "<th class=\"time\">R2 <small>00:00</small></th><th class=\"time\">R3 <small>00:00</small></th>",
+        )
+        assertContains(
+            page,
+            "<td class=\"name\">Station C</td><td class=\"time\"></td><td class=\"time\"></td><td class=\"time\">8</td>",
+        )
         assertContains(
             page,
             "<h3>Warnings</h3><ul><li class=\"strong\">Ordered by travel time only: Station B before Station C, " +
@@ -178,6 +192,44 @@ class PipelineTest {
                 "The trips stopping at only one of them differ by 33% in travel time.</li>" +
                 "<li>Against the order of the line: Station C &gt; Station B &gt; Station D (R4)</li></ul>",
         )
+    }
+
+    @Test
+    fun `timedTrains times the core route first, then the trains that stop at the most stations`() {
+        val line = Line("ABCDEF".map { it.toString() }, List(6) { 0.0 }, emptyList())
+        val scope = CoreRoute("re", "RE1", pattern("AF", 10), Difference(pattern("AF", 10), emptySet()))
+        val routes = listOf("re", "rb", "s", "back", "short").associateWith {
+            Route(it, it.uppercase(), 106, listOf(pattern("AF", 1)))
+        }
+        // The train of the core route leaves A at 08:00 and stops only at both ends.
+        val re =
+            Run(
+                "re",
+                listOf("A", "F"),
+                listOf<Long?>(null, 30000),
+                listOf<Long?>(28800, null),
+                TripTimes(listOf<Long?>(null, 30000), listOf<Long?>(28800, null)),
+            )
+        // Stops at the most stations, and waits at C for three minutes.
+        val rb = Run(
+            "rb",
+            "ABCD".map { it.toString() },
+            listOf<Long?>(0, 300, 600, 1000),
+            listOf<Long?>(0, 330, 780, 1000),
+            TripTimes(listOf<Long?>(0, 300, 600, 1000), listOf<Long?>(0, 330, 780, 1000)),
+        )
+        // The only train stopping at E runs against the listed direction.
+        val back = run("back", "FED", 0, 240, 480)
+        // Stops nowhere that RB does not, so it is never picked.
+        val short = run("short", "BCD", 0, 300, 700)
+        val index = RunIndex(listOf(re, rb, back, short), DetourRule())
+
+        val trains = timedTrains(line, scope, index, routes) { if (it === re) scope else null }
+        assertEquals(listOf("re", "rb", "back"), trains.map { it.route.id })
+        assertEquals(listOf("0", "", "", "", "", "20"), line.stations.map { trains[0].minutes(it) })
+        assertEquals(listOf("0", "5", "10–13", "17", "", ""), line.stations.map { trains[1].minutes(it) })
+        // It counts from its own first station on the line, F.
+        assertEquals(listOf("", "", "", "8", "4", "0"), line.stations.map { trains[2].minutes(it) })
     }
 
     @Test
@@ -218,7 +270,8 @@ class PipelineTest {
         val page = withoutLayout(linesPage(listOf(report), names, mapOf("re" to "Agency 1")))
         assertContains(
             page,
-            "<tr><td class=\"name\">Station D</td><td class=\"position\">16</td><td>RB1-1b</td><td>RB1-2</td></tr>",
+            "<tr><td class=\"name\">Station D</td><td class=\"time\"></td><td class=\"time\">22</td>" +
+                "<td>RB1-1b</td><td>RB1-2</td></tr>",
         )
         assertContains(page, "<h3>Additional routes with other trips stopping on the line</h3>")
         assertContains(
