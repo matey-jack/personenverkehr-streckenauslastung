@@ -110,3 +110,16 @@ registerStep(
         (findProperty("out") ?: "data/reports/hub_stations.html").toString(),
     )
 }
+
+registerStep(
+    "lines",
+    "streckenauslastung.LinesKt",
+    "Exploration: write an HTML page of the reconstructed lines of the testing routes.",
+) {
+    listOf(
+        (findProperty("rail") ?: "data/rail").toString(),
+        (findProperty("out") ?: "data/reports/lines.html").toString(),
+        (findProperty("stopAllowance") ?: "180").toString(),
+        (findProperty("detourFactor") ?: "1.5").toString(),
+    )
+}

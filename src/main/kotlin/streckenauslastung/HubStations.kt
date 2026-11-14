@@ -143,7 +143,7 @@ private fun duration(secs: Long): String {
     return if (minutes < 60) "$minutes min" else "%d:%02d h".format(minutes / 60, minutes % 60)
 }
 
-private fun resource(name: String) = ListedRoute::class.java.getResource(name)!!.readText()
+internal fun resource(name: String) = ListedRoute::class.java.getResource(name)!!.readText()
 
 /** Renders the overview as a self-contained HTML page; its style and script are in `src/main/resources`. */
 internal fun hubStationsPage(overview: HubOverview, stationNames: Map<String, String>): String {

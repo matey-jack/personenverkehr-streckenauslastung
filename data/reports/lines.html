@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8">
+    <title>Reconstructed lines of the testing routes</title>
+    <style>:root { color-scheme: light dark; }
+body { font-family: system-ui, sans-serif; font-size: 14px; margin: 0; padding: 0 1.5em 50vh; }
+/* The z-index keeps the header above the translucent text, which would otherwise be painted over it. */
+header { position: sticky; top: 0; z-index: 1; background: Canvas; padding-top: 0.5em; }
+h1 { margin: 0 0 0.4em; }
+nav { display: flex; flex-wrap: wrap; gap: 0.3em; border-bottom: 1px solid #8886; }
+nav button {
+  font: inherit; padding: 0.4em 1em; cursor: pointer; background: none; color: inherit;
+  border: 1px solid #8886; border-bottom: none; border-radius: 0.4em 0.4em 0 0;
+}
+nav button.active { background: #fc06; font-weight: 600; }
+small { opacity: 0.65; font-weight: normal; }
+section { padding: 0.3em 0 1.5em; }
+h2 { font-size: 1.15em; margin: 1em 0 0.5em; padding: 0.1em 0.3em; background: #fc06; }
+h3 { font-size: 1em; margin: 1em 0 0.2em; }
+table { border-collapse: collapse; }
+th { text-align: left; font-weight: normal; opacity: 0.65; }
+td, th { padding: 1px 1.5em 1px 0.3em; vertical-align: top; }
+tr:hover { background: #fc03; }
+table.line tr.core td.name, table.routes td.name { font-weight: 600; }
+table.line td:last-child { opacity: 0.65; }
+</style>
+  </head>
+  <body>
+    <header>
+      <h1>Reconstructed lines of the testing routes</h1>
+      <nav><button>Süd-Thüringen-Bahn Express</button><button>Erfurter Bahn Express</button><button>DB Regio AG Nordost</button><button>Ostdeutsche Eisenbahn GmbH</button></nav>
+    </header>
+    <section data-agency="Süd-Thüringen-Bahn Express">
+      <h2>RE50 Erfurt Hbf – Meiningen <small>19 stations, 10 of them in the core route</small></h2>
+      <table class="line">
+        <tr>
+          <th>Station</th>
+          <th>Routes with a core stop</th>
+          <th>Routes with other trips stopping</th>
+        </tr>
+        <tr class="core">
+          <td class="name">Erfurt Hbf</td>
+          <td>RB20, RB23, RB44, RB46, RE1, RE11, RE45, RE50, RE7</td>
+          <td>RE16</td>
+        </tr>
+        <tr>
+          <td class="name">Erfurt-Bischleben</td>
+          <td>RB20, RB23, RB46</td>
+          <td>RB44, RE1</td>
+        </tr>
+        <tr class="core">
+          <td class="name">Neudietendorf</td>
+          <td>RB20, RB23, RB44, RB46, RE1, RE11, RE45, RE50, RE7</td>
+          <td>RE16</td>
+        </tr>
+        <tr>
+          <td class="name">Sülzenbrücken</td>
+          <td>RB23, RB46</td>
+          <td>RB44</td>
+        </tr>
+        <tr>
+          <td class="name">Haarhausen</td>
+          <td>RB23, RB46</td>
+          <td>RB44</td>
+        </tr>
+        <tr class="core">
+          <td class="name">Arnstadt Hbf</td>
+          <td>RB23, RB44, RB46, RE45, RE50, RE7</td>
+          <td></td>
+        </tr>
+        <tr class="core">
+          <td class="name">Arnstadt Süd</td>
+          <td>RB44, RB46, RE45, RE50</td>
+          <td></td>
+        </tr>
+        <tr class="core">
+          <td class="name">Plaue (Thüringen)</td>
+          <td>RB44, RB46, RE50, RE7</td>
+          <td>RE45</td>
+        </tr>
+        <tr class="core">
+          <td class="name">Gräfenroda</td>
+          <td>RB44, RE50</td>
+          <td>RE7</td>
+        </tr>
+        <tr>
+          <td class="name">Dörrberg</td>
+          <td>RB44</td>
+          <td>RE50</td>
+        </tr>
+        <tr>
+          <td class="name">Gehlberg</td>
+          <td>RB44</td>
+          <td></td>
+        </tr>
+        <tr class="core">
+          <td class="name">Zella-Mehlis</td>
+          <td>RB44, RE50, RE7</td>
+          <td>RB43</td>
+        </tr>
+        <tr class="core">
+          <td class="name">Suhl</td>
+          <td>RB44, RE50, RE7</td>
+          <td>RB43</td>
+        </tr>
+        <tr>
+          <td class="name">Suhl-Heinrichs</td>
+          <td>RB44</td>
+          <td>RE50</td>
+        </tr>
+        <tr>
+          <td class="name">Dietzhausen</td>
+          <td>RB44</td>
+          <td>RE50, RE7</td>
+        </tr>
+        <tr>
+          <td class="name">Rohr (Thüringen)</td>
+          <td>RB44</td>
+          <td>RE50, RE7</td>
+        </tr>
+        <tr class="core">
+          <td class="name">Grimmenthal</td>
+          <td>RB41, RB44, RE50, RE7</td>
+          <td>RB40</td>
+        </tr>
+        <tr>
+          <td class="name">Untermaßfeld</td>
+          <td>RB41, RB44</td>
+          <td>RB40, RE50</td>
+        </tr>
+        <tr class="core">
+          <td class="name">Meiningen</td>
+          <td>RB41, RB44, RE50</td>
+          <td>RB40</td>
+        </tr>
+      </table>
+      <h3>Routes with core stops on the line</h3>
+      <table class="routes">
+        <tr>
+          <td class="name">RB20</td>
+          <td>Eisenach Hbf – Naumburg (Saale) Hbf</td>
+          <td>Abellio Rail Mitteldeutschland GmbH</td>
+          <td><small>3 stations</small></td>
+        </tr>
+        <tr>
+          <td class="name">RB23</td>
+          <td>Erfurt Hbf – Saalfeld (Saale)</td>
+          <td>Erfurter Bahn</td>
+          <td><small>6 stations</small></td>
+        </tr>
+        <tr>
+          <td class="name">RB44</td>
+          <td>Erfurt Hbf – Meiningen</td>
+          <td>Süd-Thüringen-Bahn</td>
+          <td><small>19 stations</small></td>
+        </tr>
+        <tr>
+          <td class="name">RB46</td>
+          <td>Erfurt Hbf – Ilmenau</td>
+          <td>Süd-Thüringen-Bahn</td>
+          <td><small>8 stations</small></td>
+        </tr>
+        <tr>
+          <td class="name">RE1</td>
+          <td>Glauchau, Bahnhof – Göttingen</td>
+          <td>DB Regio AG Südost</td>
+          <td><small>3 stations</small></td>
+        </tr>
+        <tr>
+          <td class="name">RE11</td>
+          <td>Göttingen – Erfurt Hbf</td>
+          <td>DB Regio AG Südost</td>
+          <td><small>2 stations</small></td>
+        </tr>
+        <tr>
+          <td class="name">RE45</td>
+          <td>Ilmenau – Erfurt Hbf</td>
+          <td>Süd-Thüringen-Bahn Express</td>
+          <td><small>5 stations</small></td>
+        </tr>
+        <tr>
+          <td class="name">RE50</td>
+          <td>Erfurt Hbf – Meiningen</td>
+          <td>Süd-Thüringen-Bahn Express</td>
+          <td><small>15 stations</small></td>
+        </tr>
+        <tr>
+          <td class="name">RE7</td>
+          <td>Erfurt Hbf – Würzburg Hbf</td>
+          <td>DB Regio AG Südost</td>
+          <td><small>10 stations</small></td>
+        </tr>
+        <tr>
+          <td class="name">RB41</td>
+          <td>Sonneberg (Thüringen) Hbf – Neuhaus am Rennweg</td>
+          <td>Süd-Thüringen-Bahn</td>
+          <td><small>3 stations</small></td>
+        </tr>
+      </table>
+      <h3>Routes with only other trips stopping on the line</h3>
+      <table class="routes">
+        <tr>
+          <td class="name">RE16</td>
+          <td>Erfurt Hbf – Halle (Saale) Hbf</td>
+          <td>Abellio Rail Mitteldeutschland GmbH</td>
+          <td><small>2 stations</small></td>
+        </tr>
+        <tr>
+          <td class="name">RB43</td>
+          <td>Zella-Mehlis – Wernshausen</td>
+          <td>Süd-Thüringen-Bahn</td>
+          <td><small>2 stations</small></td>
+        </tr>
+        <tr>
+          <td class="name">RB40</td>
+          <td>Bad Neustadt (Saale) – Schweinfurt Stadt</td>
+          <td>Erfurter Bahn</td>
+          <td><small>3 stations</small></td>
+        </tr>
+      </table>
+    </section>
+    <section data-agency="Erfurter Bahn Express">
+      <h2>RB21 Gera Hbf – Erfurt Hbf <small>16 stations, 7 of them in the core route</small></h2>
+      <table class="line">
+        <tr>
+          <th>Station</th>
+          <th>Routes with a core stop</th>
+          <th>Routes with other trips stopping</th>
+        </tr>
+        <tr class="core">
+          <td class="name">Gera Hbf</td>
+          <td>RB21, RE1</td>
+          <td>RE3</td>
+        </tr>
+        <tr>
+          <td class="name">Töppeln</td>
+          <td></td>
+          <td>RB21</td>
+        </tr>
+        <tr>
+          <td class="name">Kraftsdorf</td>
+          <td></td>
+          <td>RB21</td>
+        </tr>
+        <tr class="core">
+          <td class="name">Hermsdorf-Klosterlausnitz</td>
+          <td>RB21, RE1</td>
+          <td>RE3</td>
+        </tr>
+        <tr>
+          <td class="name">Papiermühle (bei Stadtroda)</td>
+          <td></td>
+          <td>RB21</td>
+        </tr>
+        <tr class="core">
+          <td class="name">Stadtroda</td>
+          <td>RB21, RE1</td>
+          <td>RE3</td>
+        </tr>
+        <tr>
+          <td class="name">Neue Schenke</td>
+          <td></td>
+          <td>RB21, RE1</td>
+        </tr>
+        <tr class="core">
+          <td class="name">Jena-Göschwitz</td>
+          <td>RB21, RE1, RE3</td>
+          <td></td>
+        </tr>
+        <tr class="core">
+          <td class="name">Jena West</td>
+          <td>RB21, RE1, RE3</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td class="name">Großschwabhausen</td>
+          <td>RB21</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td class="name">Mellingen (Thüringen)</td>
+          <td>RB21</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td class="name">Oberweimar</td>
+          <td>RB21</td>
+          <td></td>
+        </tr>
+        <tr class="core">
+          <td class="name">Weimar</td>
+          <td>RB20, RB21, RE1, RE16, RE3</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td class="name">Hopfgarten (bei Weimar)</td>
+          <td>RB20</td>
+          <td>RB21, RE16</td>
+        </tr>
+        <tr>
+          <td class="name">Vieselbach</td>
+          <td>RB20</td>
+          <td>RB21, RE16</td>
+        </tr>
+        <tr class="core">
+          <td class="name">Erfurt Hbf</td>
+          <td>RB20, RB21, RE1, RE16, RE3</td>
+          <td></td>
+        </tr>
+      </table>
+      <h3>Routes with core stops on the line</h3>
+      <table class="routes">
+        <tr>
+          <td class="name">RB21</td>
+          <td>Gera Hbf – Erfurt Hbf</td>
+          <td>Erfurter Bahn Express</td>
+          <td><small>7 stations</small></td>
+        </tr>
+        <tr>
+          <td class="name">RE1</td>
+          <td>Glauchau, Bahnhof – Göttingen</td>
+          <td>DB Regio AG Südost</td>
+          <td><small>8 stations</small></td>
+        </tr>
+        <tr>
+          <td class="name">RB21</td>
+          <td>Jena-Göschwitz – Weimar</td>
+          <td>Erfurter Bahn</td>
+          <td><small>16 stations</small></td>
+        </tr>
+        <tr>
+          <td class="name">RE3</td>
+          <td>Greiz – Gera Hbf</td>
+          <td>DB Regio AG Südost</td>
+          <td><small>7 stations</small></td>
+        </tr>
+        <tr>
+          <td class="name">RB20</td>
+          <td>Eisenach Hbf – Naumburg (Saale) Hbf</td>
+          <td>Abellio Rail Mitteldeutschland GmbH</td>
+          <td><small>4 stations</small></td>
+        </tr>
+        <tr>
+          <td class="name">RE16</td>
+          <td>Erfurt Hbf – Halle (Saale) Hbf</td>
+          <td>Abellio Rail Mitteldeutschland GmbH</td>
+          <td><small>4 stations</small></td>
+        </tr>
+      </table>
+    </section>
+    <section data-agency="DB Regio AG Nordost">
+      <h2>RE6a Wittenberge, Bahnhof – Hennigsdorf Bhf <small>22 stations, 18 of them in the core route</small></h2>
+      <table class="line">
+        <tr>
+          <th>Station</th>
+          <th>Routes with a core stop</th>
+          <th>Routes with other trips stopping</th>
+        </tr>
+        <tr class="core">
+          <td class="name">Wittenberge, Bahnhof</td>
+          <td>RE6</td>
+          <td></td>
+        </tr>
+        <tr class="core">
+          <td class="name">Weisen, Bahnhof</td>
+          <td>RE6</td>
+          <td></td>
+        </tr>
+        <tr class="core">
+          <td class="name">Perleberg, Bahnhof</td>
+          <td>RE6</td>
+          <td></td>
+        </tr>
+        <tr class="core">
+          <td class="name">Groß Pankow, Bahnhof</td>
+          <td>RE6</td>
+          <td></td>
+        </tr>
+        <tr class="core">
+          <td class="name">Pritzwalk, Bahnhof</td>
+          <td>RE6</td>
+          <td></td>
+        </tr>
+        <tr class="core">
+          <td class="name">Heiligengrabe, Bahnhof</td>
+          <td>RE6</td>
+          <td></td>
+        </tr>
+        <tr class="core">
+          <td class="name">Liebenthal (OPR), Bahnhof</td>
+          <td>RE6</td>
+          <td></td>
+        </tr>
+        <tr class="core">
+          <td class="name">Wittstock (Dosse), Bahnhof</td>
+          <td>RE6</td>
+          <td></td>
+        </tr>
+        <tr class="core">
+          <td class="name">Dossow, Bahnhof</td>
+          <td>RE6</td>
+          <td></td>
+        </tr>
+        <tr class="core">
+          <td class="name">Fretzdorf, Bahnhof</td>
+          <td>RE6</td>
+          <td></td>
+        </tr>
+        <tr class="core">
+          <td class="name">Netzeband, Bahnhof</td>
+          <td>RE6</td>
+          <td></td>
+        </tr>
+        <tr class="core">
+          <td class="name">Walsleben, Bahnhof</td>
+          <td>RE6</td>
+          <td></td>
+        </tr>
+        <tr class="core">
+          <td class="name">Neuruppin, West Bhf</td>
+          <td>RE6</td>
+          <td></td>
+        </tr>
+        <tr class="core">
+          <td class="name">Neuruppin, Rheinsberger Tor Bhf</td>
+          <td>RE6</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td class="name">Wustrau-Radensleben, Bahnhof</td>
+          <td>RE6</td>
+          <td></td>
+        </tr>
+        <tr class="core">
+          <td class="name">Beetz-Sommerfeld, Bahnhof</td>
+          <td>RE6</td>
+          <td></td>
+        </tr>
+        <tr class="core">
+          <td class="name">Kremmen, Bahnhof</td>
+          <td>RB55, RE6</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td class="name">Schwante, Bahnhof</td>
+          <td>RB55</td>
+          <td>RE6</td>
+        </tr>
+        <tr>
+          <td class="name">Vehlefanz, Bahnhof</td>
+          <td>RB55</td>
+          <td>RE6</td>
+        </tr>
+        <tr>
+          <td class="name">Bärenklau (OHV), Bahnhof</td>
+          <td>RB55</td>
+          <td>RE6</td>
+        </tr>
+        <tr class="core">
+          <td class="name">Velten, Bahnhof</td>
+          <td>RB55, RE6</td>
+          <td></td>
+        </tr>
+        <tr class="core">
+          <td class="name">Hennigsdorf Bhf</td>
+          <td>RB55, RE6</td>
+          <td></td>
+        </tr>
+      </table>
+      <h3>Routes with core stops on the line</h3>
+      <table class="routes">
+        <tr>
+          <td class="name">RE6</td>
+          <td>Wittenberge, Bahnhof – Hennigsdorf Bhf</td>
+          <td>DB Regio AG Nordost</td>
+          <td><small>22 stations</small></td>
+        </tr>
+        <tr>
+          <td class="name">RB55</td>
+          <td>Hennigsdorf Bhf – Kremmen, Bahnhof</td>
+          <td>DB Regio AG Nordost</td>
+          <td><small>6 stations</small></td>
+        </tr>
+      </table>
+    </section>
+    <section data-agency="Ostdeutsche Eisenbahn GmbH">
+      <h2>RB33 Jüterbog, Bahnhof – Potsdam Hbf <small>13 stations, 13 of them in the core route</small></h2>
+      <table class="line">
+        <tr>
+          <th>Station</th>
+          <th>Routes with a core stop</th>
+          <th>Routes with other trips stopping</th>
+        </tr>
+        <tr class="core">
+          <td class="name">Jüterbog, Bahnhof</td>
+          <td>RB33</td>
+          <td></td>
+        </tr>
+        <tr class="core">
+          <td class="name">Altes Lager, Bahnhof</td>
+          <td>RB33</td>
+          <td></td>
+        </tr>
+        <tr class="core">
+          <td class="name">Treuenbrietzen, Bahnhof Süd</td>
+          <td>RB33</td>
+          <td></td>
+        </tr>
+        <tr class="core">
+          <td class="name">Treuenbrietzen, Bahnhof</td>
+          <td>RB33</td>
+          <td></td>
+        </tr>
+        <tr class="core">
+          <td class="name">Buchholz (bei Treuenbrietzen), Bahnhof</td>
+          <td>RB33</td>
+          <td></td>
+        </tr>
+        <tr class="core">
+          <td class="name">Elsholz, Bahnhof</td>
+          <td>RB33</td>
+          <td></td>
+        </tr>
+        <tr class="core">
+          <td class="name">Beelitz, Stadt Bhf</td>
+          <td>RB33</td>
+          <td></td>
+        </tr>
+        <tr class="core">
+          <td class="name">Ferch-Lienewitz, Bahnhof</td>
+          <td>RB33</td>
+          <td></td>
+        </tr>
+        <tr class="core">
+          <td class="name">Caputh, Schwielowsee Bhf</td>
+          <td>RB33</td>
+          <td></td>
+        </tr>
+        <tr class="core">
+          <td class="name">Caputh-Geltow, Bahnhof</td>
+          <td>RB33</td>
+          <td></td>
+        </tr>
+        <tr class="core">
+          <td class="name">Potsdam, Pirschheide Bhf</td>
+          <td>RB33</td>
+          <td></td>
+        </tr>
+        <tr class="core">
+          <td class="name">Potsdam, Charlottenhof Bhf</td>
+          <td>RB20, RB21, RB22, RB33, RE1</td>
+          <td></td>
+        </tr>
+        <tr class="core">
+          <td class="name">Potsdam Hbf</td>
+          <td>RB20, RB21, RB22, RB33, RE1</td>
+          <td></td>
+        </tr>
+      </table>
+      <h3>Routes with core stops on the line</h3>
+      <table class="routes">
+        <tr>
+          <td class="name">RB33</td>
+          <td>Jüterbog, Bahnhof – Potsdam Hbf</td>
+          <td>Ostdeutsche Eisenbahn GmbH</td>
+          <td><small>13 stations</small></td>
+        </tr>
+        <tr>
+          <td class="name">RB20</td>
+          <td>Griebnitzsee Bhf – Hennigsdorf Bhf</td>
+          <td>DB Regio AG Nordost</td>
+          <td><small>2 stations</small></td>
+        </tr>
+        <tr>
+          <td class="name">RB21</td>
+          <td>Priort, Bahnhof – Hennigsdorf Bhf</td>
+          <td>DB Regio AG Nordost</td>
+          <td><small>2 stations</small></td>
+        </tr>
+        <tr>
+          <td class="name">RB22</td>
+          <td>Griebnitzsee Bhf – Königs Wusterhausen Bhf</td>
+          <td>DB Regio AG Nordost</td>
+          <td><small>2 stations</small></td>
+        </tr>
+        <tr>
+          <td class="name">RE1</td>
+          <td>Charlottenburg Bhf (Berlin) – Brandenburg an der Havel Hbf</td>
+          <td>Ostdeutsche Eisenbahn GmbH</td>
+          <td><small>2 stations</small></td>
+        </tr>
+      </table>
+    </section>
+    <section data-agency="DB Regio AG Nordost">
+      <h2>RE2 Cottbus Hbf – Nauen, Bahnhof <small>45 stations, 18 of them in the core route</small></h2>
+      <table class="line">
+        <tr>
+          <th>Station</th>
+          <th>Routes with a core stop</th>
+          <th>Routes with other trips stopping</th>
+        </tr>
+        <tr class="core">
+          <td class="name">Cottbus Hbf</td>
+          <td>RE2</td>
+          <td>RB43, RE10, RE20, RE7</td>
+        </tr>
+        <tr>
+          <td class="name">Kolkwitz, Bahnhof</td>
+          <td></td>
+          <td>RB43, RE10, RE2</td>
+        </tr>
+        <tr class="core">
+          <td class="name">Kunersdorf (SPN), Bahnhof</td>
+          <td>RE2</td>
+          <td></td>
+        </tr>
+        <tr class="core">
+          <td class="name">Vetschau, Bahnhof</td>
+          <td>RE2</td>
+          <td>RB43, RE10, RE20</td>
+        </tr>
+        <tr class="core">
+          <td class="name">Raddusch, Bahnhof</td>
+          <td>RE2</td>
+          <td>RB43</td>
+        </tr>
+        <tr class="core">
+          <td class="name">Lübbenau, Bahnhof</td>
+          <td>RE2, RE20, RE7</td>
+          <td>RB43, RE10</td>
+        </tr>
+        <tr class="core">
+          <td class="name">Lübben, Bahnhof</td>
+          <td>RE2, RE20, RE7</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td class="name">Lubolz, Bahnhof</td>
+          <td>RE7</td>
+          <td>RE2</td>
+        </tr>
+        <tr>
+          <td class="name">Schönwalde (Spreewald), Bahnhof</td>
+          <td>RE7</td>
+          <td>RE2</td>
+        </tr>
+        <tr class="core">
+          <td class="name">Brand, Tropical Islands Bhf</td>
+          <td>RE2, RE7</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td class="name">Oderin, Bahnhof</td>
+          <td>RE7</td>
+          <td>RE2, RE20</td>
+        </tr>
+        <tr>
+          <td class="name">Halbe, Bahnhof</td>
+          <td>RE7</td>
+          <td>RE2, RE20</td>
+        </tr>
+        <tr>
+          <td class="name">Groß Köris, Bahnhof</td>
+          <td>RE7</td>
+          <td>RE2, RE20</td>
+        </tr>
+        <tr>
+          <td class="name">Bestensee, Bahnhof</td>
+          <td>RE7</td>
+          <td>RE2, RE20</td>
+        </tr>
+        <tr>
+          <td class="name">Zeesen, Bahnhof</td>
+          <td>RE7</td>
+          <td>RE2</td>
+        </tr>
+        <tr class="core">
+          <td class="name">Königs Wusterhausen Bhf</td>
+          <td>RE2, RE20, RE7, S46</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td class="name">Wildau</td>
+          <td>S46</td>
+          <td>S8</td>
+        </tr>
+        <tr>
+          <td class="name">Zeuthen</td>
+          <td>S46</td>
+          <td>S8</td>
+        </tr>
+        <tr>
+          <td class="name">Eichwalde</td>
+          <td>S46</td>
+          <td>S8</td>
+        </tr>
+        <tr>
+          <td class="name">Grünau (Berlin)</td>
+          <td>S46, S8</td>
+          <td>S41, S42, S47, S85</td>
+        </tr>
+        <tr>
+          <td class="name">Adlershof (Berlin)</td>
+          <td>S46, S8, S85, S9</td>
+          <td>S41, S42, S47</td>
+        </tr>
+        <tr>
+          <td class="name">Johannisthal (Berlin)</td>
+          <td>S46, S8, S85, S9</td>
+          <td>S41, S42, S47</td>
+        </tr>
+        <tr class="core">
+          <td class="name">Schöneweide Bhf (Berlin)</td>
+          <td>RB24, RB32, RE2, S46, S47, S8, S85, S9</td>
+          <td>17, FEX, RE7, S41, S42</td>
+        </tr>
+        <tr>
+          <td class="name">Baumschulenweg (Berlin)</td>
+          <td>S46, S47, S8, S85, S9</td>
+          <td>S41, S42</td>
+        </tr>
+        <tr>
+          <td class="name">Plänterwald (Berlin)</td>
+          <td>S8, S85, S9</td>
+          <td>S41, S42, S46, S47</td>
+        </tr>
+        <tr>
+          <td class="name">Treptower Park (Berlin)</td>
+          <td>S41, S42, S8, S85, S9</td>
+          <td>S46, S47</td>
+        </tr>
+        <tr class="core">
+          <td class="name">Ostkreuz Bhf (Berlin)</td>
+          <td>RB24, RB32, RE2, RE7, S41, S42, S8, S85</td>
+          <td>17, FEX</td>
+        </tr>
+        <tr>
+          <td class="name">Frankfurter Allee (Berlin)</td>
+          <td>S41, S42, S8, S85</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td class="name">Storkower Str. (Berlin)</td>
+          <td>S41, S42, S8, S85</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td class="name">Landsberger Allee (Berlin)</td>
+          <td>S41, S42, S8, S85</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td class="name">Greifswalder Str. (Berlin)</td>
+          <td>S41, S42, S8, S85</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td class="name">Prenzlauer Allee (Berlin)</td>
+          <td>S41, S42, S8, S85</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td class="name">Schönhauser Allee (Berlin)</td>
+          <td>S41, S42, S8, S85</td>
+          <td></td>
+        </tr>
+        <tr class="core">
+          <td class="name">Gesundbrunnen Bhf (Berlin)</td>
+          <td>RE2, S15, S41, S42</td>
+          <td>18, 17, FEX, RB10, RE8</td>
+        </tr>
+        <tr>
+          <td class="name">Wedding (Berlin)</td>
+          <td>S15, S41, S42</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td class="name">Westhafen (Berlin)</td>
+          <td>S41, S42</td>
+          <td>S46</td>
+        </tr>
+        <tr>
+          <td class="name">Beusselstr. (Berlin)</td>
+          <td>S41, S42</td>
+          <td>S46</td>
+        </tr>
+        <tr>
+          <td class="name">Jungfernheide Bhf (Berlin)</td>
+          <td>RB10, RE4, RE8, S41, S42</td>
+          <td>RE2, S46</td>
+        </tr>
+        <tr class="core">
+          <td class="name">Spandau Bhf (Berlin)</td>
+          <td>RB10, RB14, RB21, RE2, RE4, RE8</td>
+          <td>18</td>
+        </tr>
+        <tr class="core">
+          <td class="name">Berlin, Albrechtshof Bhf</td>
+          <td>RB10, RB14, RE2</td>
+          <td>RB21, RE8</td>
+        </tr>
+        <tr class="core">
+          <td class="name">Seegefeld, Bahnhof</td>
+          <td>RB10, RB14, RE2</td>
+          <td>RB21, RE8</td>
+        </tr>
+        <tr class="core">
+          <td class="name">Falkensee, Bahnhof</td>
+          <td>RB10, RB14, RB21, RE2, RE8</td>
+          <td></td>
+        </tr>
+        <tr class="core">
+          <td class="name">Finkenkrug, Bahnhof</td>
+          <td>RB10, RB14, RE2</td>
+          <td>RB21, RE8</td>
+        </tr>
+        <tr class="core">
+          <td class="name">Brieselang, Bahnhof</td>
+          <td>RB10, RB14, RE2</td>
+          <td>RE8</td>
+        </tr>
+        <tr class="core">
+          <td class="name">Nauen, Bahnhof</td>
+          <td>RB10, RB14, RE2, RE8</td>
+          <td></td>
+        </tr>
+      </table>
+      <h3>Routes with core stops on the line</h3>
+      <table class="routes">
+        <tr>
+          <td class="name">RE2</td>
+          <td>Cottbus Hbf – Nauen, Bahnhof</td>
+          <td>DB Regio AG Nordost</td>
+          <td><small>27 stations</small></td>
+        </tr>
+        <tr>
+          <td class="name">RE20</td>
+          <td>Lübbenau, Bahnhof – Berlin Hbf</td>
+          <td>DB Regio AG Nordost</td>
+          <td><small>9 stations</small></td>
+        </tr>
+        <tr>
+          <td class="name">RE7</td>
+          <td>Senftenberg, Bahnhof – Ostbahnhof (Berlin)</td>
+          <td>DB Regio AG Nordost</td>
+          <td><small>14 stations</small></td>
+        </tr>
+        <tr>
+          <td class="name">S46</td>
+          <td>Königs Wusterhausen Bhf – Zeuthen</td>
+          <td>S-Bahn Berlin GmbH</td>
+          <td><small>5 stations</small></td>
+        </tr>
+        <tr>
+          <td class="name">S46</td>
+          <td>Königs Wusterhausen Bhf – Westend (Berlin)</td>
+          <td>S-Bahn Berlin GmbH</td>
+          <td><small>11 stations</small></td>
+        </tr>
+        <tr>
+          <td class="name">S46</td>
+          <td>Grünau (Berlin) – Hermannstr. (Berlin)</td>
+          <td>S-Bahn Berlin GmbH</td>
+          <td><small>8 stations</small></td>
+        </tr>
+        <tr>
+          <td class="name">S8</td>
+          <td>Birkenwerder Bhf – Grünau (Berlin)</td>
+          <td>S-Bahn Berlin GmbH</td>
+          <td><small>17 stations</small></td>
+        </tr>
+        <tr>
+          <td class="name">S85</td>
+          <td>Flughafen BER – Pankow (Berlin)</td>
+          <td>S-Bahn Berlin GmbH</td>
+          <td><small>14 stations</small></td>
+        </tr>
+        <tr>
+          <td class="name">S9</td>
+          <td>Spandau Bhf (Berlin) – Flughafen BER</td>
+          <td>S-Bahn Berlin GmbH</td>
+          <td><small>6 stations</small></td>
+        </tr>
+        <tr>
+          <td class="name">RB24</td>
+          <td>Eberswalde Hbf – Blankenfelde (TF) Bhf</td>
+          <td>DB Regio AG Nordost</td>
+          <td><small>2 stations</small></td>
+        </tr>
+        <tr>
+          <td class="name">RB32</td>
+          <td>Ludwigsfelde, Bahnhof – Lichtenberg Bhf (Berlin)</td>
+          <td>DB Regio AG Nordost</td>
+          <td><small>2 stations</small></td>
+        </tr>
+        <tr>
+          <td class="name">S47</td>
+          <td>Spindlersfeld (Berlin) – Südkreuz Bhf (Berlin)</td>
+          <td>S-Bahn Berlin GmbH</td>
+          <td><small>7 stations</small></td>
+        </tr>
+        <tr>
+          <td class="name">S9</td>
+          <td>Baumschulenweg (Berlin) – Plänterwald (Berlin)</td>
+          <td>S-Bahn Berlin GmbH</td>
+          <td><small>2 stations</small></td>
+        </tr>
+        <tr>
+          <td class="name">S9</td>
+          <td>Plänterwald (Berlin) – Treptower Park (Berlin)</td>
+          <td>S-Bahn Berlin GmbH</td>
+          <td><small>2 stations</small></td>
+        </tr>
+        <tr>
+          <td class="name">S41</td>
+          <td>Schönhauser Allee (Berlin) – Südkreuz Bhf (Berlin)</td>
+          <td>S-Bahn Berlin GmbH</td>
+          <td><small>8 stations</small></td>
+        </tr>
+        <tr>
+          <td class="name">S41</td>
+          <td>Beusselstr. (Berlin) – Beusselstr. (Berlin)</td>
+          <td>S-Bahn Berlin GmbH</td>
+          <td><small>19 stations</small></td>
+        </tr>
+        <tr>
+          <td class="name">S41</td>
+          <td>Beusselstr. (Berlin) – Beusselstr. (Berlin)</td>
+          <td>S-Bahn Berlin GmbH</td>
+          <td><small>18 stations</small></td>
+        </tr>
+        <tr>
+          <td class="name">S42</td>
+          <td>Beusselstr. (Berlin) – Beusselstr. (Berlin)</td>
+          <td>S-Bahn Berlin GmbH</td>
+          <td><small>19 stations</small></td>
+        </tr>
+        <tr>
+          <td class="name">S42</td>
+          <td>Beusselstr. (Berlin) – Beusselstr. (Berlin)</td>
+          <td>S-Bahn Berlin GmbH</td>
+          <td><small>15 stations</small></td>
+        </tr>
+        <tr>
+          <td class="name">S41</td>
+          <td>Landsberger Allee (Berlin) – Frankfurter Allee (Berlin)</td>
+          <td>S-Bahn Berlin GmbH</td>
+          <td><small>8 stations</small></td>
+        </tr>
+        <tr>
+          <td class="name">S42</td>
+          <td>Frankfurter Allee (Berlin) – Landsberger Allee (Berlin)</td>
+          <td>S-Bahn Berlin GmbH</td>
+          <td><small>6 stations</small></td>
+        </tr>
+        <tr>
+          <td class="name">S15</td>
+          <td>Gesundbrunnen Bhf (Berlin) – Berlin Hbf</td>
+          <td>S-Bahn Berlin GmbH</td>
+          <td><small>2 stations</small></td>
+        </tr>
+        <tr>
+          <td class="name">S15</td>
+          <td>Berlin Hbf – Gesundbrunnen Bhf (Berlin)</td>
+          <td>S-Bahn Berlin GmbH</td>
+          <td><small>2 stations</small></td>
+        </tr>
+        <tr>
+          <td class="name">RB10</td>
+          <td>Nauen, Bahnhof – Südkreuz Bhf (Berlin)</td>
+          <td>Ostdeutsche Eisenbahn GmbH</td>
+          <td><small>9 stations</small></td>
+        </tr>
+        <tr>
+          <td class="name">RE4</td>
+          <td>Spandau Bhf (Berlin) – Jüterbog, Bahnhof</td>
+          <td>DB Regio AG Nordost</td>
+          <td><small>2 stations</small></td>
+        </tr>
+        <tr>
+          <td class="name">RE8</td>
+          <td>Ludwigslust Bahnhof – Wismar Bahnhof</td>
+          <td>Ostdeutsche Eisenbahn GmbH</td>
+          <td><small>9 stations</small></td>
+        </tr>
+        <tr>
+          <td class="name">RB14</td>
+          <td>Nauen, Bahnhof – Spandau Bhf (Berlin)</td>
+          <td>DB Regio AG Nordost</td>
+          <td><small>7 stations</small></td>
+        </tr>
+        <tr>
+          <td class="name">RB21</td>
+          <td>Priort, Bahnhof – Hennigsdorf Bhf</td>
+          <td>DB Regio AG Nordost</td>
+          <td><small>5 stations</small></td>
+        </tr>
+      </table>
+      <h3>Routes with only other trips stopping on the line</h3>
+      <table class="routes">
+        <tr>
+          <td class="name">RB43</td>
+          <td>Cottbus Hbf – Frankfurt (Oder), Bahnhof</td>
+          <td>DB Regio AG Nordost</td>
+          <td><small>5 stations</small></td>
+        </tr>
+        <tr>
+          <td class="name">RE10</td>
+          <td>Cottbus Hbf – Frankfurt (Oder), Bahnhof</td>
+          <td>DB Regio AG Nordost</td>
+          <td><small>4 stations</small></td>
+        </tr>
+        <tr>
+          <td class="name">S8</td>
+          <td>Schönhauser Allee (Berlin) – Birkenwerder Bhf</td>
+          <td>S-Bahn Berlin GmbH</td>
+          <td><small>10 stations</small></td>
+        </tr>
+        <tr>
+          <td class="name">S85</td>
+          <td>Flughafen BER – Altglienicke (Berlin)</td>
+          <td>S-Bahn Berlin GmbH</td>
+          <td><small>14 stations</small></td>
+        </tr>
+        <tr>
+          <td class="name">17</td>
+          <td>Rostock Hbf – Dresden Hbf</td>
+          <td>DB Fernverkehr AG</td>
+          <td><small>3 stations</small></td>
+        </tr>
+        <tr>
+          <td class="name">FEX</td>
+          <td>Flughafen BER – Berlin Hbf</td>
+          <td>DB Regio AG Nordost</td>
+          <td><small>3 stations</small></td>
+        </tr>
+        <tr>
+          <td class="name">S42</td>
+          <td>Südkreuz Bhf (Berlin) – Treptower Park (Berlin)</td>
+          <td>S-Bahn Berlin GmbH</td>
+          <td><small>2 stations</small></td>
+        </tr>
+        <tr>
+          <td class="name">18</td>
+          <td>Hamburg-Altona – Südkreuz Bhf (Berlin)</td>
+          <td>DB Fernverkehr AG</td>
+          <td><small>2 stations</small></td>
+        </tr>
+      </table>
+    </section>
+    <script>const tabs = document.querySelectorAll('nav button');
+
+function show(agency) {
+  tabs.forEach(tab => tab.classList.toggle('active', tab.textContent === agency));
+  document.querySelectorAll('section').forEach(section => {
+    section.hidden = section.dataset.agency !== agency;
+  });
+}
+
+tabs.forEach(tab => tab.addEventListener('click', () => show(tab.textContent)));
+show(tabs[0].textContent);
+</script>
+  </body>
+</html>

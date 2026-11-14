@@ -165,14 +165,43 @@ that GTFS allows us to see) from the trip data given one core route that defines
 This includes finding all the other relevant routes, including those that have only non-core trips running on that line.
 (That is trips whose pattern is not a core route of their route.)
 
-TODO: put the algorithm description here
+### Reconstructing the line (provisional)
 
-Routes we use for testing (TODO: add the route_ids):
- - RE50 Erfurt – Meiningen
- - RB21 Erfurt – Gera
- - RE6a Hennigsdorf – Wittenberge
- - RB33 Potsdam – Jüterbog
- - RE2 Cottbus – Nauen
+Stations are those of "Core Routes", frequencies are counted in trip-days. For this task we ignore the direction: a 
+trip running the other way counts with its stations in reverse order.
+
+- A "hop" is a pair of neighbouring stations A, B of the line. The line starts as the stations of the core route, in
+  the order of its most frequent trip.
+- A "filler" of a hop is a trip of any route that stops at A, later at B, and at other stations in between, none of
+  which is on the line yet.
+- A filler is a "detour", and ignored, if it takes longer from A to B than 1.5 times the fastest trip from A to B plus
+  3 minutes for each of its stops after A up to and including B.
+- Each hop that has fillers gets the in-between stations of some of them inserted, in their order: fillers with the
+  same in-between stations count together, and those with the most trip-days win. This is repeated until no hop has a
+  filler left. Later rounds add the stations of the other fillers, and those of trips that stop at only one of A
+  and B.
+- A station of a filler that never gets inserted is "unplaced": no trip shows where it lies among the stations of the
+  line. It hints at a second line between A and B.
+
+A trip "uses the line" between two of its consecutive stops if both are stations of the line, and it is no detour
+between them. A route is relevant for the timetable if one of its trips uses the line.
+
+What this cannot see:
+- a trip that stops at only one station of the line (it counts as crossing the line),
+- a trip that passes the whole line without stopping,
+- whether trips run on separate tracks beside the line, like an S-Bahn beside a main line: their stations become
+  stations of the line.
+
+Routes we use for testing, with the route_id of their core route:
+ - RE50 Erfurt – Meiningen: `2233941_106`
+ - RB21 Erfurt – Gera: `7149172_106`
+ - RE6a Hennigsdorf – Wittenberge: `de:VBB:12070424|R-Bahn|RE6:_106:a`
+ - RB33 Potsdam – Jüterbog: `4740564_106`
+ - RE2 Cottbus – Nauen: `de:VBB:11000000|R-Bahn|RE2:DB_106`
+
+A test page lists the reconstructed line of each of them, and at each station the relevant routes that stop there:
+those with a core route stopping there, and those where only other trips do. Tabs switch between the agencies of the
+testing routes.
 
 Things to be designed:
  - does it make sense to make a timetable for an entire day, so the user can scroll through the time axis? This would 

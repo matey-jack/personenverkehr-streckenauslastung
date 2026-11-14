@@ -98,9 +98,94 @@ class PipelineTest {
     }
 
     @Test
+    fun `lines lists the stations of the line with the routes stopping there`(@TempDir tmp: Path) {
+        filterRail(gtfs, tmp.resolve("rail"))
+        val out = tmp.resolve("lines.html")
+        lines(tmp.resolve("rail"), out, listOf("R1"))
+        val page = withoutLayout(out.readText())
+        assertContains(page, "<nav><button>DB Regio</button></nav></header><section data-agency=\"DB Regio\">")
+        assertContains(page, "<h2>RE1 Aheim Hbf – Cstadt <small>3 stations, 3 of them in the core route</small></h2>")
+        assertContains(page, "<tr class=\"core\"><td class=\"name\">Bdorf</td><td>RE1</td><td></td></tr>")
+        assertContains(page, "<td class=\"name\">RE1</td><td>Aheim Hbf – Cstadt</td><td>DB Regio</td>")
+    }
+
+    /** A pattern of the stations named by the letters of [stations]. */
+    private fun pattern(stations: String, tripDays: Long) =
+        Pattern(stations.map { it.toString() }, stations.length, "", "", "").also { it.tripDays = tripDays }
+
+    /** A run stopping at the stations named by the letters of [stations] at the seconds [times], without dwelling. */
+    private fun run(routeId: String, stations: String, tripDays: Long, vararg times: Long) =
+        Run(routeId, stations.map { it.toString() }, times.toList(), times.toList(), tripDays)
+
+    @Test
+    fun `reconstructLine inserts the stations of other routes`() {
+        val re = run("re", "ACE", 10, 0, 600, 1200)
+        val rb = run("rb", "ABCDE", 10, 0, 400, 800, 1300, 1700)
+        // Runs the other way and adds F between D and E, once D is on the line.
+        val s = run("s", "EFDC", 5, 0, 300, 600, 1000)
+        // Takes far longer from A to C than the others: a detour, so Z is not even unplaced.
+        val detour = run("detour", "AZC", 10, 0, 1500, 3000)
+        // No trip stops at both B and U, so U stays unplaced.
+        val unplaced = run("unplaced", "AUC", 1, 0, 350, 700)
+        val crossing = run("crossing", "QCR", 10, 0, 300, 600)
+        val index = RunIndex(listOf(re, rb, s, detour, unplaced, crossing), DetourRule())
+
+        val line = reconstructLine(listOf("A", "C", "E"), index)
+        assertEquals("ABCDFE".map { it.toString() }, line.stations)
+        assertEquals(setOf("U"), line.unplaced)
+
+        val using = runsUsing(line, index)
+        // The next stop of the detour and of the unplaced run is not on the line.
+        assertEquals(listOf(re, rb), using.getValue("A"))
+        assertEquals(listOf(re, rb, s), using.getValue("C"))
+        assertEquals(listOf(s), using.getValue("F"))
+    }
+
+    @Test
+    fun `lineReport separates routes with core stops from routes with other trips`() {
+        val re = Route("re", "RE1", 106, listOf(pattern("ACE", 10)))
+        val rb = Route("rb", "RB1", 106, listOf(pattern("ABCDE", 10), pattern("AB", 2)))
+        // The core route of RB2 is elsewhere; one of its trips runs from D to E.
+        val rb2 = Route("rb2", "RB2", 106, listOf(pattern("QR", 10), pattern("DE", 1)))
+        val runs = listOf(
+            run("re", "ACE", 10, 0, 600, 1200),
+            run("rb", "ABCDE", 10, 0, 400, 800, 1300, 1700),
+            run("rb", "AB", 2, 0, 400),
+            run("rb2", "DE", 1, 0, 400),
+            run("rb2", "AUC", 1, 0, 350, 700),
+        )
+        val report = lineReport("re", listOf(re, rb, rb2), RunIndex(runs, DetourRule()))
+
+        assertEquals("ABCDE".map { it.toString() }, report.stops.map { it.stationId })
+        assertEquals(
+            listOf(listOf(re, rb), listOf(rb), listOf(re, rb), listOf(rb), listOf(re, rb)),
+            report.stops.map {
+                it.core
+            },
+        )
+        // RB2 stops at A and C, but does not use the line there: its next stop U is not on the line.
+        assertEquals(
+            listOf(emptyList(), emptyList(), emptyList(), listOf(rb2), listOf(rb2)),
+            report.stops.map {
+                it.other
+            },
+        )
+        assertEquals(listOf(re, rb), report.coreRoutes)
+        assertEquals(listOf(rb2), report.otherRoutes)
+
+        val names = "ABCDEU".map { it.toString() }.associateWith { "Station $it" }
+        val page = withoutLayout(linesPage(listOf(report), names, mapOf("re" to "Agency 1")))
+        assertContains(page, "<tr><td class=\"name\">Station D</td><td>RB1</td><td>RB2</td></tr>")
+        assertContains(page, "<p>Unplaced stations: Station U</p>")
+        assertContains(page, "<h3>Routes with only other trips stopping on the line</h3>")
+        assertContains(
+            page,
+            "<td class=\"name\">RB2</td><td> – </td><td>No agency</td><td><small>2 stations</small></td>",
+        )
+    }
+
+    @Test
     fun `listedRoutes lists both core routes of a route`() {
-        fun pattern(stations: String, tripDays: Long) =
-            Pattern(stations.map { it.toString() }, stations.length, "", "", "").also { it.tripDays = tripDays }
         // ABC is the most frequent pattern, but A, B, C and D are all served on most trip-days.
         val route = Route("R", "RE1", 106, listOf(pattern("ABC", 40), pattern("ABCD", 35), pattern("BCD", 25)))
         assertEquals(
