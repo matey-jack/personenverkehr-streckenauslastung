@@ -121,6 +121,46 @@ As a navigation aid, the station names in routes are clickable.
 
 And below all the hub stations we list all isolated core routes.
 
+
+## Deducing the long-distance train network from the GTFS data (plus minimal manually added data)
+
+Most parts of the rail network observe the rule "all direct trains between to stops A and B take the same route, only
+with different stopping patterns". And for many of remaining cases, the two alternative routes can be disambiguated by
+mentioning an intermediate station on one of the possible alternative routes. (If the trip doesn't stop there, mention
+the station in parentheses or explicitly "non-stop via X".) There's only very few direct high-speed lines with no
+intermediate stop, and we can refer to those by saying "via NBS".
+
+In order to visually verify our work and maybe also to find routing path ambiguities more easily in code, let's build a
+network graph for the German long-distance train network. We include every hop by a 101 or 102 time route that has a
+minimal number of daily trips for a minimum number of days in the timetable period. (My suggestion: at least 3 days per
+number of months in the timetable period that have at least 6 trips each.)
+
+Then we build the network from those hops with the following assumptions:
+
+- first use a manually entered list of NBS lines and mark those hops as going via the NBS.
+- then for all hops that match a regional train route, assume that the long-distance train hops via that route's line.
+- then for the remaining larger hops, route them via the line segments added before, using the hop times of stopping
+  long-distance trains to validate the travel time.
+- finally, there will only be a very few cases where a train does very large hops and could route them via different
+  paths that both would roughly match its travel time. We can list those cases in a CSV file, then I'll go ride the
+  trains to check the path and write that in the file.
+
+We can build a test page from this which shows the list of all long-distance core routes in a sidebar and an SVG of the
+network on the main page. Use the station coordinates to place stations in the SVG. Show only one station by city and
+label it with only the name of the city. When a line is selected and shown on the map, show the actual names of the
+stations in each city, but only one per city, preferring Hbf if there are more than one. When that doesn't break all
+ties, I'll give override rules later.
+
+On the sidebar, include a filter asking for a minimal number of trips on a minimal number of days. This way we can start
+from the major routes and dial it up over time.
+
+TODOs:
+ - define data format in which the NBS list is to be provided. Actually, that is so little data, it could be a constant 
+   in the code. But still, we need to define how the stations are identified which are connected via NBS'. 
+ - (hopefully we can defer this) define how an NBS with junctions to other routes can be specified, especially 
+   Mannheim–Stuttgart/Karlsruhe come to mind and Erfurt–Halle/Leipzig.
+ - define data format for the manual routing of trains when paths are ambiguous.
+
 # Visualizations
 
 Graphical timetable for lines between two major stations. Those will include all passenger trains which pass there, even
