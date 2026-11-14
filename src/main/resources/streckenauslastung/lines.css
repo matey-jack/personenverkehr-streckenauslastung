@@ -27,3 +27,6 @@ td, th { padding: 1px 1.5em 1px 0.3em; vertical-align: top; }
 tr:hover { background: #fc03; }
 table.line tr.core td.name, table.routes td.name { font-weight: 600; }
 table.line td:last-child { opacity: 0.65; }
+td.position { text-align: right; }
+ul { margin: 0.2em 0; padding-left: 1.5em; }
+li.strong { font-weight: 600; color: light-dark(#b00020, #ff8a80); }

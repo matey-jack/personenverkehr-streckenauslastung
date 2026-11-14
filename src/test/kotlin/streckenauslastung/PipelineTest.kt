@@ -5,6 +5,7 @@ import java.nio.file.Path
 import kotlin.io.path.readLines
 import kotlin.io.path.readText
 import kotlin.io.path.toPath
+import kotlin.math.roundToInt
 import kotlin.test.Test
 import kotlin.test.assertContains
 import kotlin.test.assertEquals
@@ -105,7 +106,10 @@ class PipelineTest {
         val page = withoutLayout(out.readText())
         assertContains(page, "<nav><button>DB Regio</button></nav></header><section data-agency=\"DB Regio\">")
         assertContains(page, "<h2>RE1 Aheim Hbf – Cstadt <small>3 stations, 3 of them in the core route</small></h2>")
-        assertContains(page, "<tr class=\"core\"><td class=\"name\">Bdorf</td><td>RE1</td><td></td></tr>")
+        assertContains(
+            page,
+            "<tr class=\"core\"><td class=\"name\">Bdorf</td><td class=\"position\">8</td><td>RE1</td><td></td></tr>",
+        )
         assertContains(page, "<td class=\"name\">RE1</td><td>Aheim Hbf – Cstadt</td><td>DB Regio</td>")
     }
 
@@ -114,31 +118,66 @@ class PipelineTest {
         Pattern(stations.map { it.toString() }, stations.length, "", "", "").also { it.tripDays = tripDays }
 
     /** A run stopping at the stations named by the letters of [stations] at the seconds [times], without dwelling. */
-    private fun run(routeId: String, stations: String, tripDays: Long, vararg times: Long) =
-        Run(routeId, stations.map { it.toString() }, times.toList(), times.toList(), tripDays)
+    private fun run(routeId: String, stations: String, vararg times: Long) =
+        Run(routeId, stations.map { it.toString() }, times.toList(), times.toList())
 
     @Test
     fun `reconstructLine inserts the stations of other routes`() {
-        val re = run("re", "ACE", 10, 0, 600, 1200)
-        val rb = run("rb", "ABCDE", 10, 0, 400, 800, 1300, 1700)
+        val re = run("re", "ACE", 0, 600, 1200)
+        val rb = run("rb", "ABCDE", 0, 400, 800, 1300, 1700)
         // Runs the other way and adds F between D and E, once D is on the line.
-        val s = run("s", "EFDC", 5, 0, 300, 600, 1000)
-        // Takes far longer from A to C than the others: a detour, so Z is not even unplaced.
-        val detour = run("detour", "AZC", 10, 0, 1500, 3000)
-        // No trip stops at both B and U, so U stays unplaced.
-        val unplaced = run("unplaced", "AUC", 1, 0, 350, 700)
-        val crossing = run("crossing", "QCR", 10, 0, 300, 600)
-        val index = RunIndex(listOf(re, rb, s, detour, unplaced, crossing), DetourRule())
+        val s = run("s", "EFDC", 0, 300, 600, 1000)
+        // Takes far longer from A to C than the others: a detour, so Z stays off the line.
+        val detour = run("detour", "AZC", 0, 1500, 3000)
+        // No trip stops at both B and U, so their travel times put them in an order.
+        val alternate = run("alternate", "AUC", 0, 500, 760)
+        val crossing = run("crossing", "QCR", 0, 300, 600)
+        val index = RunIndex(listOf(re, rb, s, detour, alternate, crossing), DetourRule())
 
         val line = reconstructLine(listOf("A", "C", "E"), index)
-        assertEquals("ABCDFE".map { it.toString() }, line.stations)
-        assertEquals(setOf("U"), line.unplaced)
+        assertEquals("ABUCDFE".map { it.toString() }, line.stations)
+        // A, C and E lie where the fastest trip reaches them, the others at their share of the way in between.
+        assertEquals(listOf(0, 300, 395, 600, 933, 1020, 1200), line.positions.map { it.roundToInt() })
+        val pair = line.timeOrdered.single()
+        assertEquals(listOf("B", "U", "A", "C"), listOf(pair.first, pair.second, pair.from, pair.to))
+        // The trips through B take 800 seconds from A to C, those through U 760.
+        assertEquals(false, pair.isStrong)
 
         val using = runsUsing(line, index)
-        // The next stop of the detour and of the unplaced run is not on the line.
-        assertEquals(listOf(re, rb), using.getValue("A"))
-        assertEquals(listOf(re, rb, s), using.getValue("C"))
+        // The next stop of the detour is not on the line.
+        assertEquals(listOf(re, rb, alternate), using.getValue("A"))
+        assertEquals(listOf(re, rb, s, alternate), using.getValue("C"))
         assertEquals(listOf(s), using.getValue("F"))
+    }
+
+    @Test
+    fun `lineReport warns about an order by travel time only and about trips against the order`() {
+        val routes = listOf("AD", "ABD", "ACD", "CBD").mapIndexed { i, stations ->
+            Route("r${i + 1}", "R${i + 1}", 106, listOf(pattern(stations, 10)))
+        }
+        val runs = listOf(
+            run("r1", "AD", 0, 500),
+            // The trips through B take 600 seconds from A to D, those through C 800: a third longer.
+            run("r2", "ABD", 0, 300, 600),
+            run("r3", "ACD", 0, 480, 800),
+            run("r4", "CBD", 0, 200, 500),
+        )
+        val report = lineReport("r1", routes, RunIndex(runs, DetourRule()))
+
+        assertEquals("ABCD".map { it.toString() }, report.stops.map { it.stationId })
+        assertEquals(true, report.timeOrdered.single().isStrong)
+        assertEquals(listOf("C", "B", "D"), report.againstOrder.single().stations)
+
+        val names = "ABCD".map { it.toString() }.associateWith { "Station $it" }
+        val page = withoutLayout(linesPage(listOf(report), names, emptyMap()))
+        assertContains(page, "<td class=\"name\">Station C</td><td class=\"position\">5</td>")
+        assertContains(
+            page,
+            "<h3>Warnings</h3><ul><li class=\"strong\">Ordered by travel time only: Station B before Station C, " +
+                "at 50% and 60% of the way from Station A to Station D. " +
+                "The trips stopping at only one of them differ by 33% in travel time.</li>" +
+                "<li>Against the order of the line: Station C &gt; Station B &gt; Station D (R4)</li></ul>",
+        )
     }
 
     @Test
@@ -149,11 +188,11 @@ class PipelineTest {
         // Another route called RB1. Its core route is elsewhere; one of its trips runs from D to E.
         val rb2 = Route("rb2", "RB1", 106, listOf(pattern("QR", 10), pattern("DE", 1)))
         val runs = listOf(
-            run("re", "ACE", 10, 0, 600, 1200),
-            run("rb", "ABCDE", 35, 0, 400, 800, 1300, 1700),
-            run("rb", "ABC", 40, 0, 400, 800),
-            run("rb2", "DE", 1, 0, 400),
-            run("rb2", "AUC", 1, 0, 350, 700),
+            run("re", "ACE", 0, 600, 1200),
+            run("rb", "ABCDE", 0, 400, 800, 1300, 1700),
+            run("rb", "ABC", 0, 400, 800),
+            run("rb2", "DE", 0, 400),
+            run("rb2", "AUQ", 0, 350, 700),
         )
         val report = lineReport("re", listOf(re, rb, rb2), RunIndex(runs, DetourRule()))
 
@@ -163,7 +202,7 @@ class PipelineTest {
             listOf("RE1 RB1-1a RB1-1b", "RB1-1a RB1-1b", "RE1 RB1-1a RB1-1b", "RB1-1b", "RE1 RB1-1b"),
             report.stops.map { stop -> stop.core.joinToString(" ") { report.label(it) } },
         )
-        // The second RB1 stops at A and C, but does not use the line there: its next stop U is not on the line.
+        // The second RB1 stops at A, but does not use the line there: its next stop U is not on the line.
         assertEquals(
             listOf(emptyList(), emptyList(), emptyList(), listOf(rb2), listOf(rb2)),
             report.stops.map { it.other },
@@ -177,8 +216,10 @@ class PipelineTest {
 
         val names = "ABCDEU".map { it.toString() }.associateWith { "Station $it" }
         val page = withoutLayout(linesPage(listOf(report), names, mapOf("re" to "Agency 1")))
-        assertContains(page, "<tr><td class=\"name\">Station D</td><td>RB1-1b</td><td>RB1-2</td></tr>")
-        assertContains(page, "<p>Unplaced stations: Station U</p>")
+        assertContains(
+            page,
+            "<tr><td class=\"name\">Station D</td><td class=\"position\">16</td><td>RB1-1b</td><td>RB1-2</td></tr>",
+        )
         assertContains(page, "<h3>Additional routes with other trips stopping on the line</h3>")
         assertContains(
             page,

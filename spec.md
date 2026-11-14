@@ -168,8 +168,9 @@ This includes finding all the other relevant routes, including those that have o
 
 ### Reconstructing the line (provisional)
 
-Stations are those of "Core Routes", frequencies are counted in trip-days. For this task we ignore the direction: a 
-trip running the other way counts with its stations in reverse order.
+Stations are those of "Core Routes". Trips of a route with the same stops count as one trip, with the times of the
+fastest of them. For this task we ignore the direction: a trip running the other way counts with its stations in
+reverse order.
 
 - A "hop" is a pair of neighbouring stations A, B of the line. The line starts as the stations of the core route, in
   the order of its most frequent trip.
@@ -177,15 +178,26 @@ trip running the other way counts with its stations in reverse order.
   which is on the line yet.
 - A filler is a "detour", and ignored, if it takes longer from A to B than 1.5 times the fastest trip from A to B plus
   3 minutes for each of its stops after A up to and including B.
-- Each hop that has fillers gets the in-between stations of some of them inserted, in their order: fillers with the
-  same in-between stations count together, and those with the most trip-days win. This is repeated until no hop has a
-  filler left. Later rounds add the stations of the other fillers, and those of trips that stop at only one of A
+- The "share" of a station X between A and B is the travel time from A to X as a share of the travel times from A to X
+  and from X to B: the median over the fillers stopping at X.
+- Each hop gets the in-between stations of all its fillers inserted. A station comes before another one if a filler
+  stops at both in this order. Where no filler does, or fillers contradict each other, the smaller share comes first.
+  This is repeated until no hop has a filler left: later rounds add the stations of trips that stop at only one of A
   and B.
-- A station of a filler that never gets inserted is "unplaced": no trip shows where it lies among the stations of the
-  line. It hints at a second line between A and B.
+- Each station has a "position": the travel time from the first station of the line. For the stations of the core
+  route these are the travel times of the fastest trip over each hop, added up. An inserted station lies at its share
+  of the way between the positions of A and B.
 
 A trip "uses the line" between two of its consecutive stops if both are stations of the line, and it is no detour
 between them. A route is relevant for the timetable if one of its trips uses the line.
+
+Two kinds of warnings point at stations whose order is uncertain:
+- Two neighbouring stations inserted into the same hop are "ordered by travel time only" if no filler stops at both.
+  The warning is a strong one if the fastest filler stopping at only the one takes over 10% longer from A to B than
+  the fastest filler stopping at only the other: then the two kinds of trips are hard to compare, or run on
+  different lines.
+- A trip goes "against the order" if it uses the line between three consecutive stops and does not keep one direction
+  along the line.
 
 What this cannot see:
 - a trip that stops at only one station of the line (it counts as crossing the line),
@@ -200,10 +212,11 @@ Routes we use for testing, with the route_id of their core route:
  - RB33 Potsdam – Jüterbog: `4740564_106`
  - RE2 Cottbus – Nauen: `de:VBB:11000000|R-Bahn|RE2:DB_106`
 
-A test page lists the reconstructed line of each of them, and at each station what stops there: the core routes with
-a trip using the line there, and the routes where only other trips do. Below the line it lists all these core routes,
-and then the additional routes: those of which only other trips use the line. Both lists are sorted by name. Tabs
-switch between the agencies of the testing routes.
+A test page lists the reconstructed line of each of them, and at each station its position in minutes and what stops
+there: the core routes with a trip using the line there, and the routes where only other trips do. Below the line it
+lists the warnings, with the strong ones set apart, then all these core routes, and then the additional routes: those
+of which only other trips use the line. Both lists are sorted by name. Tabs switch between the agencies of the testing
+routes.
 
 Relevant routes of one line that share their route_short_name get the suffixes `-1`, `-2`, … on it, in the order of
 their route_id. The suffix of a core route follows it: `S8-2a`.

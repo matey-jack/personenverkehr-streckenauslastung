@@ -32,6 +32,9 @@ td, th { padding: 1px 1.5em 1px 0.3em; vertical-align: top; }
 tr:hover { background: #fc03; }
 table.line tr.core td.name, table.routes td.name { font-weight: 600; }
 table.line td:last-child { opacity: 0.65; }
+td.position { text-align: right; }
+ul { margin: 0.2em 0; padding-left: 1.5em; }
+li.strong { font-weight: 600; color: light-dark(#b00020, #ff8a80); }
 </style>
   </head>
   <body>
@@ -44,101 +47,121 @@ table.line td:last-child { opacity: 0.65; }
       <table class="line">
         <tr>
           <th>Station</th>
+          <th>Minutes</th>
           <th>Routes with a core stop</th>
           <th>Routes with other trips stopping</th>
         </tr>
         <tr class="core">
           <td class="name">Erfurt Hbf</td>
+          <td class="position">0</td>
           <td>RB20, RB23, RB44, RB46, RE1, RE7, RE11, RE45, RE50</td>
           <td>RE16</td>
         </tr>
         <tr>
           <td class="name">Erfurt-Bischleben</td>
+          <td class="position">4</td>
           <td>RB20, RB23, RB46</td>
           <td>RB44, RE1</td>
         </tr>
         <tr class="core">
           <td class="name">Neudietendorf</td>
+          <td class="position">7</td>
           <td>RB20, RB23, RB44, RB46, RE1, RE7, RE11, RE45, RE50</td>
           <td>RE16</td>
         </tr>
         <tr>
           <td class="name">Sülzenbrücken</td>
+          <td class="position">9</td>
           <td>RB23, RB46</td>
           <td>RB44</td>
         </tr>
         <tr>
           <td class="name">Haarhausen</td>
+          <td class="position">11</td>
           <td>RB23, RB46</td>
           <td>RB44</td>
         </tr>
         <tr class="core">
           <td class="name">Arnstadt Hbf</td>
+          <td class="position">13</td>
           <td>RB23, RB44, RB46, RE7, RE45, RE50</td>
           <td></td>
         </tr>
         <tr class="core">
           <td class="name">Arnstadt Süd</td>
+          <td class="position">14</td>
           <td>RB44, RB46, RE45, RE50</td>
           <td></td>
         </tr>
         <tr class="core">
           <td class="name">Plaue (Thüringen)</td>
+          <td class="position">18</td>
           <td>RB44, RB46, RE7, RE50</td>
           <td>RE45</td>
         </tr>
         <tr class="core">
           <td class="name">Gräfenroda</td>
+          <td class="position">22</td>
           <td>RB44, RE50</td>
           <td>RE7</td>
         </tr>
         <tr>
           <td class="name">Dörrberg</td>
+          <td class="position">24</td>
           <td>RB44</td>
           <td>RE50</td>
         </tr>
         <tr>
           <td class="name">Gehlberg</td>
+          <td class="position">29</td>
           <td>RB44</td>
           <td></td>
         </tr>
         <tr class="core">
           <td class="name">Zella-Mehlis</td>
+          <td class="position">35</td>
           <td>RB44, RE7, RE50</td>
           <td>RB43</td>
         </tr>
         <tr class="core">
           <td class="name">Suhl</td>
+          <td class="position">40</td>
           <td>RB44, RE7, RE50</td>
           <td>RB43</td>
         </tr>
         <tr>
           <td class="name">Suhl-Heinrichs</td>
+          <td class="position">42</td>
           <td>RB44</td>
           <td>RE50</td>
         </tr>
         <tr>
           <td class="name">Dietzhausen</td>
+          <td class="position">44</td>
           <td>RB44</td>
           <td>RE7, RE50</td>
         </tr>
         <tr>
           <td class="name">Rohr (Thüringen)</td>
+          <td class="position">48</td>
           <td>RB44</td>
           <td>RE7, RE50</td>
         </tr>
         <tr class="core">
           <td class="name">Grimmenthal</td>
+          <td class="position">51</td>
           <td>RB41b, RB44, RE7, RE50</td>
           <td>RB40</td>
         </tr>
         <tr>
           <td class="name">Untermaßfeld</td>
+          <td class="position">53</td>
           <td>RB41b, RB44</td>
           <td>RB40, RE50</td>
         </tr>
         <tr class="core">
           <td class="name">Meiningen</td>
+          <td class="position">56</td>
           <td>RB41b, RB44, RE50</td>
           <td>RB40</td>
         </tr>
@@ -233,86 +256,103 @@ table.line td:last-child { opacity: 0.65; }
       <table class="line">
         <tr>
           <th>Station</th>
+          <th>Minutes</th>
           <th>Routes with a core stop</th>
           <th>Routes with other trips stopping</th>
         </tr>
         <tr class="core">
           <td class="name">Gera Hbf</td>
+          <td class="position">0</td>
           <td>RE1, RE21</td>
           <td>RB21, RE3</td>
         </tr>
         <tr>
           <td class="name">Töppeln</td>
+          <td class="position">5</td>
           <td></td>
           <td>RB21</td>
         </tr>
         <tr>
           <td class="name">Kraftsdorf</td>
+          <td class="position">8</td>
           <td></td>
           <td>RB21</td>
         </tr>
         <tr class="core">
           <td class="name">Hermsdorf-Klosterlausnitz</td>
+          <td class="position">12</td>
           <td>RE1, RE21</td>
           <td>RB21, RE3</td>
         </tr>
         <tr>
           <td class="name">Papiermühle (bei Stadtroda)</td>
+          <td class="position">15</td>
           <td></td>
           <td>RB21</td>
         </tr>
         <tr class="core">
           <td class="name">Stadtroda</td>
+          <td class="position">19</td>
           <td>RE1, RE21</td>
           <td>RB21, RE3</td>
         </tr>
         <tr>
           <td class="name">Neue Schenke</td>
+          <td class="position">22</td>
           <td></td>
           <td>RB21, RE1</td>
         </tr>
         <tr class="core">
           <td class="name">Jena-Göschwitz</td>
+          <td class="position">24</td>
           <td>RB21a, RB21b, RE1, RE3b, RE21</td>
           <td></td>
         </tr>
         <tr class="core">
           <td class="name">Jena West</td>
+          <td class="position">28</td>
           <td>RB21a, RB21b, RE1, RE3b, RE21</td>
           <td></td>
         </tr>
         <tr>
           <td class="name">Großschwabhausen</td>
+          <td class="position">32</td>
           <td>RB21a, RB21b</td>
           <td></td>
         </tr>
         <tr>
           <td class="name">Mellingen (Thüringen)</td>
+          <td class="position">36</td>
           <td>RB21a, RB21b</td>
           <td></td>
         </tr>
         <tr>
           <td class="name">Oberweimar</td>
+          <td class="position">38</td>
           <td>RB21a, RB21b</td>
           <td></td>
         </tr>
         <tr class="core">
           <td class="name">Weimar</td>
+          <td class="position">41</td>
           <td>RB20, RB21a, RB21b, RE1, RE3b, RE16, RE21</td>
           <td></td>
         </tr>
         <tr>
           <td class="name">Hopfgarten (bei Weimar)</td>
+          <td class="position">45</td>
           <td>RB20</td>
           <td>RB21, RE16</td>
         </tr>
         <tr>
           <td class="name">Vieselbach</td>
+          <td class="position">48</td>
           <td>RB20</td>
           <td>RB21, RE16</td>
         </tr>
         <tr class="core">
           <td class="name">Erfurt Hbf</td>
+          <td class="position">53</td>
           <td>RB20, RB21b, RE1, RE3b, RE16, RE21</td>
           <td></td>
         </tr>
@@ -368,116 +408,139 @@ table.line td:last-child { opacity: 0.65; }
       <table class="line">
         <tr>
           <th>Station</th>
+          <th>Minutes</th>
           <th>Routes with a core stop</th>
           <th>Routes with other trips stopping</th>
         </tr>
         <tr class="core">
           <td class="name">Wittenberge, Bahnhof</td>
+          <td class="position">0</td>
           <td>RE6a, RE6b</td>
           <td></td>
         </tr>
         <tr class="core">
           <td class="name">Weisen, Bahnhof</td>
+          <td class="position">3</td>
           <td>RE6a, RE6b</td>
           <td></td>
         </tr>
         <tr class="core">
           <td class="name">Perleberg, Bahnhof</td>
+          <td class="position">9</td>
           <td>RE6a, RE6b</td>
           <td></td>
         </tr>
         <tr class="core">
           <td class="name">Groß Pankow, Bahnhof</td>
+          <td class="position">21</td>
           <td>RE6a, RE6b</td>
           <td></td>
         </tr>
         <tr class="core">
           <td class="name">Pritzwalk, Bahnhof</td>
+          <td class="position">30</td>
           <td>RE6a, RE6b</td>
           <td></td>
         </tr>
         <tr class="core">
           <td class="name">Heiligengrabe, Bahnhof</td>
+          <td class="position">37</td>
           <td>RE6a, RE6b</td>
           <td></td>
         </tr>
         <tr class="core">
           <td class="name">Liebenthal (OPR), Bahnhof</td>
+          <td class="position">40</td>
           <td>RE6a, RE6b</td>
           <td></td>
         </tr>
         <tr class="core">
           <td class="name">Wittstock (Dosse), Bahnhof</td>
+          <td class="position">45</td>
           <td>RE6a, RE6b</td>
           <td></td>
         </tr>
         <tr class="core">
           <td class="name">Dossow, Bahnhof</td>
+          <td class="position">49</td>
           <td>RE6a, RE6b</td>
           <td></td>
         </tr>
         <tr class="core">
           <td class="name">Fretzdorf, Bahnhof</td>
+          <td class="position">53</td>
           <td>RE6a, RE6b</td>
           <td></td>
         </tr>
         <tr class="core">
           <td class="name">Netzeband, Bahnhof</td>
+          <td class="position">59</td>
           <td>RE6a, RE6b</td>
           <td></td>
         </tr>
         <tr class="core">
           <td class="name">Walsleben, Bahnhof</td>
+          <td class="position">63</td>
           <td>RE6a, RE6b</td>
           <td></td>
         </tr>
         <tr class="core">
           <td class="name">Neuruppin, West Bhf</td>
+          <td class="position">68</td>
           <td>RE6a, RE6b</td>
           <td></td>
         </tr>
         <tr class="core">
           <td class="name">Neuruppin, Rheinsberger Tor Bhf</td>
+          <td class="position">70</td>
           <td>RE6a, RE6b</td>
           <td></td>
         </tr>
         <tr>
           <td class="name">Wustrau-Radensleben, Bahnhof</td>
+          <td class="position">76</td>
           <td>RE6b</td>
           <td></td>
         </tr>
         <tr class="core">
           <td class="name">Beetz-Sommerfeld, Bahnhof</td>
+          <td class="position">82</td>
           <td>RE6a, RE6b</td>
           <td></td>
         </tr>
         <tr class="core">
           <td class="name">Kremmen, Bahnhof</td>
+          <td class="position">86</td>
           <td>RB55, RE6a, RE6b</td>
           <td></td>
         </tr>
         <tr>
           <td class="name">Schwante, Bahnhof</td>
+          <td class="position">88</td>
           <td>RB55</td>
           <td>RE6</td>
         </tr>
         <tr>
           <td class="name">Vehlefanz, Bahnhof</td>
+          <td class="position">90</td>
           <td>RB55</td>
           <td>RE6</td>
         </tr>
         <tr>
           <td class="name">Bärenklau (OHV), Bahnhof</td>
+          <td class="position">92</td>
           <td>RB55</td>
           <td>RE6</td>
         </tr>
         <tr class="core">
           <td class="name">Velten, Bahnhof</td>
+          <td class="position">94</td>
           <td>RB55, RE6a, RE6b</td>
           <td></td>
         </tr>
         <tr class="core">
           <td class="name">Hennigsdorf Bhf</td>
+          <td class="position">99</td>
           <td>RB55, RE6a, RE6b</td>
           <td></td>
         </tr>
@@ -509,71 +572,85 @@ table.line td:last-child { opacity: 0.65; }
       <table class="line">
         <tr>
           <th>Station</th>
+          <th>Minutes</th>
           <th>Routes with a core stop</th>
           <th>Routes with other trips stopping</th>
         </tr>
         <tr class="core">
           <td class="name">Jüterbog, Bahnhof</td>
+          <td class="position">0</td>
           <td>RB33</td>
           <td></td>
         </tr>
         <tr class="core">
           <td class="name">Altes Lager, Bahnhof</td>
+          <td class="position">5</td>
           <td>RB33</td>
           <td></td>
         </tr>
         <tr class="core">
           <td class="name">Treuenbrietzen, Bahnhof Süd</td>
+          <td class="position">12</td>
           <td>RB33</td>
           <td></td>
         </tr>
         <tr class="core">
           <td class="name">Treuenbrietzen, Bahnhof</td>
+          <td class="position">15</td>
           <td>RB33</td>
           <td></td>
         </tr>
         <tr class="core">
           <td class="name">Buchholz (bei Treuenbrietzen), Bahnhof</td>
+          <td class="position">22</td>
           <td>RB33</td>
           <td></td>
         </tr>
         <tr class="core">
           <td class="name">Elsholz, Bahnhof</td>
+          <td class="position">26</td>
           <td>RB33</td>
           <td></td>
         </tr>
         <tr class="core">
           <td class="name">Beelitz, Stadt Bhf</td>
+          <td class="position">30</td>
           <td>RB33</td>
           <td></td>
         </tr>
         <tr class="core">
           <td class="name">Ferch-Lienewitz, Bahnhof</td>
+          <td class="position">35</td>
           <td>RB33</td>
           <td></td>
         </tr>
         <tr class="core">
           <td class="name">Caputh, Schwielowsee Bhf</td>
+          <td class="position">38</td>
           <td>RB33</td>
           <td></td>
         </tr>
         <tr class="core">
           <td class="name">Caputh-Geltow, Bahnhof</td>
+          <td class="position">40</td>
           <td>RB33</td>
           <td></td>
         </tr>
         <tr class="core">
           <td class="name">Potsdam, Pirschheide Bhf</td>
+          <td class="position">43</td>
           <td>RB33</td>
           <td></td>
         </tr>
         <tr class="core">
           <td class="name">Potsdam, Charlottenhof Bhf</td>
+          <td class="position">46</td>
           <td>RB20, RB21, RB22a, RB22b, RB33, RE1a</td>
           <td></td>
         </tr>
         <tr class="core">
           <td class="name">Potsdam Hbf</td>
+          <td class="position">47</td>
           <td>RB20, RB21, RB22a, RB22b, RB33, RE1a</td>
           <td></td>
         </tr>
@@ -623,141 +700,169 @@ table.line td:last-child { opacity: 0.65; }
       <table class="line">
         <tr>
           <th>Station</th>
+          <th>Minutes</th>
           <th>Routes with a core stop</th>
           <th>Routes with other trips stopping</th>
         </tr>
         <tr class="core">
           <td class="name">Cottbus Hbf</td>
+          <td class="position">0</td>
           <td>RE2</td>
           <td>RB43, RE7, RE10, RE20</td>
         </tr>
         <tr>
           <td class="name">Kolkwitz, Bahnhof</td>
+          <td class="position">4</td>
           <td></td>
           <td>RB43, RE2, RE10</td>
         </tr>
         <tr class="core">
           <td class="name">Kunersdorf (SPN), Bahnhof</td>
+          <td class="position">6</td>
           <td>RE2</td>
           <td></td>
         </tr>
         <tr class="core">
           <td class="name">Vetschau, Bahnhof</td>
+          <td class="position">10</td>
           <td>RE2</td>
           <td>RB43, RE10, RE20</td>
         </tr>
         <tr class="core">
           <td class="name">Raddusch, Bahnhof</td>
+          <td class="position">13</td>
           <td>RE2</td>
           <td>RB43</td>
         </tr>
         <tr class="core">
           <td class="name">Lübbenau, Bahnhof</td>
+          <td class="position">17</td>
           <td>RE2, RE7a, RE20</td>
           <td>RB43, RE10</td>
         </tr>
         <tr class="core">
           <td class="name">Lübben, Bahnhof</td>
+          <td class="position">22</td>
           <td>RE2, RE7a, RE20</td>
           <td></td>
         </tr>
         <tr>
           <td class="name">Lubolz, Bahnhof</td>
+          <td class="position">24</td>
           <td>RE7a</td>
           <td>RE2</td>
         </tr>
         <tr>
           <td class="name">Schönwalde (Spreewald), Bahnhof</td>
+          <td class="position">27</td>
           <td>RE7a</td>
           <td>RE2</td>
         </tr>
         <tr class="core">
           <td class="name">Brand, Tropical Islands Bhf</td>
+          <td class="position">29</td>
           <td>RE2, RE7a</td>
           <td></td>
         </tr>
         <tr>
           <td class="name">Oderin, Bahnhof</td>
+          <td class="position">31</td>
           <td>RE7a</td>
           <td>RE2, RE20</td>
         </tr>
         <tr>
           <td class="name">Halbe, Bahnhof</td>
+          <td class="position">33</td>
           <td>RE7a</td>
           <td>RE2, RE20</td>
         </tr>
         <tr>
           <td class="name">Groß Köris, Bahnhof</td>
+          <td class="position">36</td>
           <td>RE7a</td>
           <td>RE2, RE20</td>
         </tr>
         <tr>
           <td class="name">Bestensee, Bahnhof</td>
+          <td class="position">40</td>
           <td>RE7a</td>
           <td>RE2, RE20</td>
         </tr>
         <tr>
           <td class="name">Zeesen, Bahnhof</td>
+          <td class="position">41</td>
           <td>RE7a</td>
           <td>RE2</td>
         </tr>
         <tr class="core">
           <td class="name">Königs Wusterhausen Bhf</td>
+          <td class="position">43</td>
           <td>RE2, RE7a, RE20</td>
           <td></td>
         </tr>
         <tr class="core">
           <td class="name">Schöneweide Bhf (Berlin)</td>
+          <td class="position">55</td>
           <td>RB24, RB32, RE2</td>
           <td>17, FEX, RE7</td>
         </tr>
         <tr class="core">
           <td class="name">Ostkreuz Bhf (Berlin)</td>
+          <td class="position">60</td>
           <td>RB24, RB32, RE2, RE7a</td>
           <td>17, FEX</td>
         </tr>
         <tr class="core">
           <td class="name">Gesundbrunnen Bhf (Berlin)</td>
+          <td class="position">68</td>
           <td>RE2</td>
           <td>17, 18, FEX, RB10, RE8</td>
         </tr>
         <tr>
           <td class="name">Jungfernheide Bhf (Berlin)</td>
+          <td class="position">73</td>
           <td>RB10, RE4, RE8b</td>
           <td>RE2</td>
         </tr>
         <tr class="core">
           <td class="name">Spandau Bhf (Berlin)</td>
+          <td class="position">77</td>
           <td>RB10, RB14, RB21, RE2, RE4, RE8b</td>
           <td>18</td>
         </tr>
         <tr class="core">
           <td class="name">Berlin, Albrechtshof Bhf</td>
+          <td class="position">80</td>
           <td>RB10, RB14, RE2</td>
           <td>RB21, RE8</td>
         </tr>
         <tr class="core">
           <td class="name">Seegefeld, Bahnhof</td>
+          <td class="position">81</td>
           <td>RB10, RB14, RE2</td>
           <td>RB21, RE8</td>
         </tr>
         <tr class="core">
           <td class="name">Falkensee, Bahnhof</td>
+          <td class="position">83</td>
           <td>RB10, RB14, RB21, RE2, RE8b</td>
           <td></td>
         </tr>
         <tr class="core">
           <td class="name">Finkenkrug, Bahnhof</td>
+          <td class="position">85</td>
           <td>RB10, RB14, RE2</td>
           <td>RB21, RE8</td>
         </tr>
         <tr class="core">
           <td class="name">Brieselang, Bahnhof</td>
+          <td class="position">88</td>
           <td>RB10, RB14, RE2</td>
           <td>RE8</td>
         </tr>
         <tr class="core">
           <td class="name">Nauen, Bahnhof</td>
+          <td class="position">93</td>
           <td>RB10, RB14, RE2, RE8b</td>
           <td></td>
         </tr>
