@@ -11,15 +11,18 @@ internal const val MAJORITY = 0.5
 
 /**
  * All trips of a route serving the same set of stations, in either direction and any order.
- * [numStops], [firstStation], [lastStation] and [stationNames] are those of its most frequent trip group.
+ * [stationIds], [numStops], [firstStation], [lastStation] and [stationNames] are those of its most
+ * frequent trip group.
  */
 internal class Pattern(
-    val stations: Set<String>,
+    val stationIds: List<String>,
     val numStops: Int,
     val firstStation: String,
     val lastStation: String,
     val stationNames: String,
 ) {
+    val stations = stationIds.toSet()
+
     /** The trips of the pattern, each counted once per day it runs. */
     var tripDays = 0L
 }
@@ -95,9 +98,9 @@ internal fun loadRoutes(railDir: Path, minDays: Int = 1): Routes {
             val row = rows.getOrPut(rs.getString(1)) {
                 Row(rs.getString(1), rs.getString(2) ?: "", rs.getInt(3), LinkedHashMap())
             }
-            val stations = (rs.getArray(5).array as Array<*>).map { it.toString() }.toSet()
-            val pattern = row.patterns.getOrPut(stations) {
-                Pattern(stations, rs.getInt(6), rs.getString(7), rs.getString(8), rs.getString(9))
+            val stationIds = (rs.getArray(5).array as Array<*>).map { it.toString() }
+            val pattern = row.patterns.getOrPut(stationIds.toSet()) {
+                Pattern(stationIds, rs.getInt(6), rs.getString(7), rs.getString(8), rs.getString(9))
             }
             pattern.tripDays += rs.getLong(4)
         }

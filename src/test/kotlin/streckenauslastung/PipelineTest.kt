@@ -3,8 +3,10 @@ package streckenauslastung
 import org.junit.jupiter.api.io.TempDir
 import java.nio.file.Path
 import kotlin.io.path.readLines
+import kotlin.io.path.readText
 import kotlin.io.path.toPath
 import kotlin.test.Test
+import kotlin.test.assertContains
 import kotlin.test.assertEquals
 
 class PipelineTest {
@@ -78,5 +80,53 @@ class PipelineTest {
             "R1,RE1,106,867,2,3,equal,0.67,Aheim Hbf,Cstadt,shorter -1,0.33,Cstadt,Aheim Hbf,1,equal,,",
             out.readLines()[1],
         )
+    }
+
+    @Test
+    fun `hubStations lists a single route as isolated`(@TempDir tmp: Path) {
+        filterRail(gtfs, tmp.resolve("rail"))
+        val out = tmp.resolve("hub_stations.html")
+        hubStations(tmp.resolve("rail"), out)
+        val page = out.readText()
+        assertContains(page, "1 touching no hub station")
+        assertContains(
+            page,
+            "<td class=\"name\">RE1</td><td class=\"type\">Regional <small>106</small></td>" +
+                "<td>Aheim Hbf</td><td>–</td><td>Cstadt</td>",
+        )
+    }
+
+    @Test
+    fun `listedRoutes lists both core routes of a route`() {
+        fun pattern(stations: String, tripDays: Long) =
+            Pattern(stations.map { it.toString() }, stations.length, "", "", "").also { it.tripDays = tripDays }
+        // ABC is the most frequent pattern, but A, B, C and D are all served on most trip-days.
+        val route = Route("R", "RE1", 106, listOf(pattern("ABC", 40), pattern("ABCD", 35), pattern("BCD", 25)))
+        assertEquals(
+            listOf("RE1a" to listOf("A", "B", "C"), "RE1b" to listOf("A", "B", "C", "D")),
+            listedRoutes(listOf(route)).map { it.shortName to it.stationIds },
+        )
+    }
+
+    @Test
+    fun `hubOverview finds hubs, stopping routes and isolated routes`() {
+        val names = listOf("A", "B", "C", "D", "E", "F", "G").associateWith { "Station $it" }
+        val re1 = ListedRoute("r1", "RE1", 106, listOf("A", "B", "C"))
+        val re2 = ListedRoute("r2", "RE2", 106, listOf("D", "A"))
+        val ice = ListedRoute("r3", "ICE", 101, listOf("D", "A", "C"))
+        // Both core routes of S1 end at E, which makes E no hub.
+        val s1a = ListedRoute("r4", "S1a", 109, listOf("E", "F"))
+        val s1b = ListedRoute("r4", "S1b", 109, listOf("E", "F", "G"))
+        val overview = hubOverview(listOf(re1, re2, ice, s1a, s1b), names)
+
+        assertEquals(listOf("A", "C", "D"), overview.hubs.map { it.stationId })
+        assertEquals(listOf(listOf(re1, re2), listOf(re1, ice), listOf(re2, ice)), overview.hubs.map { it.ending })
+        assertEquals(listOf(listOf(ice), emptyList(), emptyList()), overview.hubs.map { it.stopping })
+        assertEquals(listOf(s1a, s1b), overview.isolated)
+
+        val page = hubStationsPage(overview, names)
+        assertContains(page, "<details id=\"hub1\">\n<summary>Station A <small>2 routes starting or ending, 1 stopping")
+        // Under hub A, RE2 starts at A, which is not a link to itself; D is a link to its own section.
+        assertContains(page, "<td>Station A</td><td>–</td><td><a href=\"#hub3\">Station D</a></td>")
     }
 }

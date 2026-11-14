@@ -98,3 +98,14 @@ registerStep(
         (findProperty("minDays") ?: "1").toString(),
     )
 }
+
+registerStep(
+    "hubStations",
+    "streckenauslastung.HubStationsKt",
+    "Exploration: write an HTML page of the stations where several core routes start or end.",
+) {
+    listOf(
+        (findProperty("rail") ?: "data/rail").toString(),
+        (findProperty("out") ?: "data/reports/hub_stations.html").toString(),
+    )
+}
