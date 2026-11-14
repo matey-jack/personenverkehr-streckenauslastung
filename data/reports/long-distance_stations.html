@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8">
+    <title>Long-distance stations</title>
+    <style>:root { color-scheme: light dark; }
+body { font-family: system-ui, sans-serif; font-size: 14px; margin: 0; padding: 0.5em 1.5em 50vh; }
+h1 { margin: 0 0 0.4em; }
+small { opacity: 0.65; font-weight: normal; }
+table { border-collapse: collapse; }
+/* Opacity would make the background of the sticky header translucent, so the text colour is mixed. */
+th {
+  position: sticky; top: 0; z-index: 1; vertical-align: bottom; max-width: 8em;
+  text-align: left; font-weight: normal; background: Canvas; color: color-mix(in srgb, CanvasText 65%, Canvas);
+}
+td, th { padding: 2px 1.5em 2px 0.3em; }
+tr:hover { background: #fc03; }
+td.name { font-weight: 600; }
+td.number, th.number { text-align: right; }
+td.routes { cursor: help; }
+</style>
+  </head>
+  <body>
+    <h1>Long-distance stations</h1>
+    <p>The 150 stations with the most long-distance trip-days (route types 101 and 102).</p>
+    <table>
+      <thead>
+        <tr>
+          <th class="number">#</th>
+          <th>Station</th>
+          <th class="number">Long-distance trip-days</th>
+          <th class="number">Long-distance routes</th>
+          <th class="number">Regional routes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="number">1</td>
+          <td class="name">Berlin Hbf <small>de:11000:900003201</small></td>
+          <td class="number">11,934</td>
+          <td class="number routes" title="10, 11, 12, 12N, 15, 17, 18, 19, 27, 27N, 28, 29, 3, 6, 77, 82, 91, FLX10, FLX30">22</td>
+          <td class="number routes" title="DRF, FEX, RB10, RB63, RE20, RE3, RE4, RE5, RE51, RE8, S15, S3, S41, S46, S5, S7, S9">25</td>
+        </tr>
+        <tr>
+          <td class="number">2</td>
+          <td class="name">München Hbf <small>de:09162:100</small></td>
+          <td class="number">11,539</td>
+          <td class="number routes" title="11, 18, 24, 25, 27N, 28, 29, 41, 42, 47, 60, 62, 62N, 83, 88, 89, 90, 91, 91N">22</td>
+          <td class="number routes" title="DRF, RB16, RB33, RB48, RB54, RB55, RB56, RB57, RB58, RB6, RB60, RB65, RB66, RB68, RB74, RB86, RB87, RB89, RE1, RE16, RE2, RE23, RE25, RE3, RE4, RE5, RE61, RE62, RE70, RE72, RE76, RE80, RE89, RE9, RE96, S1, S2, S3, S4, S5, S6, S7, S8">47</td>
+        </tr>
+        <tr>
+          <td class="number">3</td>
+          <td class="name">Hannover Hbf <small>de:03241:31</small></td>
+          <td class="number">10,695</td>
+          <td class="number routes" title="10, 13, 14, 19, 20, 20N, 22, 24, 25, 26, 3, 33, 4, 55, 56, 77, 91N, FLX20, FLX30">21</td>
+          <td class="number routes" title="LEER, RB31, RB38, RE1, RE10, RE2, RE3, RE30, RE60, RE70, RE8, S1, S2, S21, S3, S4, S5, S51, S6, S7, SEV3">21</td>
+        </tr>
+        <tr>
+          <td class="number">4</td>
+          <td class="name">Köln Hbf <small>de:05315:11201</small></td>
+          <td class="number">10,157</td>
+          <td class="number routes" title="1, 10, 14, 19, 33, 35, 41, 42, 43, 43N, 45, 47, 49, 51, 55, 78, 79, 90N, 91, FLX20, FLX30, THA">25</td>
+          <td class="number routes" title="DRF, RB24, RB25, RB26, RB27, RB30, RB38, RB48, RE1, RE12, RE22, RE5, RE6, RE7, RE8, RE9, S11, S12, S19, S6">21</td>
+        </tr>
+        <tr>
+          <td class="number">5</td>
+          <td class="name">Frankfurt (Main) Hbf <small>de:06412:10</small></td>
+          <td class="number">10,033</td>
+          <td class="number routes" title="1, 11, 12, 13, 15, 20, 22, 24, 26, 3, 4, 41, 42, 43N, 45, 49, 50, 55, 62, 78, 79, 82, 84, 85, 91">27</td>
+          <td class="number routes" title="RB10, RB12, RB15, RB22, RB31, RB33, RB34, RB37, RB40, RB41, RB47, RB48, RB51, RB58, RB61, RB67, RB68, RB82, RE13, RE14, RE2, RE20, RE3, RE30, RE4, RE5, RE50, RE54, RE55, RE60, RE70, RE85, RE98, RE99, S1, S2, S3, S4, S5, S6, S7, S8, S9">47</td>
+        </tr>
+        <tr>
+          <td class="number">6</td>
+          <td class="name">Stuttgart Hbf <small>de:08111:6115</small></td>
+          <td class="number">9,515</td>
+          <td class="number routes" title="11, 13, 22, 42, 45, 47, 55, 6, 60, 61, 62, 62N, 83, 87, 90, FLX10">20</td>
+          <td class="number routes" title="DRB, DRF, IC87, MEX12, MEX13, MEX16, MEX17, MEX18, MEX19, MEX90, RB10a, RB14a, RB47, RB79, RB8, RE1, RE14a, RE14b, RE3, RE4, RE5, RE6, RE6a, RE6b, RE8, RE90, S1, S2, S3, S4, S5, S6, S60">35</td>
+        </tr>
+        <tr>
+          <td class="number">7</td>
+          <td class="name">Hamburg Hbf <small>de:02000:10950</small></td>
+          <td class="number">9,070</td>
+          <td class="number routes" title="1, 18, 20, 20N, 22, 24, 25, 27, 28, 33, 4, 42, 43, 57, 75, 91, 91N, EN, FLX10, FLX20">22</td>
+          <td class="number routes" title="RB31, RB41, RB61, RB71, RB81, RE1, RE3, RE4, RE5, RE7, RE70, RE8, RE80, RE8X, S1, S2, S3, S5, S7">19</td>
+        </tr>
+        <tr>
+          <td class="number">8</td>
+          <td class="name">Frankfurt (Main) Flughafen Fernbahnhof <small>de:06412:11511</small></td>
+          <td class="number">8,769</td>
+          <td class="number routes" title="1, 11, 12, 13, 15, 20, 41, 42, 43, 43N, 45, 47, 49, 50, 55, 62, 78, 79, 91">20</td>
+          <td class="number routes" title="RB58, S8, S9">3</td>
+        </tr>
+        <tr>
+          <td class="number">9</td>
+          <td class="name">Mannheim Hbf <small>de:08222:2417</small></td>
+          <td class="number">8,321</td>
+          <td class="number routes" title="11, 12, 12N, 15, 20, 22, 42, 43, 43N, 45, 47, 50, 55, 60, 62, 82, 84, 85">23</td>
+          <td class="number routes" title="RB35, RB46, RB56, RB67, RB69, RE, RE1, RE10, RE10a, RE10b, RE14, RE4, RE40, RE45, RE6, RE60, RE70, RE73, S1, S10, S2, S3, S33, S4, S5, S6, S7, S8, S9">35</td>
+        </tr>
+        <tr>
+          <td class="number">10</td>
+          <td class="name">Südkreuz Bhf (Berlin) <small>de:11000:900058101</small></td>
+          <td class="number">7,881</td>
+          <td class="number routes" title="10, 11, 12, 12N, 15, 17, 18, 19, 27, 27N, 28, 29, 3, 6, 77, 82, 91, FLX10, FLX30">22</td>
+          <td class="number routes" title="FEX, RB10, RE20, RE3, RE4, RE5, RE51, RE8, S2, S25, S26, S41, S42, S46, S47">27</td>
+        </tr>
+        <tr>
+          <td class="number">11</td>
+          <td class="name">Düsseldorf Hbf <small>de:05111:18235</small></td>
+          <td class="number">7,726</td>
+          <td class="number routes" title="1, 10, 14, 19, 33, 35, 41, 42, 43, 43N, 47, 51, 55, 62, 78, 91, FLX20, FLX30, THA">22</td>
+          <td class="number routes" title="RB33, RB39, RB48, RE1, RE10, RE100, RE11, RE13, RE19, RE2, RE3, RE4, RE47, RE5, RE6, RE7, S1, S11, S28, S6, S68, S8">24</td>
+        </tr>
+        <tr>
+          <td class="number">12</td>
+          <td class="name">Dortmund Hbf <small>de:05913:131</small></td>
+          <td class="number">7,161</td>
+          <td class="number routes" title="10, 14, 19, 33, 41, 42, 43, 47, 51, 55, 62, 77, 91, 91N, FLX20, FLX30, THA">18</td>
+          <td class="number routes" title="RB32, RB43, RB50, RB51, RB52, RB53, RB59, RE1, RE11, RE3, RE34, RE4, RE57, RE6, S1, S2, S5">20</td>
+        </tr>
+        <tr>
+          <td class="number">13</td>
+          <td class="name">Nürnberg Hbf <small>de:09564:510</small></td>
+          <td class="number">7,049</td>
+          <td class="number routes" title="1, 18, 25, 28, 29, 41, 6, 61, 91, 91N">10</td>
+          <td class="number routes" title="RB11, RB12, RB16, RB30, RB31, RE1, RE10, RE14, RE16, RE19, RE20, RE22, RE28, RE29, RE30, RE31, RE32, RE33, RE35, RE38, RE40, RE41, RE43, RE47, RE50, RE60, RE90, S1, S2, S3, S4, S5, S6">38</td>
+        </tr>
+        <tr>
+          <td class="number">14</td>
+          <td class="name">Erfurt Hbf <small>de:16051:8010101</small></td>
+          <td class="number">6,953</td>
+          <td class="number routes" title="11, 12, 12N, 15, 18, 28, 29, 50, 51, 82, 91, FLX10">14</td>
+          <td class="number routes" title="DRF, RB20, RB21, RB23, RB44, RB46, RB52, RB59, RE1, RE10, RE11, RE16, RE29, RE3, RE45, RE50, RE55, RE56, RE7">20</td>
+        </tr>
+        <tr>
+          <td class="number">15</td>
+          <td class="name">Karlsruhe Hbf <small>de:08212:90</small></td>
+          <td class="number">6,271</td>
+          <td class="number routes" title="12, 12N, 13, 20, 20N, 26, 43, 43N, 45, 60, 61, 82, 83, 84, 85, 90, FLX10">23</td>
+          <td class="number routes" title="DRB, FEX, MEX17, RB41, RB44, RB51, RB52, RB54, RB72, RE1, RE2, RE21, RE4, RE40, RE45, RE6, RE7, RE71, RE73, S1, S2, S3, S31, S32, S33, S4, S44, S5, S52, S6, S71, S81, S9">37</td>
+        </tr>
+        <tr>
+          <td class="number">16</td>
+          <td class="name">Augsburg Hbf <small>de:09761:100</small></td>
+          <td class="number">6,118</td>
+          <td class="number routes" title="11, 18, 24, 25, 28, 29, 41, 42, 47, 60, 62, 62N, 83, 90, 91, 91N">18</td>
+          <td class="number routes" title="DRF, RB13, RB67, RB69, RB77, RB83, RB86, RB87, RB89, RE1, RE16, RE17, RE7, RE71, RE73, RE79, RE80, RE89, RE9">21</td>
+        </tr>
+        <tr>
+          <td class="number">17</td>
+          <td class="name">Duisburg Hbf <small>de:05112:16032</small></td>
+          <td class="number">5,527</td>
+          <td class="number routes" title="1, 10, 14, 19, 33, 35, 41, 42, 43, 43N, 47, 51, 55, 62, 78, 91, FLX20, FLX30, THA">22</td>
+          <td class="number routes" title="RB31, RB33, RB35, RE1, RE11, RE19, RE2, RE3, RE42, RE44, RE5, RE6, S1">14</td>
+        </tr>
+        <tr>
+          <td class="number">18</td>
+          <td class="name">Fulda Bahnhof <small>de:06631:11049</small></td>
+          <td class="number">5,446</td>
+          <td class="number routes" title="11, 12, 12N, 13, 15, 20, 22, 25, 26, 29, 42, 50, FLX10">15</td>
+          <td class="number routes" title="RB45, RB5, RB51, RB52, RE, RE25, RE5, RE50">8</td>
+        </tr>
+        <tr>
+          <td class="number">19</td>
+          <td class="name">Leipzig Hbf <small>de:14713:8010205</small></td>
+          <td class="number">5,334</td>
+          <td class="number routes" title="11, 12, 12N, 15, 17, 18, 28, 29, 50, 51, 55, 56, 57, 61, 91, 97, FLX10">19</td>
+          <td class="number routes" title="RB110, RB113, RB13, RB22, RE10, RE11, RE12, RE13, RE15, RE50, RE6, S1, S2, S3, S30, S4, S5, S5X, S6">22</td>
+        </tr>
+        <tr>
+          <td class="number">20</td>
+          <td class="name">Hamburg-Harburg <small>de:02000:8000147</small></td>
+          <td class="number">5,131</td>
+          <td class="number routes" title="1, 20, 20N, 22, 24, 25, 33, 4, 42, 43, 57, 77, 91N, FLX20">16</td>
+          <td class="number routes" title="DRF, RB31, RB38, RB41, RE3, RE4, RE5, S3, S5">9</td>
+        </tr>
+        <tr>
+          <td class="number">21</td>
+          <td class="name">Kassel Bahnhof Wilhelmshöhe <small>de:06611:200007</small></td>
+          <td class="number">5,067</td>
+          <td class="number routes" title="12, 13, 20, 22, 24, 25, 26, 3, 42, 51, 91N">12</td>
+          <td class="number routes" title="RB38, RB39, RB4, RB5, RB57, RB83, RE11, RE30, RE39, RE5, RE50, RE8, RE9, RE98, RT5">15</td>
+        </tr>
+        <tr>
+          <td class="number">22</td>
+          <td class="name">Basel SBB <small>ch:1:sloid:10</small></td>
+          <td class="number">5,030</td>
+          <td class="number routes" title="12, 12N, 20, 20N, 43, 43N, 6, 60, 61, 85, EC, ECM, EN, IC, ICE, NJ">22</td>
+          <td class="number routes" title="RB27, RE7, S6">3</td>
+        </tr>
+        <tr>
+          <td class="number">23</td>
+          <td class="name">Salzburg Hbf <small>at:45:50002</small></td>
+          <td class="number">5,011</td>
+          <td class="number routes" title="27N, 62, 62N, 90, 90N, 91N, EC, EN, ICE, RJ, RJX">21</td>
+          <td class="number routes" title="2, 3, DRF, R, RB45, RE5">8</td>
+        </tr>
+        <tr>
+          <td class="number">24</td>
+          <td class="name">Göttingen <small>de:03152:33817</small></td>
+          <td class="number">4,882</td>
+          <td class="number routes" title="13, 20, 20N, 22, 24, 25, 26, 3, 91N">11</td>
+          <td class="number routes" title="RB80, RB82, RB83, RB85, RB86, RB87, RE1, RE11, RE2">9</td>
+        </tr>
+        <tr>
+          <td class="number">25</td>
+          <td class="name">Hamburg-Altona <small>de:02000:8002553</small></td>
+          <td class="number">4,837</td>
+          <td class="number routes" title="1, 18, 20, 20N, 24, 27, 28, 33, 4, 42, 43, 91, 91N">14</td>
+          <td class="number routes" title="RB60, RB61, RB71, RE6, RE6x, RE7, RE70, S1, S2, S3, S5, S7">12</td>
+        </tr>
+        <tr>
+          <td class="number">26</td>
+          <td class="name">Essen Hbf <small>de:05113:9289</small></td>
+          <td class="number">4,620</td>
+          <td class="number routes" title="1, 10, 14, 19, 33, 41, 42, 43, 47, 51, 55, 62, 91, 91N, FLX20, FLX30, THA">18</td>
+          <td class="number routes" title="RB32, RB33, RB40, RE1, RE100, RE11, RE14, RE16, RE2, RE3, RE42, RE49, RE6, S1, S2, S3, S6, S9">19</td>
+        </tr>
+        <tr>
+          <td class="number">27</td>
+          <td class="name">Hamburg Dammtor <small>de:02000:8002548</small></td>
+          <td class="number">4,565</td>
+          <td class="number routes" title="20, 20N, 22, 25, 27, 28, 4, 42, 43, 91N">12</td>
+          <td class="number routes" title="RB61, RB71, RE7, RE70, S1, S2, S3, S5, S7">9</td>
+        </tr>
+        <tr>
+          <td class="number">28</td>
+          <td class="name">Halle (Saale) Hbf <small>de:15002:8010159</small></td>
+          <td class="number">4,557</td>
+          <td class="number routes" title="11, 12, 12N, 15, 18, 29, 55, 56, 57, 6, 82, 91, FLX10">14</td>
+          <td class="number routes" title="RB20, RB25, RB47, RB77, RE16, RE24, RE3, RE30, RE4, S11, S3, S5, S5X, S8, S9">17</td>
+        </tr>
+        <tr>
+          <td class="number">29</td>
+          <td class="name">Ulm Hbf <small>de:08421:1008</small></td>
+          <td class="number">4,432</td>
+          <td class="number routes" title="11, 42, 47, 55, 60, 62, 62N, 83, 90">11</td>
+          <td class="number routes" title="DRF, MEX16, RB15, RE200, RE3, RE5, RE50, RE55, RE75, RE9, RS2, RS21, RS3, RS5, RS51, RS7, RS71, SAB">20</td>
+        </tr>
+        <tr>
+          <td class="number">30</td>
+          <td class="name">Bielefeld Hbf <small>de:05711:5500</small></td>
+          <td class="number">4,179</td>
+          <td class="number routes" title="10, 19, 55, FLX30">4</td>
+          <td class="number routes" title="RB61, RB67, RB69, RB71, RB73, RB74, RB75, RE6, RE70, RE78, RE82">11</td>
+        </tr>
+        <tr>
+          <td class="number">31</td>
+          <td class="name">Braunschweig Hbf <small>de:03101:178</small></td>
+          <td class="number">4,018</td>
+          <td class="number routes" title="10, 13, 19, 55, 56">5</td>
+          <td class="number routes" title="RB40, RB42, RB43, RB44, RB45, RB46, RB47, RB48, RE50, RE60, RE70">11</td>
+        </tr>
+        <tr>
+          <td class="number">32</td>
+          <td class="name">Zürich HB <small>ch:1:sloid:3000</small></td>
+          <td class="number">3,997</td>
+          <td class="number routes" title="1, 3, EC, ECM, EN, IC, ICE, NJ">10</td>
+          <td class="number routes" title="13, 16, 48, 75, 9, RE">7</td>
+        </tr>
+        <tr>
+          <td class="number">33</td>
+          <td class="name">Würzburg Hbf <small>de:09663:177</small></td>
+          <td class="number">3,970</td>
+          <td class="number routes" title="1, 12, 24, 25, 29, 41, 91, 91N">8</td>
+          <td class="number routes" title="DRF, RB53, RB79, RB8, RB80, RB85, RE10, RE20, RE54, RE55, RE7, RE8, RE80">13</td>
+        </tr>
+        <tr>
+          <td class="number">34</td>
+          <td class="name">Gesundbrunnen Bhf (Berlin) <small>de:11000:900007102</small></td>
+          <td class="number">3,693</td>
+          <td class="number routes" title="10, 11, 12, 15, 17, 18, 19, 27, 28, 29, 3, 6, 82, 95, 96, EN">16</td>
+          <td class="number routes" title="DRF, FEX, HBX, RB10, RB27, RB63, RE2, RE20, RE3, RE5, RE51, RE7, RE8, S1, S15, S2, S25, S26, S41, S42, S85">27</td>
+        </tr>
+        <tr>
+          <td class="number">35</td>
+          <td class="name">Bremen Hbf <small>de:04011:13927</small></td>
+          <td class="number">3,607</td>
+          <td class="number routes" title="13, 20N, 26, 33, 42, 43, 56, FLX20">9</td>
+          <td class="number routes" title="IC56, RB37, RB41, RB58, RE1, RE4, RE8, RE9, RS1, RS2, RS3, RS30, RS4">14</td>
+        </tr>
+        <tr>
+          <td class="number">36</td>
+          <td class="name">Dresden Bahnhof Neustadt <small>de:14612:16</small></td>
+          <td class="number">3,433</td>
+          <td class="number routes" title="12N, 15, 17, 27, 27N, 50, 55, 56, FLX30">12</td>
+          <td class="number routes" title="IC17, RB30, RB31, RB33, RB60, RB61, RE1, RE15, RE18, RE2, RE3, RE50, S1, S2, S8">16</td>
+        </tr>
+        <tr>
+          <td class="number">37</td>
+          <td class="name">Dresden Hbf <small>de:14612:28</small></td>
+          <td class="number">3,428</td>
+          <td class="number routes" title="12N, 15, 17, 27, 27N, 50, 55, 56, FLX30">12</td>
+          <td class="number routes" title="DRF, RB30, RB60, RB61, RE1, RE19, RE2, RE20, RE3, RE50, S1, S2, S3, S8">16</td>
+        </tr>
+        <tr>
+          <td class="number">38</td>
+          <td class="name">Magdeburg Hbf <small>de:15003:8010224</small></td>
+          <td class="number">3,362</td>
+          <td class="number routes" title="10, 13, 17, 19, 55, 56, 57">7</td>
+          <td class="number routes" title="HBX, RB36, RB40, RB41, RB43, RB47, RE1, RE10, RE11, RE13, RE14, RE20, RE21, RE30, RE31, RE6, S1">17</td>
+        </tr>
+        <tr>
+          <td class="number">39</td>
+          <td class="name">Basel Bad Bf <small>ch:1:sloid:90</small></td>
+          <td class="number">3,339</td>
+          <td class="number routes" title="12, 12N, 20, 20N, 43, 43N, 60, 85, FLX10">14</td>
+          <td class="number routes" title="RB27, RE7, S6">3</td>
+        </tr>
+        <tr>
+          <td class="number">40</td>
+          <td class="name">Freiburg Hbf <small>de:08311:6508</small></td>
+          <td class="number">3,263</td>
+          <td class="number routes" title="12, 12N, 20, 20N, 43, 43N, 60, 85, FLX10">14</td>
+          <td class="number routes" title="RB26, RB27, RE2, RE7, S1, S10, S11, S2">9</td>
+        </tr>
+        <tr>
+          <td class="number">41</td>
+          <td class="name">Hamm (Westf) Hbf <small>de:05915:7756</small></td>
+          <td class="number">3,216</td>
+          <td class="number routes" title="10, 14, 19, 33, 41, 42, 43, 51, 55, 77, 91N, FLX30">12</td>
+          <td class="number routes" title="RB59, RB69, RB89, RE1, RE11, RE13, RE3, RE59, RE6, RE7">11</td>
+        </tr>
+        <tr>
+          <td class="number">42</td>
+          <td class="name">Wuppertal Hbf <small>de:05124:11376</small></td>
+          <td class="number">3,177</td>
+          <td class="number routes" title="10, 19, 41, 42, 43, 55">6</td>
+          <td class="number routes" title="RB48, RE13, RE4, RE49, RE6, RE7, S28, S7, S8, S9">11</td>
+        </tr>
+        <tr>
+          <td class="number">43</td>
+          <td class="name">Köln Messe/Deutz Bf <small>de:05315:11901</small></td>
+          <td class="number">3,169</td>
+          <td class="number routes" title="41, 42, 43, 43N, 47, 62, 91">8</td>
+          <td class="number routes" title="RB24, RB25, RB26, RB27, RB30, RB38, RB48, RE1, RE12, RE22, RE5, RE6, RE7, RE8, RE9, S11, S12, S19, S6">20</td>
+        </tr>
+        <tr>
+          <td class="number">44</td>
+          <td class="name">Schaffhausen <small>ch:1:sloid:3424</small></td>
+          <td class="number">3,149</td>
+          <td class="number routes" title="12N, 20N, 43N, 87, EC, IC, NJ">13</td>
+          <td class="number routes" title="1, 48, 65, 9, N65, RE3, S62, S64">8</td>
+        </tr>
+        <tr>
+          <td class="number">45</td>
+          <td class="name">Hagen Hbf <small>de:05914:2007</small></td>
+          <td class="number">3,144</td>
+          <td class="number routes" title="10, 19, 41, 42, 43, 55">6</td>
+          <td class="number routes" title="RB40, RB52, RB91, RE11, RE13, RE16, RE17, RE34, RE4, RE57, RE7, S5, S8, S9">15</td>
+        </tr>
+        <tr>
+          <td class="number">46</td>
+          <td class="name">Heidelberg Hbf <small>de:08221:1160</small></td>
+          <td class="number">3,085</td>
+          <td class="number routes" title="11, 12, 13, 20, 20N, 22, 26, 42, 45, 55, 62, 82, FLX10">16</td>
+          <td class="number routes" title="RB56, RB67, RB68, RE, RE1, RE10, RE10a, RE10b, RE14, RE40, RE7, RE71, RE73, S1, S12, S2, S3, S33, S4, S5, S6, S7, S8">26</td>
+        </tr>
+        <tr>
+          <td class="number">47</td>
+          <td class="name">Bochum Hbf <small>de:05911:5194</small></td>
+          <td class="number">3,075</td>
+          <td class="number routes" title="10, 14, 19, 33, 41, 42, 43, 51, 55, 62, 91, FLX30">13</td>
+          <td class="number routes" title="RB32, RB40, RB46, RE1, RE11, RE16, RE3, RE41, RE6, S1">10</td>
+        </tr>
+        <tr>
+          <td class="number">48</td>
+          <td class="name">Spandau Bhf (Berlin) <small>de:11000:900029101</small></td>
+          <td class="number">3,049</td>
+          <td class="number routes" title="18, 27, 28, 77, 91, FLX10">6</td>
+          <td class="number routes" title="DRF, RB10, RB14, RB21, RE2, RE4, RE8, S3, S9">13</td>
+        </tr>
+        <tr>
+          <td class="number">49</td>
+          <td class="name">Rosenheim <small>de:09163:9</small></td>
+          <td class="number">3,008</td>
+          <td class="number routes" title="24, 27N, 62, 62N, 89, 90, 90N, 91, 91N">14</td>
+          <td class="number routes" title="DRF, RB44, RB52, RB54, RB58, RE5">6</td>
+        </tr>
+        <tr>
+          <td class="number">50</td>
+          <td class="name">Siegburg Bf <small>de:05382:55101</small></td>
+          <td class="number">3,000</td>
+          <td class="number routes" title="41, 42, 43, 45, 47, 49, 62, 78, 79">9</td>
+          <td class="number routes" title="RE9, S12, S19">3</td>
+        </tr>
+        <tr>
+          <td class="number">51</td>
+          <td class="name">Münster Hbf <small>de:05515:41000</small></td>
+          <td class="number">2,995</td>
+          <td class="number routes" title="10, 14, 33, 35, 42, 43, 55, 62, 77, 91N, FLX20">12</td>
+          <td class="number routes" title="RB50, RB63, RB64, RB65, RB66, RB67, RB89, RE15, RE2, RE42, RE7">12</td>
+        </tr>
+        <tr>
+          <td class="number">52</td>
+          <td class="name">München Pasing <small>de:09162:10</small></td>
+          <td class="number">2,930</td>
+          <td class="number routes" title="11, 18, 24, 42, 47, 60, 62, 90, 91, 91N">10</td>
+          <td class="number routes" title="DRF, RB6, RB60, RB65, RB66, RB68, RB74, RB86, RB87, RB89, RE61, RE62, RE70, RE72, RE76, RE80, RE89, RE9, RE96, S2, S20, S3, S4, S5, S6, S8">27</td>
+        </tr>
+        <tr>
+          <td class="number">53</td>
+          <td class="name">Wien Hbf <small>at:49:1349</small></td>
+          <td class="number">2,832</td>
+          <td class="number routes" title="27N, 90, 90N, 91N, EC, EN, IC, ICE, NJ, RJ, RJX">13</td>
+          <td class="number routes" title="">0</td>
+        </tr>
+        <tr>
+          <td class="number">54</td>
+          <td class="name">Frankfurt (Main) Südbahnhof <small>de:06412:912</small></td>
+          <td class="number">2,757</td>
+          <td class="number routes" title="1, 11, 12, 12N, 13, 15, 20, 20N, 22, 4, 41, 42, 91, FLX10">18</td>
+          <td class="number routes" title="RB51, RB58, RB61, RB82, RE, RE30, RE5, RE50, RE54, RE55, RE59, RE85, S1, S3, S4, S5, S6, S9">18</td>
+        </tr>
+        <tr>
+          <td class="number">55</td>
+          <td class="name">Hanau Hbf <small>de:06435:4503</small></td>
+          <td class="number">2,623</td>
+          <td class="number routes" title="1, 11, 12, 15, 20, 20N, 22, 26, 41, 50, 91">13</td>
+          <td class="number routes" title="RB49, RB51, RB56, RB58, RB66, RB75, RB86, RE, RE30, RE5, RE50, RE54, RE55, RE59, RE85, S8, S9">18</td>
+        </tr>
+        <tr>
+          <td class="number">56</td>
+          <td class="name">Offenburg Bahnhof <small>de:08317:14506</small></td>
+          <td class="number">2,509</td>
+          <td class="number routes" title="12, 12N, 20, 20N, 43, 43N, 45, 60, FLX10">14</td>
+          <td class="number routes" title="RB26, RB27, RE2, RE7, RS1, RS12, RS2, RS3, RS4">9</td>
+        </tr>
+        <tr>
+          <td class="number">57</td>
+          <td class="name">Osnabrück Hbf <small>de:03404:71612</small></td>
+          <td class="number">2,440</td>
+          <td class="number routes" title="14, 33, 42, 43, 77, FLX20">6</td>
+          <td class="number routes" title="RB58, RB59, RB61, RB66, RB75, RE18, RE2, RE60, RE62, RE9">11</td>
+        </tr>
+        <tr>
+          <td class="number">58</td>
+          <td class="name">Rzepin <small>pl:unknown:EVANR-5100082</small></td>
+          <td class="number">2,202</td>
+          <td class="number routes" title="95, 96, IC">5</td>
+          <td class="number routes" title="RB91">1</td>
+        </tr>
+        <tr>
+          <td class="number">59</td>
+          <td class="name">Wien Meidling <small>at:49:1015</small></td>
+          <td class="number">2,196</td>
+          <td class="number routes" title="27N, 90, 90N, 91N, EC, EN, ICE, RJ, RJX">10</td>
+          <td class="number routes" title="">0</td>
+        </tr>
+        <tr>
+          <td class="number">60</td>
+          <td class="name">Lutherstadt Wittenberg Hbf <small>de:15091:8010222</small></td>
+          <td class="number">2,186</td>
+          <td class="number routes" title="11, 12N, 17, 18, 28, 91">7</td>
+          <td class="number routes" title="RB51, RE14, RE3, S2, S8">5</td>
+        </tr>
+        <tr>
+          <td class="number">61</td>
+          <td class="name">München Ostbahnhof <small>de:09162:5</small></td>
+          <td class="number">2,186</td>
+          <td class="number routes" title="24, 27N, 62, 62N, 89, 90, 90N, 91, 91N">13</td>
+          <td class="number routes" title="DRF, RB40, RB48, RB54, RE4, RE5, S1, S2, S3, S4, S5, S6, S8">13</td>
+        </tr>
+        <tr>
+          <td class="number">62</td>
+          <td class="name">Mainz Hbf <small>de:07315:9037</small></td>
+          <td class="number">2,080</td>
+          <td class="number routes" title="1, 11, 20, 42, 43N, 45, 55, 91">10</td>
+          <td class="number routes" title="EX, RB10, RB26, RB31, RB33, RB44, RB75, RE13, RE14, RE15, RE2, RE3, RE4, S5, S6, S8">21</td>
+        </tr>
+        <tr>
+          <td class="number">63</td>
+          <td class="name">Singen (Htw) Bahnhof <small>de:08335:6588</small></td>
+          <td class="number">2,066</td>
+          <td class="number routes" title="12N, 20N, 43N, 45, 87">9</td>
+          <td class="number routes" title="IC87, RB31, RE2, RE3, RE4, S6, S62">10</td>
+        </tr>
+        <tr>
+          <td class="number">64</td>
+          <td class="name">Decin hl.n. <small>000005400003</small></td>
+          <td class="number">2,046</td>
+          <td class="number routes" title="12N, 27, 27N, EC, EN, NJ, RJ">11</td>
+          <td class="number routes" title="DRF, L2, Os, RE20, U28">8</td>
+        </tr>
+        <tr>
+          <td class="number">65</td>
+          <td class="name">Lüneburg <small>de:03355:8000238</small></td>
+          <td class="number">2,008</td>
+          <td class="number routes" title="20, 22, 24, 25, 33, 57">6</td>
+          <td class="number routes" title="RB31, RB32, RE3, RE83">4</td>
+        </tr>
+        <tr>
+          <td class="number">66</td>
+          <td class="name">Koblenz Hbf <small>de:07111:010001</small></td>
+          <td class="number">1,954</td>
+          <td class="number routes" title="1, 41, 42, 43, 43N, 47, 55, 90N, 91">11</td>
+          <td class="number routes" title="RB23, RB26, RB27, RB81, RE1, RE11, RE17, RE2, RE21, RE25, RE5, RE8">13</td>
+        </tr>
+        <tr>
+          <td class="number">67</td>
+          <td class="name">Linz/Donau Hbf <small>at:44:41164</small></td>
+          <td class="number">1,954</td>
+          <td class="number routes" title="27N, 90, 90N, 91N, EC, EN, ICE, RJX">9</td>
+          <td class="number routes" title="2, 50, 51, DRF">5</td>
+        </tr>
+        <tr>
+          <td class="number">68</td>
+          <td class="name">St.Pölten Hbf <small>at:43:4848</small></td>
+          <td class="number">1,954</td>
+          <td class="number routes" title="27N, 90, 90N, 91N, EC, EN, ICE, RJX">9</td>
+          <td class="number routes" title="DRF">1</td>
+        </tr>
+        <tr>
+          <td class="number">69</td>
+          <td class="name">Bonn Hbf <small>de:05314:61101</small></td>
+          <td class="number">1,946</td>
+          <td class="number routes" title="1, 41, 42, 43N, 55, 90N, 91">9</td>
+          <td class="number routes" title="RB26, RB27, RB30, RB48, RE5, RE8, S23">7</td>
+        </tr>
+        <tr>
+          <td class="number">70</td>
+          <td class="name">Ingolstadt Hbf <small>de:09161:9000</small></td>
+          <td class="number">1,939</td>
+          <td class="number routes" title="18, 25, 29, 41, 91N">5</td>
+          <td class="number routes" title="RB13, RB14, RB15, RB16, RB17, RE1, RE18">7</td>
+        </tr>
+        <tr>
+          <td class="number">71</td>
+          <td class="name">Darmstadt Hbf <small>de:06411:4734</small></td>
+          <td class="number">1,919</td>
+          <td class="number routes" title="11, 13, 15, 20, 20N, 26, 42, 50, 62, 82, FLX10">13</td>
+          <td class="number routes" title="RB61, RB66, RB67, RB68, RB75, RB81, RB82, RE60, RE80, S6">10</td>
+        </tr>
+        <tr>
+          <td class="number">72</td>
+          <td class="name">Arnhem Centraal <small>nl:4:18038</small></td>
+          <td class="number">1,898</td>
+          <td class="number routes" title="43N, 47, 77, 78, 91N, IC, ICE, NJ">9</td>
+          <td class="number routes" title="DRF, RE19">2</td>
+        </tr>
+        <tr>
+          <td class="number">73</td>
+          <td class="name">Eisenach Hbf <small>de:16056:8010097</small></td>
+          <td class="number">1,886</td>
+          <td class="number routes" title="11, 12, 15, 50">4</td>
+          <td class="number routes" title="RB20, RB41, RB6, RE1, RE16">5</td>
+        </tr>
+        <tr>
+          <td class="number">74</td>
+          <td class="name">Padborg st <small>000008601899</small></td>
+          <td class="number">1,858</td>
+          <td class="number routes" title="27, 4, 75, ECE, EN, IC, RJ">7</td>
+          <td class="number routes" title="">0</td>
+        </tr>
+        <tr>
+          <td class="number">75</td>
+          <td class="name">Kufstein <small>at:47:2184</small></td>
+          <td class="number">1,814</td>
+          <td class="number routes" title="24, 89, 91, 91N, ICE, RJ">7</td>
+          <td class="number routes" title="RB54">1</td>
+        </tr>
+        <tr>
+          <td class="number">76</td>
+          <td class="name">Amsterdam Centraal <small>000008400058</small></td>
+          <td class="number">1,756</td>
+          <td class="number routes" title="43N, 91N, IC, ICE, NJ">6</td>
+          <td class="number routes" title="DRF">1</td>
+        </tr>
+        <tr>
+          <td class="number">77</td>
+          <td class="name">Bamberg <small>de:09461:20010</small></td>
+          <td class="number">1,726</td>
+          <td class="number routes" title="12, 18, 25, 28, 61">5</td>
+          <td class="number routes" title="RB22, RB24, RB25, RB26, RB53, RB79, RE14, RE19, RE20, RE28, RE29, RE30, RE32, RE35, RE38, RE54, RE55, S1">18</td>
+        </tr>
+        <tr>
+          <td class="number">78</td>
+          <td class="name">Strasbourg Bahnhof <small>fr:24067:1284</small></td>
+          <td class="number">1,704</td>
+          <td class="number routes" title="82, 83, 84">6</td>
+          <td class="number routes" title="RS4">2</td>
+        </tr>
+        <tr>
+          <td class="number">79</td>
+          <td class="name">St. Margrethen SG <small>ch:1:sloid:6314</small></td>
+          <td class="number">1,644</td>
+          <td class="number routes" title="EC">2</td>
+          <td class="number routes" title="3, 7">3</td>
+        </tr>
+        <tr>
+          <td class="number">80</td>
+          <td class="name">Böblingen <small>de:08115:7100</small></td>
+          <td class="number">1,617</td>
+          <td class="number routes" title="87">1</td>
+          <td class="number routes" title="IC87, RB14a, RB46, RE14a, RE14b, RE4, S1, S60">9</td>
+        </tr>
+        <tr>
+          <td class="number">81</td>
+          <td class="name">Horb Bahnhof/ZOB <small>de:08237:5001</small></td>
+          <td class="number">1,614</td>
+          <td class="number routes" title="87">1</td>
+          <td class="number routes" title="IC87, RB14a, RB74, RE14a, RE4, RE6b">7</td>
+        </tr>
+        <tr>
+          <td class="number">82</td>
+          <td class="name">Minden, Bahnhof <small>de:05770:4213</small></td>
+          <td class="number">1,614</td>
+          <td class="number routes" title="10, 19, 55">3</td>
+          <td class="number routes" title="RE6, RE60, RE70, RE78, S1">5</td>
+        </tr>
+        <tr>
+          <td class="number">83</td>
+          <td class="name">Rottweil Bahnhof <small>de:08325:6584</small></td>
+          <td class="number">1,604</td>
+          <td class="number routes" title="87">1</td>
+          <td class="number routes" title="IC87, RB14a, RB42, RB43, RE14a, RE4, RE42">10</td>
+        </tr>
+        <tr>
+          <td class="number">84</td>
+          <td class="name">Aachen Hbf <small>de:05334:1008</small></td>
+          <td class="number">1,579</td>
+          <td class="number routes" title="10, 79, 90N, THA">4</td>
+          <td class="number routes" title="DRF, RB20, RB33, RE1, RE18, RE4, RE9, S19, S41">10</td>
+        </tr>
+        <tr>
+          <td class="number">85</td>
+          <td class="name">Liège, Guillemins Bf <small>be:62000:7500</small></td>
+          <td class="number">1,553</td>
+          <td class="number routes" title="79, NJ, THA">4</td>
+          <td class="number routes" title="DRF, R">2</td>
+        </tr>
+        <tr>
+          <td class="number">86</td>
+          <td class="name">Tuttlingen Bahnhof <small>de:08327:1748</small></td>
+          <td class="number">1,541</td>
+          <td class="number routes" title="87">1</td>
+          <td class="number routes" title="IC87, RB43, RB43a, RE4, RE55">7</td>
+        </tr>
+        <tr>
+          <td class="number">87</td>
+          <td class="name">Baden-Baden <small>de:08211:1847</small></td>
+          <td class="number">1,522</td>
+          <td class="number routes" title="12, 12N, 20, 20N, 43, 43N, 45, 60, 84">13</td>
+          <td class="number routes" title="RB44, RE2, RE7, S7, S71">5</td>
+        </tr>
+        <tr>
+          <td class="number">88</td>
+          <td class="name">Gelsenkirchen Hbf <small>de:05513:5613</small></td>
+          <td class="number">1,505</td>
+          <td class="number routes" title="1, 10, 19, 33, 35, 41, 42, 43, 47, 51, 55, 62, 77, 91, FLX20, FLX30">18</td>
+          <td class="number routes" title="RB32, RB35, RB46, RE1, RE11, RE2, RE3, RE42, RE6, S2">10</td>
+        </tr>
+        <tr>
+          <td class="number">89</td>
+          <td class="name">Lindau, Reutin Bahnhof <small>de:09776:1592</small></td>
+          <td class="number">1,489</td>
+          <td class="number routes" title="62, 88, EC, ICE">4</td>
+          <td class="number routes" title="1, 7, RB92, RB93, RE3, RE5, RE7, RE70, RE96, REX">12</td>
+        </tr>
+        <tr>
+          <td class="number">90</td>
+          <td class="name">Potsdam Hbf <small>de:12054:900230999</small></td>
+          <td class="number">1,456</td>
+          <td class="number routes" title="10, 17, FLX30">3</td>
+          <td class="number routes" title="HBX, RB20, RB21, RB22, RB33, RE1, S7">10</td>
+        </tr>
+        <tr>
+          <td class="number">91</td>
+          <td class="name">Riesa Busbf/Bahnhof <small>de:14627:5500</small></td>
+          <td class="number">1,448</td>
+          <td class="number routes" title="12N, 50, 55, 56, 97">6</td>
+          <td class="number routes" title="RB45, RE50">3</td>
+        </tr>
+        <tr>
+          <td class="number">92</td>
+          <td class="name">Rheine, Bahnhof <small>de:05566:60846</small></td>
+          <td class="number">1,440</td>
+          <td class="number routes" title="35, 42, 43, 77">5</td>
+          <td class="number routes" title="RB61, RB65, RE15, RE60, RE62, RE7">6</td>
+        </tr>
+        <tr>
+          <td class="number">93</td>
+          <td class="name">Wittenberge, Bahnhof <small>de:12070:900216026</small></td>
+          <td class="number">1,391</td>
+          <td class="number routes" title="18, 27, 28, 57, 77, 91">6</td>
+          <td class="number routes" title="RB33, RE6, RE8, S1">4</td>
+        </tr>
+        <tr>
+          <td class="number">94</td>
+          <td class="name">Flensburg [Grenze] <small>de:01001:27448</small></td>
+          <td class="number">1,385</td>
+          <td class="number routes" title="27, 4, 75, EN, IC, RJ">6</td>
+          <td class="number routes" title="">0</td>
+        </tr>
+        <tr>
+          <td class="number">95</td>
+          <td class="name">Vaihingen (E) <small>de:08118:5879</small></td>
+          <td class="number">1,375</td>
+          <td class="number routes" title="22, 45, 55, 61, 62">6</td>
+          <td class="number routes" title="MEX17, RB79, RE1">3</td>
+        </tr>
+        <tr>
+          <td class="number">96</td>
+          <td class="name">Bruxelles Midi <small>000008800004</small></td>
+          <td class="number">1,373</td>
+          <td class="number routes" title="79, NJ, THA">4</td>
+          <td class="number routes" title="DRF">1</td>
+        </tr>
+        <tr>
+          <td class="number">97</td>
+          <td class="name">Schwerin Hbf <small>de:13004:9005</small></td>
+          <td class="number">1,356</td>
+          <td class="number routes" title="1, 17, 25, 33, 57">5</td>
+          <td class="number routes" title="RB13, RB18, RE1, RE8">4</td>
+        </tr>
+        <tr>
+          <td class="number">98</td>
+          <td class="name">Hengelo <small>000008400316</small></td>
+          <td class="number">1,342</td>
+          <td class="number routes" title="77, ICE">2</td>
+          <td class="number routes" title="RB61">1</td>
+        </tr>
+        <tr>
+          <td class="number">99</td>
+          <td class="name">Ludwigslust Bahnhof <small>de:13076:4782</small></td>
+          <td class="number">1,341</td>
+          <td class="number routes" title="18, 27, 28, 57, 77, 91">6</td>
+          <td class="number routes" title="RB14, RE8">2</td>
+        </tr>
+        <tr>
+          <td class="number">100</td>
+          <td class="name">Solingen Hbf <small>de:05122:13800</small></td>
+          <td class="number">1,328</td>
+          <td class="number routes" title="10, 19, 41, 42, 43, 55, 91">7</td>
+          <td class="number routes" title="RB48, RE47, RE7, S1, S7">6</td>
+        </tr>
+        <tr>
+          <td class="number">101</td>
+          <td class="name">Traunstein <small>de:09189:41179</small></td>
+          <td class="number">1,322</td>
+          <td class="number routes" title="62, 90">4</td>
+          <td class="number routes" title="RB47, RB49, RB53, RB59, RE5">5</td>
+        </tr>
+        <tr>
+          <td class="number">102</td>
+          <td class="name">Kolding st <small>000008601318</small></td>
+          <td class="number">1,318</td>
+          <td class="number routes" title="ECE, IC, RJ">3</td>
+          <td class="number routes" title="">0</td>
+        </tr>
+        <tr>
+          <td class="number">103</td>
+          <td class="name">D-Flughafen Bf <small>de:05111:18488</small></td>
+          <td class="number">1,300</td>
+          <td class="number routes" title="10, 35, 42, 43, 51, 55">6</td>
+          <td class="number routes" title="RE1, RE11, RE19, RE2, RE3, RE5, RE6, S1">8</td>
+        </tr>
+        <tr>
+          <td class="number">104</td>
+          <td class="name">Montabaur Bahnhof <small>de:07143:040004</small></td>
+          <td class="number">1,290</td>
+          <td class="number routes" title="41, 45, 49, 79">4</td>
+          <td class="number routes" title="RB29">1</td>
+        </tr>
+        <tr>
+          <td class="number">105</td>
+          <td class="name">Limburg (Lahn) Süd (ICE) <small>de:06533:11504</small></td>
+          <td class="number">1,286</td>
+          <td class="number routes" title="41, 45, 49, 79">4</td>
+          <td class="number routes" title="">0</td>
+        </tr>
+        <tr>
+          <td class="number">106</td>
+          <td class="name">Rostock Hbf <small>de:13003:1489</small></td>
+          <td class="number">1,285</td>
+          <td class="number routes" title="1, 17, 25, 33, 57">5</td>
+          <td class="number routes" title="RB11, RB12, RB28, RE1, RE5, RE50, RE9, S1, S2, S3">12</td>
+        </tr>
+        <tr>
+          <td class="number">107</td>
+          <td class="name">Oberhausen Hbf <small>de:05119:14022</small></td>
+          <td class="number">1,270</td>
+          <td class="number routes" title="35, 43N, 47, 78, 91, 91N">8</td>
+          <td class="number routes" title="RB32, RB35, RB36, RE1, RE11, RE19, RE2, RE3, RE42, RE44, RE49, RE5, RE6, S3">15</td>
+        </tr>
+        <tr>
+          <td class="number">108</td>
+          <td class="name">Uelzen <small>de:03360:92160</small></td>
+          <td class="number">1,231</td>
+          <td class="number routes" title="20, 22, 25, 33, 57">6</td>
+          <td class="number routes" title="RB31, RB37, RB47, RE2, RE20, RE3">6</td>
+        </tr>
+        <tr>
+          <td class="number">109</td>
+          <td class="name">Weinheim Hbf <small>de:08226:4109</small></td>
+          <td class="number">1,230</td>
+          <td class="number routes" title="12, 13, 20, 26, 62, 82">7</td>
+          <td class="number routes" title="RB67, RB68, RB69, RE60, S5, S6">7</td>
+        </tr>
+        <tr>
+          <td class="number">110</td>
+          <td class="name">Erlangen <small>de:09562:3110</small></td>
+          <td class="number">1,224</td>
+          <td class="number routes" title="18, 25, 28, 61">4</td>
+          <td class="number routes" title="RE14, RE19, RE20, RE28, RE29, S1">6</td>
+        </tr>
+        <tr>
+          <td class="number">111</td>
+          <td class="name">Bitterfeld <small>de:15082:8010050</small></td>
+          <td class="number">1,222</td>
+          <td class="number routes" title="11, 12N, 17, 18, 28, 55, 56">8</td>
+          <td class="number routes" title="RE13, RE3, S2, S8">4</td>
+        </tr>
+        <tr>
+          <td class="number">112</td>
+          <td class="name">Breclav <small>000005400202</small></td>
+          <td class="number">1,212</td>
+          <td class="number routes" title="EN, IC, NJ, RJ">10</td>
+          <td class="number routes" title="">0</td>
+        </tr>
+        <tr>
+          <td class="number">113</td>
+          <td class="name">Bensheim, Bahnhof <small>de:06431:236</small></td>
+          <td class="number">1,200</td>
+          <td class="number routes" title="13, 15, 26, 50, 62">5</td>
+          <td class="number routes" title="RB63, RB67, RB68, RE60, S5, S6">7</td>
+        </tr>
+        <tr>
+          <td class="number">114</td>
+          <td class="name">Utrecht Centraal <small>000008400621</small></td>
+          <td class="number">1,176</td>
+          <td class="number routes" title="43N, 91N, IC, ICE, NJ">6</td>
+          <td class="number routes" title="DRF">1</td>
+        </tr>
+        <tr>
+          <td class="number">115</td>
+          <td class="name">Schöna(Gr) <small>000008089126</small></td>
+          <td class="number">1,169</td>
+          <td class="number routes" title="12N, 27, 27N, NJ">8</td>
+          <td class="number routes" title="DRF, RE20, U28">6</td>
+        </tr>
+        <tr>
+          <td class="number">116</td>
+          <td class="name">Freilassing <small>de:09172:42293</small></td>
+          <td class="number">1,164</td>
+          <td class="number routes" title="62, 90, 90N">5</td>
+          <td class="number routes" title="2, 3, DRF, R, RB45, RE5, S4">10</td>
+        </tr>
+        <tr>
+          <td class="number">117</td>
+          <td class="name">Emden Hbf <small>de:03402:24289</small></td>
+          <td class="number">1,146</td>
+          <td class="number routes" title="35, 56">2</td>
+          <td class="number routes" title="IC35, IC56, RE1, RE15">4</td>
+        </tr>
+        <tr>
+          <td class="number">118</td>
+          <td class="name">Leer(Ostfriesl) <small>de:03457:54173</small></td>
+          <td class="number">1,146</td>
+          <td class="number routes" title="35, 56">2</td>
+          <td class="number routes" title="IC35, IC56, RE1, RE15">4</td>
+        </tr>
+        <tr>
+          <td class="number">119</td>
+          <td class="name">Praha hl.n. <small>000005400014</small></td>
+          <td class="number">1,144</td>
+          <td class="number routes" title="EC, EN, NJ, RE25, RJ">7</td>
+          <td class="number routes" title="DRF, RR">2</td>
+        </tr>
+        <tr>
+          <td class="number">120</td>
+          <td class="name">Paris Est <small>000008700011</small></td>
+          <td class="number">1,128</td>
+          <td class="number routes" title="82, 83">2</td>
+          <td class="number routes" title="">0</td>
+        </tr>
+        <tr>
+          <td class="number">121</td>
+          <td class="name">Bruchsal <small>de:08215:1856</small></td>
+          <td class="number">1,102</td>
+          <td class="number routes" title="13, 20N, 26, 60">6</td>
+          <td class="number routes" title="FEX, MEX17, RB71, RE1, RE40, RE71, RE73, S1, S2, S3, S31, S32, S33, S4">14</td>
+        </tr>
+        <tr>
+          <td class="number">122</td>
+          <td class="name">Köthen <small>de:15082:8010195</small></td>
+          <td class="number">1,102</td>
+          <td class="number routes" title="55, 56, 57">3</td>
+          <td class="number routes" title="RB50, RE30">2</td>
+        </tr>
+        <tr>
+          <td class="number">123</td>
+          <td class="name">Innsbruck Hbf <small>at:47:1187</small></td>
+          <td class="number">1,070</td>
+          <td class="number routes" title="89, 91N, ICE, RJ">4</td>
+          <td class="number routes" title="6">1</td>
+        </tr>
+        <tr>
+          <td class="number">124</td>
+          <td class="name">Celle Bahnhof <small>de:03351:50</small></td>
+          <td class="number">1,063</td>
+          <td class="number routes" title="20, 22, 25, 33">4</td>
+          <td class="number routes" title="LEER, RB31, RE2, RE3, S6, S7">6</td>
+        </tr>
+        <tr>
+          <td class="number">125</td>
+          <td class="name">Bad Schandau Nationalparkbahnhof <small>de:14628:3620</small></td>
+          <td class="number">1,044</td>
+          <td class="number routes" title="12N, 27, 27N">6</td>
+          <td class="number routes" title="CD 083, DRF, RE20, RE50, S1, U28">7</td>
+        </tr>
+        <tr>
+          <td class="number">126</td>
+          <td class="name">Gütersloh Hbf/ZOB <small>de:05754:5947</small></td>
+          <td class="number">1,040</td>
+          <td class="number routes" title="10, 19, 55, FLX30">4</td>
+          <td class="number routes" title="RB67, RB69, RE6, RE78">4</td>
+        </tr>
+        <tr>
+          <td class="number">127</td>
+          <td class="name">Saarbrücken Hbf <small>de:10041:8000323</small></td>
+          <td class="number">1,024</td>
+          <td class="number routes" title="15, 50, 60, 62, 82">6</td>
+          <td class="number routes" title="RB33, RB68, RB70, RB71, RB72, RB73, RB76, RB77, RE1, RE18, RE19, RE3, S1">15</td>
+        </tr>
+        <tr>
+          <td class="number">128</td>
+          <td class="name">Praha-Holesovice <small>000005400201</small></td>
+          <td class="number">1,023</td>
+          <td class="number routes" title="EC, EN, NJ, RJ">6</td>
+          <td class="number routes" title="">0</td>
+        </tr>
+        <tr>
+          <td class="number">129</td>
+          <td class="name">Usti nad Labem hl.n. <small>000005400019</small></td>
+          <td class="number">1,023</td>
+          <td class="number routes" title="EC, EN, NJ, RJ">6</td>
+          <td class="number routes" title="DRF, Os">2</td>
+        </tr>
+        <tr>
+          <td class="number">130</td>
+          <td class="name">Günzburg, Bahnhof <small>de:09774:2600</small></td>
+          <td class="number">1,020</td>
+          <td class="number routes" title="11, 42, 60, 62, 90">5</td>
+          <td class="number routes" title="DRF, RB15, RB78, RE9">5</td>
+        </tr>
+        <tr>
+          <td class="number">131</td>
+          <td class="name">Wörgl Hbf <small>at:47:1170</small></td>
+          <td class="number">1,007</td>
+          <td class="number routes" title="89, 91N, ICE, RJ">4</td>
+          <td class="number routes" title="">0</td>
+        </tr>
+        <tr>
+          <td class="number">132</td>
+          <td class="name">Emmerich(Gr) <small>000008001774</small></td>
+          <td class="number">1,002</td>
+          <td class="number routes" title="43N, 47, 77, 78, 91N">6</td>
+          <td class="number routes" title="RE19">1</td>
+        </tr>
+        <tr>
+          <td class="number">133</td>
+          <td class="name">Frankfurt (Oder), Bahnhof <small>de:12053:900360000</small></td>
+          <td class="number">1,001</td>
+          <td class="number routes" title="95, 96">2</td>
+          <td class="number routes" title="RB36, RB43, RB91, RE1, RE10">5</td>
+        </tr>
+        <tr>
+          <td class="number">134</td>
+          <td class="name">Frankfurt(Oder), Grenze <small>000008089124</small></td>
+          <td class="number">1,001</td>
+          <td class="number routes" title="95, 96">2</td>
+          <td class="number routes" title="RB91">1</td>
+        </tr>
+        <tr>
+          <td class="number">135</td>
+          <td class="name">Brennero/Brenner <small>it:22021:1389</small></td>
+          <td class="number">1,000</td>
+          <td class="number routes" title="89">2</td>
+          <td class="number routes" title="">0</td>
+        </tr>
+        <tr>
+          <td class="number">136</td>
+          <td class="name">Büchen <small>de:01053:8000058</small></td>
+          <td class="number">1,000</td>
+          <td class="number routes" title="18, 25, 27, 57, 91">5</td>
+          <td class="number routes" title="RE1, RE83">2</td>
+        </tr>
+        <tr>
+          <td class="number">137</td>
+          <td class="name">Jenbach <small>at:47:61321</small></td>
+          <td class="number">1,000</td>
+          <td class="number routes" title="89, 91N, ICE, RJ">4</td>
+          <td class="number routes" title="">0</td>
+        </tr>
+        <tr>
+          <td class="number">138</td>
+          <td class="name">Hegyeshalom <small>000005500017</small></td>
+          <td class="number">995</td>
+          <td class="number routes" title="EC, EN, RJX">4</td>
+          <td class="number routes" title="">0</td>
+        </tr>
+        <tr>
+          <td class="number">139</td>
+          <td class="name">Villach Hbf <small>at:42:3654</small></td>
+          <td class="number">985</td>
+          <td class="number routes" title="62, 62N, EC, EN, ICE, RJ">8</td>
+          <td class="number routes" title="">0</td>
+        </tr>
+        <tr>
+          <td class="number">140</td>
+          <td class="name">Delmenhorst <small>de:03401:19646</small></td>
+          <td class="number">960</td>
+          <td class="number routes" title="26, 56">2</td>
+          <td class="number routes" title="IC56, RB58, RE1, RS3, RS30, RS4">6</td>
+        </tr>
+        <tr>
+          <td class="number">141</td>
+          <td class="name">Oldenburg(Oldb) Hbf <small>de:03403:16750</small></td>
+          <td class="number">960</td>
+          <td class="number routes" title="26, 56">2</td>
+          <td class="number routes" title="IC56, RB59, RE1, RE18, RS3, RS30">6</td>
+        </tr>
+        <tr>
+          <td class="number">142</td>
+          <td class="name">Oberndorf (Neckar) Bahnhof <small>de:08325:6596</small></td>
+          <td class="number">957</td>
+          <td class="number routes" title="87">1</td>
+          <td class="number routes" title="IC87, RB14a, RE14a, RE4">4</td>
+        </tr>
+        <tr>
+          <td class="number">143</td>
+          <td class="name">Sulz (Neckar) Bahnhof <small>de:08325:6590</small></td>
+          <td class="number">956</td>
+          <td class="number routes" title="87">1</td>
+          <td class="number routes" title="IC87, RB14a, RE14a, RE4">4</td>
+        </tr>
+        <tr>
+          <td class="number">144</td>
+          <td class="name">Katowice <small>000005100020</small></td>
+          <td class="number">946</td>
+          <td class="number routes" title="95, 96, EN, IC">4</td>
+          <td class="number routes" title="">0</td>
+        </tr>
+        <tr>
+          <td class="number">145</td>
+          <td class="name">Stralsund Hbf <small>de:13073:10401</small></td>
+          <td class="number">934</td>
+          <td class="number routes" title="15, 17, 33">3</td>
+          <td class="number routes" title="RB25, RE3, RE30, RE5, RE51, RE9">8</td>
+        </tr>
+        <tr>
+          <td class="number">146</td>
+          <td class="name">Wiesbaden Hbf <small>de:06414:6907</small></td>
+          <td class="number">934</td>
+          <td class="number routes" title="11, 20, 45, 50">4</td>
+          <td class="number routes" title="RB10, RB21, RB33, RB75, S1, S5, S6, S8, S9">10</td>
+        </tr>
+        <tr>
+          <td class="number">147</td>
+          <td class="name">Donauwörth <small>de:09779:5500</small></td>
+          <td class="number">923</td>
+          <td class="number routes" title="18, 24, 91">3</td>
+          <td class="number routes" title="RB15, RB87, RB89, RE16, RE80, RE89">8</td>
+        </tr>
+        <tr>
+          <td class="number">148</td>
+          <td class="name">Herrenberg <small>de:08115:4512</small></td>
+          <td class="number">915</td>
+          <td class="number routes" title="87">1</td>
+          <td class="number routes" title="IC87, RB14a, RB41, RB63, RE14a, RE14b, RE4, RE40, S1">10</td>
+        </tr>
+        <tr>
+          <td class="number">149</td>
+          <td class="name">Schwarzach-St.Veit <small>at:45:52197</small></td>
+          <td class="number">912</td>
+          <td class="number routes" title="62, 62N, EC, EN, ICE, RJ">8</td>
+          <td class="number routes" title="3, R">3</td>
+        </tr>
+        <tr>
+          <td class="number">150</td>
+          <td class="name">Bregenz <small>at:48:452</small></td>
+          <td class="number">889</td>
+          <td class="number routes" title="EC, ICE">2</td>
+          <td class="number routes" title="1, 3, 7">4</td>
+        </tr>
+      </tbody>
+    </table>
+  </body>
+</html>

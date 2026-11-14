@@ -14,9 +14,17 @@ What the Delfi data set of 2026-11-09 turned out to contain, where that differs 
 - Tram-train stops in front of a main station are stations of their own: "KA Hauptbahnhof (Vorplatz)", "Heilbronn Hbf/Willy-Brandt-Pl.", "Chemnitz, Hbf Bahnhofstr". So are "Frankfurt (Main) Flughafen Fernbahnhof" and "Regionalbahnhof". These stay separate.
 - About 55 Czech stations appear once with a numeric ID and once with a `cz:` ID, for example "Decin hl.n." and "Liberec". These stay separate as well.
 
+## Long-distance stations
+
+What `./gradlew longDistanceStations` shows:
+
+- Long-distance and regional trips often stop at different stop IDs of a station, but these share the station part of the ID. So once stops are mapped to stations, regional routes stop at each of the 50 stations with the most long-distance trip-days.
+- Among the top 150, the stations without regional routes are foreign ones, Limburg (Lahn) Süd, which only long-distance trains serve, and "Flensburg [Grenze]".
+- Border points are stations in the data: "Flensburg [Grenze]", "Schöna(Gr)", "Emmerich(Gr)", "Frankfurt(Oder), Grenze".
+
 ## Station names
 
-- A few stations are named without their town: Stuttgart's main station is just "Hauptbahnhof", its underground part "Hauptbahnhof (tief)", München's "Hauptbahnhof (U, Tram)", and the station of Brunnen (Oberbayern) just "Bahnhof".
+- A few stations are named without their town: Stuttgart's main station is just "Hauptbahnhof", its underground part "Hauptbahnhof (tief)", München's "Hauptbahnhof (U, Tram)", "Ostbahnhof" and "Pasing", and the station of Brunnen (Oberbayern) just "Bahnhof".
 - Names start with "S " or "S+U " where S-Bahn or U-Bahn trains call, mostly in Berlin: "S+U Berlin Hauptbahnhof".
 - Main stations are spelled in four ways: "Kassel Hauptbahnhof", "Cottbus, Hauptbahnhof", "Hamburg Hbf", "Eschweiler, Hbf".
 

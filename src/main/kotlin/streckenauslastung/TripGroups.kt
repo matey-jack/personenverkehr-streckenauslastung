@@ -53,6 +53,8 @@ private val stationNameFixes = mapOf(
     "de:08111:6115" to "Stuttgart Hbf",
     "de:08111:6118" to "Stuttgart Hbf (tief)",
     "de:09162:6" to "München Hbf (tief)",
+    "de:09162:5" to "München Ostbahnhof",
+    "de:09162:10" to "München Pasing",
     "de:09185:90261" to "Brunnen(Oberbayern)",
 )
 

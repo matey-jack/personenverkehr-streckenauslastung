@@ -48,7 +48,7 @@ de:vvo:9-WTB_100,Weißeritztalbahn,100,132,2,13,equal,0.85,Freital S-Bahnhof Hai
 162291_101,13,101,666,17,6,longer +1,0.30,Braunschweig Hbf,Frankfurt (Main) Flughafen Fernbahnhof,different +1 -1,0.12,Braunschweig Hbf,Frankfurt (Main) Hbf,1,longer +1,Frankfurt (Main) Flughafen Fernbahnhof,
 1449904_101,14,101,148,16,6,equal,0.26,Hannover Hbf,Köln Hbf,shorter -4,0.19,Hannover Hbf,Münster Hbf,1,equal,,
 162292_101,15,101,554,28,10,equal,0.29,Südkreuz Bhf (Berlin),Stralsund Hbf,different +2 -2,0.12,Ostseebad Binz,Südkreuz Bhf (Berlin),1,equal,,
-162294_101,18,101,1238,41,15,shorter -7,0.18,Hamburg-Altona,Südkreuz Bhf (Berlin),different +1 -1,0.12,Hamburg-Altona,München Hbf,3,longer +1,,Augsburg Hbf | Bamberg | Donauwörth | Erfurt Hbf | München Hbf | Nürnberg Hbf | Pasing
+162294_101,18,101,1238,41,15,shorter -7,0.18,Hamburg-Altona,Südkreuz Bhf (Berlin),different +1 -1,0.12,Hamburg-Altona,München Hbf,3,longer +1,,Augsburg Hbf | Bamberg | Donauwörth | Erfurt Hbf | München Hbf | München Pasing | Nürnberg Hbf
 5587182_101,19,101,853,20,7,equal,0.40,Berlin Hbf,Köln Hbf,longer +1,0.36,Köln Hbf,Gesundbrunnen Bhf (Berlin),1,equal,,
 162295_101,20,101,701,73,12,equal,0.14,Basel SBB,Hamburg Hbf,longer +1,0.12,Hamburg Dammtor,Basel SBB,1,equal,,
 162296_101,22,101,981,74,10,different +1 -1,0.12,Kiel Hbf,Stuttgart Hbf,equal,0.08,Kiel Hbf,Stuttgart Hbf,2,equal,Hamburg-Harburg,Hamburg Hbf
@@ -87,7 +87,7 @@ de:vvo:9-WTB_100,Weißeritztalbahn,100,132,2,13,equal,0.85,Freital S-Bahnhof Hai
 162327_101,84,101,100,5,6,equal,0.41,Frankfurt (Main) Hbf,Strasbourg Bahnhof,longer +1,0.39,Strasbourg Bahnhof,Frankfurt (Main) Hbf,1,equal,,
 162330_101,89,101,1200,6,4,equal,0.58,München Hbf,Kufstein,different +8 -4,0.17,Brennero/Brenner,Bologna Centrale,1,equal,,
 7142466_101,89,101,500,1,5,equal,1.00,Kufstein,Brennero/Brenner,,,,,1,equal,,
-162331_101,90,101,329,8,5,longer +2,0.25,München Hbf,Salzburg Hbf,longer +4,0.15,Salzburg Hbf,Stuttgart Hbf,4,equal,Freilassing | Ostbahnhof,
+162331_101,90,101,329,8,5,longer +2,0.25,München Hbf,Salzburg Hbf,longer +4,0.15,Salzburg Hbf,Stuttgart Hbf,4,equal,Freilassing | München Ostbahnhof,
 162332_101,91,101,792,52,8,longer +1,0.34,Dortmund Hbf,Frankfurt (Main) Hbf,equal,0.14,Frankfurt (Main) Hbf,Dortmund Hbf,2,equal,Bochum Hbf,
 162244_101,ICE,101,1035,8,2,longer +3,0.46,Basel SBB,Chur,equal,0.20,Zürich HB,Basel SBB,2,equal,Chur | Landquart | Sargans,
 162252_101,ICE,101,1420,9,2,longer +1,0.45,Arnhem Centraal,Amsterdam Centraal,different +5 -1,0.39,Hengelo,Amsterdam Centraal,1,longer +1,Arnhem Centraal,
@@ -362,7 +362,7 @@ de:nvv:RB39:_106,RB39,106,1024,3,16,equal,0.76,Bad Wildungen Bahnhof,Kassel Hbf,
 de:nvv:RB4:_106,RB4,106,1768,6,12,equal,0.90,Kassel Bahnhof Wilhelmshöhe,Korbach Hbf,shorter -4,0.04,Korbach Hbf,Wolfhagen Bahnhof,1,equal,,
 2233928_106,RB40,106,1975,31,11,shorter -1,0.16,Bad Neustadt (Saale),Schweinfurt Stadt,different +6 -1,0.15,Meiningen,Schweinfurt Stadt,5,equal,,Mellrichstadt Bahnhof
 5587115_106,RB40,106,2911,13,13,equal,0.66,Gießen Bahnhof,Dillenburg Bahnhof,different +5 -12,0.20,Gießen Bahnhof,Frankfurt (Main) Hbf,1,equal,,
-de:beg:RB40S:_106,RB40,106,1118,7,8,shorter -1,0.39,Ostbahnhof,Mühldorf,longer +1,0.32,Ostbahnhof,Mühldorf,3,equal,,Walpertskirchen
+de:beg:RB40S:_106,RB40,106,1118,7,8,shorter -1,0.39,München Ostbahnhof,Mühldorf,longer +1,0.32,München Ostbahnhof,Mühldorf,3,equal,,Walpertskirchen
 de:nasa:15|RZug|RB40:_106,RB40,106,2120,10,22,equal,0.68,Burg (Magdeburg),Braunschweig Hbf,shorter -6,0.15,Magdeburg Hbf,Braunschweig Hbf,1,equal,,
 de:nrw:rb40:_106,RB40,106,2088,7,8,equal,0.91,Hagen Hbf,Essen Hbf,shorter -4,0.04,Witten Hbf,Hagen Hbf,1,equal,,
 161913_106,RB41,106,2570,7,14,equal,0.42,Bremen Hbf,Hamburg-Harburg,longer +1,0.38,Hamburg Hbf,Bremen Hbf,1,equal,,
@@ -441,7 +441,7 @@ de:rlp:rb53:_106,RB53,106,1569,9,14,equal,0.78,Neustadt Hbf,"Wissembourg, Bahnho
 de:rlp:rb53:_D_106,RB53,106,45,2,14,equal,0.91,"Wissembourg, Bahnhof",Neustadt Hbf,shorter -7,0.09,Neustadt Hbf,Landau Hbf,1,equal,,
 7145783_106,RB53a,106,1,1,6,equal,1.00,Aulendorf Bahnhof,Leutkirch Bahnhof,,,,,1,equal,,
 1544376_106,RB54,106,752,2,4,equal,0.99,"Löwenberg (Mark), Bahnhof","Rheinsberg, Bahnhof",longer +3,0.01,"Rheinsberg, Bahnhof",Lichtenberg Bhf (Berlin),1,equal,,
-2230888_106,RB54,106,2280,7,10,shorter -3,0.49,Rosenheim,Kufstein,longer +3,0.44,München Hbf,Kufstein,4,equal,,Grafing-Bahnhof | München Hbf | Ostbahnhof
+2230888_106,RB54,106,2280,7,10,shorter -3,0.49,Rosenheim,Kufstein,longer +3,0.44,München Hbf,Kufstein,4,equal,,Grafing-Bahnhof | München Hbf | München Ostbahnhof
 de:nrw:rb54:_106,RB54,106,3432,4,3,equal,0.56,"Fröndenberg, Bahnhof","Menden, Bahnhof",longer +9,0.40,"Neuenrade, Bahnhof","Fröndenberg, Bahnhof",1,equal,,
 de:rlp:rb54:_106,RB54,106,1726,4,4,equal,0.94,"Bad Bergzabern, Bahnhof",Winden (Pfalz),different +7 -3,0.02,Karlsruhe Hbf,Winden (Pfalz),1,equal,,
 2230705_106,RB55,106,2482,10,15,equal,0.53,Bayrischzell,München Hbf,different +1 -1,0.22,Bayrischzell,München Hbf,1,equal,,
@@ -504,13 +504,13 @@ de:rlp:rb65:_106,RB65,106,774,8,6,equal,0.48,Bingen Hbf,"Bad Kreuznach, Bahnhof"
 161996_106,RB66,106,996,1,5,equal,1.00,Niebüll,Toender st,,,,,1,equal,,
 3694959_106,RB66,106,1954,4,8,equal,0.96,Osnabrück Hbf,Münster Hbf,shorter -4,0.02,"Kattenvenne, Bahnhof",Münster Hbf,1,equal,,
 4373565_106,RB66,106,2346,16,17,equal,0.39,Tübingen Hbf,Ebingen Bahnhof,longer +3,0.27,Tübingen Hbf,Sigmaringen Bahnhof,1,equal,,
-de:beg:RB66:_106,RB66,106,2254,13,9,longer +2,0.32,Kochel,München Hbf,equal,0.22,Kochel,Starnberg,2,equal,München Hbf | Pasing,
+de:beg:RB66:_106,RB66,106,2254,13,9,longer +2,0.32,Kochel,München Hbf,equal,0.22,Kochel,Starnberg,2,equal,München Hbf | München Pasing,
 de:rlp:rb66:_106,RB66,106,1479,2,15,equal,0.64,Kaiserslautern Hbf,"Lauterecken, Bahnhof",shorter -1,0.36,"Lauterecken, Bahnhof",Kaiserslautern Hbf,1,equal,,
 2233944_106,RB67,106,4874,13,15,different +5 -15,0.39,Schongau,Peißenberg,longer +5,0.37,Weilheim,Augsburg-Oberhausen,5,longer +4,Hohenpeißenberg | Peiting Nord | Peiting Ost | Peißenberg | Schongau,Augsburg Haunstetterstraße | Augsburg Hbf | Augsburg-Hochzoll | Dießen | Geltendorf | Kissing | Mering | Mering-St. Afra | Raisting | Riederau | Schondorf am Ammersee | St. Alban | St. Ottilien | Utting | Weilheim
 3694960_106,RB67,106,1918,5,12,equal,0.82,Bielefeld Hbf,Münster Hbf,shorter -7,0.09,"Beelen, Bahnhof",Münster Hbf,1,equal,,
 de:rlp:rb67:_106,RB67,106,1682,19,14,equal,0.47,"Kusel, Bahnhof",Kaiserslautern Hbf,shorter -1,0.20,"Landstuhl, Bahnhof","Kusel, Bahnhof",1,equal,,
 de:rmv:00004126:_106,RB67,106,148,4,13,longer +9,0.47,Mannheim Hbf,Frankfurt (Main) Hbf,equal,0.47,"Bensheim, Bahnhof",Mannheim Hbf,2,equal,"Alsbach-Hähnlein-Alsbach Bahnhof | Auerbach, Bahnhof | Bickenbach Bahnhof | Darmstadt Hbf | Darmstadt Südbahnhof | Darmstadt-Eberstadt Bahnhof | Frankfurt (Main) Hbf | Langen (Hessen) Bahnhof | Zwingenberg, Bahnhof",
-2233945_106,RB68,106,389,7,15,equal,0.58,Füssen,Pasing,shorter -3,0.27,Füssen,Buchloe,1,equal,,
+2233945_106,RB68,106,389,7,15,equal,0.58,Füssen,München Pasing,shorter -3,0.27,Füssen,Buchloe,1,equal,,
 4373568_106,RB68,106,1374,6,11,equal,0.68,Hechingen Bf/ZOB,Gammertingen Bahnhof,longer +7,0.15,Sigmaringen Bahnhof,Hechingen Bf/ZOB,1,equal,,
 5690018_106,RB68,106,44,1,8,equal,1.00,Gammertingen Bahnhof,Sigmaringen Bahnhof,,,,,1,equal,,
 de:rlp:rb68:_106,RB68,106,1710,5,20,equal,0.85,Saarbrücken Hbf,Pirmasens Hbf,different +1 -1,0.08,Pirmasens Hbf,Saarbrücken Hbf,1,equal,,
@@ -540,7 +540,7 @@ de:beg:RB73:_106,RB73,106,278,1,13,equal,1.00,Kempten Hbf,Pfronten-Steinach,,,,,
 161924_106,RB74,106,390,5,4,equal,0.62,"Meyenburg, Bahnhof","Pritzwalk, Bahnhof",longer +1,0.19,"Pritzwalk, West Bhf","Meyenburg, Bahnhof",1,equal,,
 5716590_106,RB74,106,30,3,13,equal,0.90,Kiel Hbf,Husum,shorter -2,0.07,Kiel Hbf,Schleswig,1,equal,,
 7137792_106,RB74,106,2619,4,13,equal,0.47,Bielefeld Hbf,Paderborn Hbf,shorter -1,0.27,Bielefeld Hbf,Paderborn Hbf,1,equal,,
-de:beg:RB74:_106,RB74,106,946,4,5,equal,0.75,Pasing,Buchloe,longer +1,0.24,München Hbf,Buchloe,1,equal,,
+de:beg:RB74:_106,RB74,106,946,4,5,equal,0.75,München Pasing,Buchloe,longer +1,0.24,München Hbf,Buchloe,1,equal,,
 de:nvbw:90T74_:_106,RB74,106,5057,29,2,different +17 -1,0.32,Pforzheim Hbf,Horb Bahnhof/ZOB,longer +6,0.18,Tübingen Hbf,Horb Bahnhof/ZOB,25,longer +2,"Bad Liebenzell, Bahnhof | Bad Teinach-Neubulach Bahnhof | Brötzingen Mitte | Calw, Bahnhof/ZOB | Eutingen im Gäu Nord | Hirsau, Bahnhof | Hochdorf, Bahnhof | Monbach-Neuhausen | Nagold Stadtmitte, Bf | Nagold, Bahnhof | Nagold-Iselshausen, Bf | Nagold-Steinberg, Bf | Pforzheim Hbf | Pforzheim Maihälden | Unterreichenbach, Bahnhof | Weißenstein Bahnhof | Wildberg, Bahnhof",Rottenburg Bahnhof
 506828_106,RB75,106,3469,23,20,equal,0.45,Wiesbaden Hbf,Aschaffenburg Hbf,shorter -4,0.20,Mainz-Bischofsheim Bahnhof,Aschaffenburg Hbf,1,equal,,
 5587105_106,RB75,106,1979,3,9,equal,0.95,Rendsburg,Kiel Hbf,shorter -3,0.05,Felde,Kiel Hbf,1,equal,,
@@ -761,7 +761,7 @@ de:nvv:RE39:_106,RE39,106,665,7,13,equal,0.68,Kassel Hbf,Bad Wildungen Bahnhof,l
 6290975_106,RE4,106,275,4,3,equal,0.45,Tuttlingen Bahnhof,Singen (Htw) Bahnhof,shorter -1,0.25,Engen Bahnhof,Tuttlingen Bahnhof,1,equal,,
 6986863_106,RE4,106,4,2,10,longer +1,0.50,Konstanz Bahnhof,Stuttgart Hbf,equal,0.50,Stuttgart Hbf,Konstanz Bahnhof,2,equal,Herrenberg,
 de:VBB:12072240|R-Bahn|RE4:_106,RE4,106,2409,14,13,shorter -2,0.33,Spandau Bhf (Berlin),"Jüterbog, Bahnhof",longer +4,0.27,"Falkenberg/E., Bahnhof",Spandau Bhf (Berlin),1,shorter -2,,"Falkenberg/E., Bahnhof | Herzberg (Elster), Bahnhof"
-de:beg:RE4:_106,RE4,106,178,7,9,shorter -3,0.36,Mühldorf,Simbach (Inn),longer +5,0.11,München Hbf,Simbach (Inn),4,equal,,Dorfen | München Hbf | Ostbahnhof
+de:beg:RE4:_106,RE4,106,178,7,9,shorter -3,0.36,Mühldorf,Simbach (Inn),longer +5,0.11,München Hbf,Simbach (Inn),4,equal,,Dorfen | München Hbf | München Ostbahnhof
 de:nasa:15|RZug|RE4:DBRegio_106,RE4,106,944,32,15,shorter -1,0.34,"Goslar, Bahnhof",Halle (Saale) Hbf,longer +1,0.24,Halle (Saale) Hbf,"Goslar, Bahnhof",1,shorter -1,,Drohndorf-Mehringen
 de:nrw:re4:_106,RE4,106,2275,25,24,equal,0.44,Aachen Hbf,Dortmund Hbf,shorter -1,0.27,Dortmund Hbf,Aachen Hbf,1,equal,,
 de:nvbw:90T04_:_106,RE4,106,121,11,10,longer +3,0.29,Rottweil Bahnhof,Tuttlingen Bahnhof,longer +1,0.29,Tuttlingen Bahnhof,Rottweil Bahnhof,2,longer +1,Aldingen Bahnhof | Rottweil Göllsdorf Bahnhof | Rottweil Saline Bahnhof,
@@ -819,7 +819,7 @@ de:beg:RE60:_106,RE60,106,910,4,9,equal,0.81,Nürnberg Hbf,Treuchtlingen,shorter
 de:rmv:00001307:_106,RE60,106,1745,11,12,equal,0.77,Frankfurt (Main) Hbf,Mannheim Hbf,shorter -9,0.13,Darmstadt Hbf,Frankfurt (Main) Hbf,1,equal,,
 de:beg:RE61:_106,RE61,106,278,8,7,equal,0.41,München Hbf,Mittenwald,shorter -4,0.18,Garmisch-Partenkirchen,Mittenwald,1,equal,,
 de:VBN:RE62:_106,RE62,106,856,4,8,equal,0.99,"Löhne, Remarqueplatz/Bhf","Rheine, Bahnhof",shorter -3,0.01,"Löhne, Remarqueplatz/Bhf",Osnabrück Hbf,1,equal,,
-de:beg:RE62:_106,RE62,106,15,3,9,longer +2,0.47,München Hbf,Lermoos,shorter -3,0.40,Garmisch-Partenkirchen,Lermoos,3,equal,München Hbf | Pasing,
+de:beg:RE62:_106,RE62,106,15,3,9,longer +2,0.47,München Hbf,Lermoos,shorter -3,0.40,Garmisch-Partenkirchen,Lermoos,3,equal,München Hbf | München Pasing,
 4373566_106,RE66,106,70,4,4,longer +1,0.47,Tübingen Hbf,Hechingen Bf/ZOB,equal,0.47,Hechingen Bf/ZOB,Tübingen Hbf,2,equal,Tübingen Derendingen Bhf,
 de:nvbw:90T06A:_106,RE6a,106,1791,30,3,different +6 -2,0.43,Sigmaringen Bahnhof,Aulendorf Bahnhof,longer +5,0.19,Sigmaringen Bahnhof,Stuttgart Hbf,11,shorter -1,Altshausen Bahnhof | Aulendorf Bahnhof | Bad Saulgau Bahnhof | Herbertingen Bahnhof | Herbertingen Ort | Mengen Bahnhof,Ebingen Bahnhof | Tübingen Hbf
 de:nvbw:90T06_:_106,RE6b,106,1096,7,3,equal,0.57,Tübingen Hbf,Rottenburg Bahnhof,longer +2,0.20,Stuttgart Hbf,Rottenburg Bahnhof,1,equal,,
@@ -993,7 +993,7 @@ de:rmv:00001315:_109,S2,109,7202,22,26,longer +1,0.27,Dietzenbach Bahnhof,Nieder
 de:vmv-mbh:13|S2:_D_109,S2,109,1690,5,17,equal,0.83,Warnemünde,Güstrow Bahnhof,shorter -7,0.11,Warnemünde,Rostock Hbf,1,equal,,
 de:vvo:10-2:_109,S2,109,3906,14,17,equal,0.63,Pirna Bahnhof,Dresden Flughafen,shorter -9,0.30,Dresden Flughafen,Dresden Hbf,1,equal,,
 de:vvs:10002_:_109,S2,109,6761,13,27,equal,0.95,Schorndorf,Filderstadt,shorter -6,0.02,Vaihingen,Schorndorf,1,equal,,
-de:beg:S20M:_109,S20,109,603,3,8,equal,0.90,Pasing,Höllriegelskreuth,shorter -3,0.05,Solln,Pasing,1,equal,,
+de:beg:S20M:_109,S20,109,603,3,8,equal,0.90,München Pasing,Höllriegelskreuth,shorter -3,0.05,Solln,München Pasing,1,equal,,
 3448389_109,S21,109,346,2,7,equal,0.99,Barsinghausen Bahnhof,Hannover Hbf,shorter -2,0.01,Hannover Bahnhof Linden/Fischerhof,Barsinghausen Bahnhof,1,equal,,
 de:nrw:s23:_109,S23,109,5158,6,13,equal,0.48,Bonn Hbf,Euskirchen Bf,longer +5,0.23,Bad Münstereifel Bf,Bonn Hbf,1,equal,,
 de:VBB:11000000|S-Bahn|S25:S25-VII_109,S25,109,389,9,8,equal,0.74,Schönholz (Berlin),Hennigsdorf Bhf,longer +1,0.14,Hennigsdorf Bhf,Wollankstr. (Berlin),1,equal,,
@@ -1025,7 +1025,7 @@ de:rlp:s33:_109,S33,109,2617,25,11,equal,0.66,Bruchsal,Germersheim,shorter -6,0.
 162620_109,S4,109,3974,33,24,equal,0.40,Eilenburg Ost,Wurzen,shorter -4,0.16,Wurzen,Taucha (b. Leipzig),1,equal,,
 3448393_109,S4,109,3507,15,12,shorter -2,0.49,Hannover Hbf,Bennemühlen,longer +5,0.47,Bennemühlen,Hildesheim Hbf,3,equal,,Hildesheim Hbf | Sarstedt
 7142166_109,S4,109,8797,77,17,longer +17,0.15,Öhringen-Cappel,Schwaigern(Württ) West,different +32 -17,0.11,Karlsruhe Albtalbahnhof,Flehingen,4,equal,Affaltrach | Bitzfeld | Bretzfeld | Ellhofen | Eschenau (b Heilbronn) | Heilbronn Trappensee (S-Bahn) | Scheppach | Sülzbach | Sülzbach Schule | Weinsberg | Weinsberg West | Weinsberg/Ellhofen Gewerbegebiet | Wieslensdorf | Willsbach | Öhringen Hbf | Öhringen West | Öhringen-Cappel,
-de:beg:S4M:_109,S4,109,6005,33,23,shorter -12,0.12,Pasing,Geltendorf,longer +1,0.09,Trudering,Geltendorf,3,equal,,Berg am Laim | Donnersbergerbrücke | Hackerbrücke | Hirschgarten | Isartor | Karlsplatz (Stachus) | Leuchtenbergring | Marienplatz | München Hbf | Ostbahnhof | Rosenheimer Platz | Trudering
+de:beg:S4M:_109,S4,109,6005,33,23,shorter -12,0.12,München Pasing,Geltendorf,longer +1,0.09,Trudering,Geltendorf,3,equal,,Berg am Laim | Donnersbergerbrücke | Hackerbrücke | Hirschgarten | Isartor | Karlsplatz (Stachus) | Leuchtenbergring | Marienplatz | München Hbf | München Ostbahnhof | Rosenheimer Platz | Trudering
 de:beg:S4N:_109,S4,109,4418,4,14,equal,0.77,Nürnberg Hbf,Ansbach,longer +4,0.21,Crailsheim Bahnhof,Nürnberg Hbf,1,equal,,
 de:nrw:s4:_109,S4,109,4986,5,19,equal,0.73,"Unna, Bahnhof",Dortmund Lütgendortmund,shorter -2,0.22,Dortmund Lütgendortmund,"Königsborn, Bahnhof",1,equal,,
 de:rlp:s4:_109,S4,109,202,16,19,different +8 -12,0.20,Bruchsal,Mannheim Hbf,longer +36,0.19,"Osterburken, Bahnhof",Bruchsal,9,shorter -7,"Bad Schönborn Süd | Bad Schönborn-Kronau | Kirchheim/Rohrbach, Bf | Rot-Malsch, Bahnhof | St. Ilgen, Bahnhof | Stettfeld-Weiher | Ubstadt-Weiher | Wiesloch-Walldorf, Bf","Berghausen (Pfalz) Bahnhof | Germersheim | Heiligenstein, Bahnhof | LU Rheingönheim, Bahnhof | LU-Mundenheim, Bahnhof | Limburgerhof, Bahnhof | Lingenfeld Bahnhof | Ludwigshafen Hbf | Schifferstadt, Bahnhof | Schifferstadt, Südbahnhof | Speyer Hbf/ZOB | Speyer, Nord/West"
@@ -1060,7 +1060,7 @@ de:VBB:11000000|S-Bahn|S5:S5-EII_109,S5,109,1470,2,10,equal,0.98,Mahlsdorf Bhf (
 de:VBB:11000000|S-Bahn|S5:S5-EI_109,S5,109,5589,23,21,longer +2,0.39,Hoppegarten,Westkreuz (Berlin),equal,0.35,Westkreuz (Berlin),Mahlsdorf Bhf (Berlin),2,equal,Birkenstein | Hoppegarten,
 de:VBB:11000000|S-Bahn|S5:S5-E_109,S5,109,6330,32,30,equal,0.65,Strausberg Nord,Westkreuz (Berlin),shorter -9,0.14,Westkreuz (Berlin),Mahlsdorf Bhf (Berlin),1,equal,,
 de:VBB:11000000|S-Bahn|S5:S5-SII_109,S5,109,1470,3,9,equal,0.88,Mahlsdorf Bhf (Berlin),Warschauer Str. (Berlin),longer +1,0.10,Mahlsdorf Bhf (Berlin),Ostbahnhof (Berlin),1,equal,,
-de:beg:S5M:_109,S5,109,5867,26,22,equal,0.20,Pasing,Aying,longer +3,0.18,Kreuzstraße,Pasing,1,equal,,
+de:beg:S5M:_109,S5,109,5867,26,22,equal,0.20,München Pasing,Aying,longer +3,0.18,Kreuzstraße,München Pasing,1,equal,,
 de:beg:S5N:_109,S5,109,152,1,2,equal,1.00,Allersberg (Rothsee),Nürnberg Hbf,,,,,1,equal,,
 de:nasa:14|S|MDSB_S5:DBRegio_109,S5,109,1866,41,23,longer +2,0.37,Halle-Trotha,Gößnitz,equal,0.25,Halle-Trotha,Altenburg,2,equal,Gößnitz | Lehndorf (Altenburg),
 de:nrw:s5:_109,S5,109,3914,2,8,equal,0.55,Hagen Hbf,Dortmund Hbf,shorter -3,0.45,Dortmund Hbf,Witten Hbf,1,equal,,
@@ -1078,7 +1078,7 @@ de:vvs:10005_:_109,S5,109,6557,10,12,equal,0.85,Schwabstraße,Bietigheim,shorter
 7129403_109,S6,109,2873,4,18,equal,0.77,Zell i.W. Bahnhof,Basel SBB,shorter -10,0.16,Zell i.W. Bahnhof,Steinen Bahnhof,1,equal,,
 7129405_109,S6,109,3694,6,16,equal,0.85,Engen Bahnhof,Konstanz Bahnhof,shorter -4,0.07,Konstanz Bahnhof,Singen (Htw) Bahnhof,1,equal,,
 7142172_109,S6,109,2466,1,19,equal,1.00,Pforzheim Hbf,"Bad Wildbad, Kurpark",,,,,1,equal,,
-de:beg:S6M:_109,S6,109,10100,26,16,shorter -10,0.34,Gauting,Tutzing,different +14 -6,0.14,Ebersberg,Pasing,9,shorter -7,,Baldham | Eglharting | Grafing-Bahnhof | Gronsdorf | Haar | Kirchseeon | Pasing | Trudering | Vaterstetten | Zorneding
+de:beg:S6M:_109,S6,109,10100,26,16,shorter -10,0.34,Gauting,Tutzing,different +14 -6,0.14,Ebersberg,München Pasing,9,shorter -7,,Baldham | Eglharting | Grafing-Bahnhof | Gronsdorf | Haar | Kirchseeon | München Pasing | Trudering | Vaterstetten | Zorneding
 de:beg:S6N:_109,S6,109,1833,3,10,equal,0.98,Neustadt (Aisch) Bahnhof,Nürnberg Hbf,shorter -2,0.02,Nürnberg Hbf,Neustadt (Aisch) Bahnhof,1,equal,,
 de:beg:S6T:_109,S6,109,400,1,3,equal,1.00,Mittenwald,Garmisch-Partenkirchen,,,,,1,equal,,
 de:nasa:14|S|MDSB_S6:DBRegio_109,S6,109,2018,11,14,equal,0.66,Leipzig Hbf,Naumburg (Saale) Hbf,shorter -10,0.12,Großkorbetha,Naumburg (Saale) Hbf,1,equal,,

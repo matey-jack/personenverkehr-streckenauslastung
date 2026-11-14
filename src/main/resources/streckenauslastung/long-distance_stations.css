@@ -1,0 +1,15 @@
+:root { color-scheme: light dark; }
+body { font-family: system-ui, sans-serif; font-size: 14px; margin: 0; padding: 0.5em 1.5em 50vh; }
+h1 { margin: 0 0 0.4em; }
+small { opacity: 0.65; font-weight: normal; }
+table { border-collapse: collapse; }
+/* Opacity would make the background of the sticky header translucent, so the text colour is mixed. */
+th {
+  position: sticky; top: 0; z-index: 1; vertical-align: bottom; max-width: 8em;
+  text-align: left; font-weight: normal; background: Canvas; color: color-mix(in srgb, CanvasText 65%, Canvas);
+}
+td, th { padding: 2px 1.5em 2px 0.3em; }
+tr:hover { background: #fc03; }
+td.name { font-weight: 600; }
+td.number, th.number { text-align: right; }
+td.routes { cursor: help; }

@@ -28,7 +28,7 @@ jobs:
       - uses: gradle/actions/setup-gradle@v6
 
       - name: Write the HTML reports
-        run: ./gradlew hubStations lines
+        run: ./gradlew hubStations lines longDistanceStations
 
       # The hub stations page is the start page of the site.
       - name: Collect the HTML reports

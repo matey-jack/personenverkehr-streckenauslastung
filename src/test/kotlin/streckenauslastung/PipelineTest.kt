@@ -113,6 +113,45 @@ class PipelineTest {
         assertContains(page, "<td class=\"name\">RE1</td><td>Aheim Hbf – Cstadt</td><td>DB Regio</td>")
     }
 
+    @Test
+    fun `longDistanceStations counts the routes stopping at each station`(@TempDir tmp: Path) {
+        filterRail(gtfs, tmp.resolve("rail"))
+        val stations = loadRailStations(tmp.resolve("rail"))
+        assertEquals(listOf("A", "B", "C"), stations.map { it.id })
+        val aheim = stations.first()
+        assertEquals("Aheim Hbf", aheim.name)
+        assertEquals(listOf("RE1"), aheim.regionalRoutes)
+        assertEquals(emptyList(), aheim.longDistanceRoutes)
+        assertEquals(0, aheim.longDistanceTripDays)
+
+        val out = tmp.resolve("long-distance_stations.html")
+        longDistanceStations(tmp.resolve("rail"), out, top = 50)
+        assertContains(out.readText(), "The 0 stations with the most long-distance trip-days")
+    }
+
+    @Test
+    fun `longDistanceStations lists the stations with the most long-distance trip-days`() {
+        fun station(id: String, tripDays: Long, longDistance: List<String>, regional: List<String>) =
+            RailStation(id, "Station $id", tripDays, longDistance, regional)
+        val stations = listOf(
+            station("mixed", 50, listOf("ICE 1"), listOf("RE3", "RE3", "S1")),
+            station("regional", 0, emptyList(), listOf("RE2")),
+            station("pure", 100, listOf("ICE 1", "ICE 2"), emptyList()),
+            station("rare", 10, listOf("IC 3"), emptyList()),
+        )
+        val listed = longDistanceStations(stations, top = 2)
+        assertEquals(listOf("pure", "mixed"), listed.map { it.id })
+
+        val page = withoutLayout(longDistanceStationsPage(listed))
+        assertContains(
+            page,
+            "<tr><td class=\"number\">2</td>" +
+                "<td class=\"name\">Station mixed <small>mixed</small></td><td class=\"number\">50</td>" +
+                "<td class=\"number routes\" title=\"ICE 1\">1</td>" +
+                "<td class=\"number routes\" title=\"RE3, S1\">3</td></tr>",
+        )
+    }
+
     /** A pattern of the stations named by the letters of [stations]. */
     private fun pattern(stations: String, tripDays: Long) =
         Pattern(stations.map { it.toString() }, stations.length, "", "", "").also { it.tripDays = tripDays }

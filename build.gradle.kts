@@ -112,6 +112,18 @@ registerStep(
 }
 
 registerStep(
+    "longDistanceStations",
+    "streckenauslastung.LongDistanceStationsKt",
+    "Exploration: write an HTML page of the stations with the most long-distance trips.",
+) {
+    listOf(
+        (findProperty("rail") ?: "data/rail").toString(),
+        (findProperty("out") ?: "data/reports/long-distance_stations.html").toString(),
+        (findProperty("top") ?: "150").toString(),
+    )
+}
+
+registerStep(
     "lines",
     "streckenauslastung.LinesKt",
     "Exploration: write an HTML page of the reconstructed lines of the testing routes.",
