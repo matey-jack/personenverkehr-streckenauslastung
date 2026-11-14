@@ -199,9 +199,13 @@ Routes we use for testing, with the route_id of their core route:
  - RB33 Potsdam – Jüterbog: `4740564_106`
  - RE2 Cottbus – Nauen: `de:VBB:11000000|R-Bahn|RE2:DB_106`
 
-A test page lists the reconstructed line of each of them, and at each station the relevant routes that stop there:
-those with a core route stopping there, and those where only other trips do. Tabs switch between the agencies of the
-testing routes.
+A test page lists the reconstructed line of each of them, and at each station what stops there: the core routes with
+a trip using the line there, and the routes where only other trips do. Below the line it lists all these core routes,
+and then the additional routes: those of which only other trips use the line. Both lists are sorted by name. Tabs
+switch between the agencies of the testing routes.
+
+Relevant routes of one line that share their route_short_name get the suffixes `-1`, `-2`, … on it, in the order of
+their route_id. The suffix of a core route follows it: `RB21-2a`.
 
 Things to be designed:
  - does it make sense to make a timetable for an entire day, so the user can scroll through the time axis? This would 

@@ -2,7 +2,7 @@
 
 package streckenauslastung
 
-import kotlinx.html.FlowContent
+import kotlinx.html.TABLE
 import kotlinx.html.body
 import kotlinx.html.button
 import kotlinx.html.h1
@@ -158,38 +158,85 @@ internal fun runsUsing(line: Line, index: RunIndex): Map<String, List<Run>> {
 }
 
 /**
- * A station of a line with the relevant routes stopping there: [core] are those with a trip of
- * one of their core routes using the line here, [other] those where only other trips do.
+ * A station of a line with what stops there: [core] are the core routes with a trip using the line
+ * here, [other] the routes where only trips of no such core route do. Both are in the order of the
+ * routes.
  */
-internal class LineStop(val stationId: String, val core: List<Route>, val other: List<Route>)
+internal class LineStop(val stationId: String, val core: List<CoreRoute>, val other: List<Route>)
 
-/** The reconstructed line of the core route [core] of [route]: its [stops] and [unplaced] stations. */
-internal class LineReport(val route: Route, val core: CoreRoute, val stops: List<LineStop>, val unplaced: Set<String>) {
-    /** The relevant routes with a core stop on the line. */
-    val coreRoutes = stops.flatMap { it.core }.distinct()
+/** Sorts names with numbers by the value of the numbers: RE3 comes before RE16. */
+internal val naturalOrder: Comparator<String> = compareBy { name ->
+    Regex("[0-9]+").replace(name) { it.value.padStart(9, '0') }
+}
 
-    /** The relevant routes without a core stop on the line. */
-    val otherRoutes = stops.flatMap { it.other }.distinct() - coreRoutes.toSet()
+/**
+ * The reconstructed line of the core route [core]: its [stops] and [unplaced] stations.
+ * [routeOf] gives the route of each core route.
+ */
+internal class LineReport(
+    val core: CoreRoute,
+    val stops: List<LineStop>,
+    val unplaced: Set<String>,
+    val routeOf: Map<CoreRoute, Route>,
+) {
+    /** The names of the relevant routes on this line (see spec.md, "Reconstructing the line"). */
+    private val routeLabels: Map<Route, String> = run {
+        val stopping = stops.flatMap { stop -> stop.core.map(routeOf::getValue) + stop.other }
+        val relevant = (stopping + routeOf.getValue(core)).distinct()
+        val labels = HashMap<Route, String>()
+        for ((name, sameName) in relevant.groupBy { it.shortName }) {
+            for ((i, route) in sameName.sortedBy { it.id }.withIndex()) {
+                labels[route] = when {
+                    name.isEmpty() -> route.id
+                    sameName.size > 1 -> "$name-${i + 1}"
+                    else -> name
+                }
+            }
+        }
+        labels
+    }
+
+    /** The name of the route [route] on this line. */
+    fun label(route: Route) = routeLabels.getValue(route)
+
+    /** The name of the core route [core] on this line. */
+    fun label(core: CoreRoute): String {
+        val route = routeOf.getValue(core)
+        val label = label(route)
+        return when {
+            label == route.shortName -> core.shortName
+            route.coreRoutes.size == 1 -> label
+            else -> label + "ab"[route.coreRoutes.indexOf(core)]
+        }
+    }
+
+    /** The core routes with a core stop on the line, sorted by name. */
+    val coreRoutes = stops.flatMap { it.core }.distinct().sortedWith(compareBy(naturalOrder, ::label))
+
+    /** The routes with other trips stopping on the line and no core route among the [coreRoutes], sorted by name. */
+    val additionalRoutes = (stops.flatMap { it.other }.toSet() - coreRoutes.map(routeOf::getValue).toSet())
+        .sortedWith(compareBy(naturalOrder, ::label))
 }
 
 /** Reconstructs the line of the core route with the ID [coreRouteId] and finds the routes relevant for it. */
 internal fun lineReport(coreRouteId: String, routes: List<Route>, index: RunIndex): LineReport {
-    val route = routes.firstOrNull { route -> route.coreRoutes.any { it.id == coreRouteId } }
-        ?: error("No core route '$coreRouteId'")
-    val core = route.coreRoutes.first { it.id == coreRouteId }
+    val routeOf = LinkedHashMap<CoreRoute, Route>()
+    for (route in routes) for (core in route.coreRoutes) routeOf[core] = route
+    val core = routeOf.keys.firstOrNull { it.id == coreRouteId } ?: error("No core route '$coreRouteId'")
     val line = reconstructLine(core.pattern.stationIds, index)
     val routeById = routes.associateBy { it.id }
     val using = runsUsing(line, index)
 
-    fun Run.isCore() = routeById[routeId]?.coreRoutes?.any { it.pattern.stations == stations.toSet() } == true
+    /** The core route that the trips of the run belong to, if any. */
+    fun Run.coreRoute() = routeById[routeId]?.coreRoutes?.firstOrNull { it.pattern.stations == stations.toSet() }
     val stops = line.stations.map { station ->
         val runs = using.getValue(station)
-        val coreIds = runs.filter { it.isCore() }.map { it.routeId }.toSet()
-        val otherIds = runs.map { it.routeId }.toSet() - coreIds
-        // Filtering the routes keeps their order.
-        LineStop(station, routes.filter { it.id in coreIds }, routes.filter { it.id in otherIds })
+        val cores = runs.mapNotNull { it.coreRoute() }.toSet()
+        val otherIds = runs.map { it.routeId }.toSet() - cores.map { routeOf.getValue(it).id }.toSet()
+        // Filtering keeps the order of the routes.
+        LineStop(station, routeOf.keys.filter { it in cores }, routes.filter { it.id in otherIds })
     }
-    return LineReport(route, core, stops, line.unplaced)
+    return LineReport(core, stops, line.unplaced, routeOf)
 }
 
 /** The runs of all rail routes, and the agency names of the routes by route_id. */
@@ -257,24 +304,17 @@ internal fun linesPage(
 ): String {
     fun agency(route: Route) = agencies[route.id] ?: NO_AGENCY
 
-    fun name(route: Route) = route.shortName.ifEmpty { route.id }
+    fun names(names: List<String>) = names.sortedWith(naturalOrder).joinToString(", ")
 
-    fun names(routes: List<Route>) = routes.map(::name).distinct().joinToString(", ")
-
-    /** One table row per route, with the number of stations of the line where it stops. */
-    fun FlowContent.routeTable(report: LineReport, routes: List<Route>) = table("routes") {
-        for (route in routes) {
-            val pattern = route.coreRoutes.first().pattern
-            tr {
-                td("name") { +name(route) }
-                td { +"${pattern.firstStation} – ${pattern.lastStation}" }
-                td { +agency(route) }
-                td { small { +"${report.stops.count { route in it.core || route in it.other }} stations" } }
-            }
-        }
+    /** A table row for something named [name] that stops at [stations] stations of the line. */
+    fun TABLE.routeRow(name: String, pattern: Pattern, route: Route, stations: Int) = tr {
+        td("name") { +name }
+        td { +"${pattern.firstStation} – ${pattern.lastStation}" }
+        td { +agency(route) }
+        td { small { +(if (stations == 1) "1 station" else "$stations stations") } }
     }
 
-    val tabs = reports.map { agency(it.route) }.distinct()
+    val tabs = reports.map { agency(it.routeOf.getValue(it.core)) }.distinct()
     val page = createHTML().html {
         lang = "de"
         head {
@@ -292,10 +332,10 @@ internal fun linesPage(
             for (report in reports) {
                 val coreStations = report.core.pattern.stations
                 section {
-                    attributes["data-agency"] = agency(report.route)
+                    attributes["data-agency"] = agency(report.routeOf.getValue(report.core))
                     h2 {
                         val pattern = report.core.pattern
-                        +"${report.core.shortName} ${pattern.firstStation} – ${pattern.lastStation} "
+                        +"${report.label(report.core)} ${pattern.firstStation} – ${pattern.lastStation} "
                         small { +"${report.stops.size} stations, ${coreStations.size} of them in the core route" }
                     }
                     table("line") {
@@ -307,9 +347,8 @@ internal fun linesPage(
                         for (stop in report.stops) {
                             tr(if (stop.stationId in coreStations) "core" else null) {
                                 td("name") { +stationNames.getValue(stop.stationId) }
-                                td { +names(stop.core) }
-                                // A short name can belong to several routes; it is not repeated here.
-                                td { +names(stop.other.filter { other -> stop.core.none { name(it) == name(other) } }) }
+                                td { +names(stop.core.map(report::label)) }
+                                td { +names(stop.other.map(report::label)) }
                             }
                         }
                     }
@@ -320,10 +359,20 @@ internal fun linesPage(
                         }
                     }
                     h3 { +"Routes with core stops on the line" }
-                    routeTable(report, report.coreRoutes)
-                    if (report.otherRoutes.isNotEmpty()) {
-                        h3 { +"Routes with only other trips stopping on the line" }
-                        routeTable(report, report.otherRoutes)
+                    table("routes") {
+                        for (core in report.coreRoutes) {
+                            val stations = report.stops.count { core in it.core }
+                            routeRow(report.label(core), core.pattern, report.routeOf.getValue(core), stations)
+                        }
+                    }
+                    if (report.additionalRoutes.isNotEmpty()) {
+                        h3 { +"Additional routes with other trips stopping on the line" }
+                        table("routes") {
+                            for (route in report.additionalRoutes) {
+                                val stations = report.stops.count { route in it.other }
+                                routeRow(report.label(route), route.coreRoutes.first().pattern, route, stations)
+                            }
+                        }
                     }
                 }
             }
@@ -352,7 +401,7 @@ fun lines(railDir: Path, outFile: Path, coreRouteIds: List<String>, rule: Detour
                 report.core.pattern.stations.size,
                 report.unplaced.size,
                 report.coreRoutes.size,
-                report.otherRoutes.size,
+                report.additionalRoutes.size,
             ),
         )
     }

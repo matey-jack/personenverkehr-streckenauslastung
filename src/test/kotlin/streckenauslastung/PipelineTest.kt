@@ -144,43 +144,45 @@ class PipelineTest {
     @Test
     fun `lineReport separates routes with core stops from routes with other trips`() {
         val re = Route("re", "RE1", 106, listOf(pattern("ACE", 10)))
-        val rb = Route("rb", "RB1", 106, listOf(pattern("ABCDE", 10), pattern("AB", 2)))
-        // The core route of RB2 is elsewhere; one of its trips runs from D to E.
-        val rb2 = Route("rb2", "RB2", 106, listOf(pattern("QR", 10), pattern("DE", 1)))
+        // RB1 has two core routes: RB1a from A to C is the most frequent, RB1b from A to E is what most trips serve.
+        val rb = Route("rb", "RB1", 106, listOf(pattern("ABC", 40), pattern("ABCDE", 35), pattern("BCDE", 25)))
+        // Another route called RB1. Its core route is elsewhere; one of its trips runs from D to E.
+        val rb2 = Route("rb2", "RB1", 106, listOf(pattern("QR", 10), pattern("DE", 1)))
         val runs = listOf(
             run("re", "ACE", 10, 0, 600, 1200),
-            run("rb", "ABCDE", 10, 0, 400, 800, 1300, 1700),
-            run("rb", "AB", 2, 0, 400),
+            run("rb", "ABCDE", 35, 0, 400, 800, 1300, 1700),
+            run("rb", "ABC", 40, 0, 400, 800),
             run("rb2", "DE", 1, 0, 400),
             run("rb2", "AUC", 1, 0, 350, 700),
         )
         val report = lineReport("re", listOf(re, rb, rb2), RunIndex(runs, DetourRule()))
 
         assertEquals("ABCDE".map { it.toString() }, report.stops.map { it.stationId })
+        // The two routes called RB1 are numbered; the core routes of the first one keep their own suffixes.
         assertEquals(
-            listOf(listOf(re, rb), listOf(rb), listOf(re, rb), listOf(rb), listOf(re, rb)),
-            report.stops.map {
-                it.core
-            },
+            listOf("RE1 RB1-1a RB1-1b", "RB1-1a RB1-1b", "RE1 RB1-1a RB1-1b", "RB1-1b", "RE1 RB1-1b"),
+            report.stops.map { stop -> stop.core.joinToString(" ") { report.label(it) } },
         )
-        // RB2 stops at A and C, but does not use the line there: its next stop U is not on the line.
+        // The second RB1 stops at A and C, but does not use the line there: its next stop U is not on the line.
         assertEquals(
             listOf(emptyList(), emptyList(), emptyList(), listOf(rb2), listOf(rb2)),
-            report.stops.map {
-                it.other
-            },
+            report.stops.map { it.other },
         )
-        assertEquals(listOf(re, rb), report.coreRoutes)
-        assertEquals(listOf(rb2), report.otherRoutes)
+        assertEquals(listOf("RB1-1a", "RB1-1b", "RE1"), report.coreRoutes.map { report.label(it) })
+        assertEquals(listOf("RB1-2"), report.additionalRoutes.map { report.label(it) })
+        assertEquals(
+            listOf("RE3", "RE16", "S1", "S1-2", "S10"),
+            listOf("S10", "RE16", "S1-2", "RE3", "S1").sortedWith(naturalOrder),
+        )
 
         val names = "ABCDEU".map { it.toString() }.associateWith { "Station $it" }
         val page = withoutLayout(linesPage(listOf(report), names, mapOf("re" to "Agency 1")))
-        assertContains(page, "<tr><td class=\"name\">Station D</td><td>RB1</td><td>RB2</td></tr>")
+        assertContains(page, "<tr><td class=\"name\">Station D</td><td>RB1-1b</td><td>RB1-2</td></tr>")
         assertContains(page, "<p>Unplaced stations: Station U</p>")
-        assertContains(page, "<h3>Routes with only other trips stopping on the line</h3>")
+        assertContains(page, "<h3>Additional routes with other trips stopping on the line</h3>")
         assertContains(
             page,
-            "<td class=\"name\">RB2</td><td> – </td><td>No agency</td><td><small>2 stations</small></td>",
+            "<td class=\"name\">RB1-2</td><td> – </td><td>No agency</td><td><small>2 stations</small></td>",
         )
     }
 
