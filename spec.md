@@ -158,7 +158,8 @@ Graphical Timetable:
  - while the core route defines the scope in the space-dimension, the time-dimension will use the exact data of trips 
    of this route and others that use the line.
  - the first only needs to work for single- and double-tracked lines. We'll allow-list selectable routes manually at 
-   first. 
+   first. For now, the trips of the S-Bahn in Berlin and Hamburg are left out entirely: they run on tracks of their
+   own beside the main lines.
 
 First task: design the algorithm / ruleset to reconstruct the line data (sequence of all possible stops, at least all
 that GTFS allows us to see) from the trip data given one core route that defines the scope of this specific timetable.

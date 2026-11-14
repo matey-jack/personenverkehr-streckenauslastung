@@ -239,10 +239,13 @@ internal fun lineReport(coreRouteId: String, routes: List<Route>, index: RunInde
     return LineReport(core, stops, line.unplaced, routeOf)
 }
 
-/** The runs of all rail routes, and the agency names of the routes by route_id. */
+/** The runs of rail routes, and the agency names of the routes by route_id. */
 internal class RailRuns(val runs: List<Run>, val agencies: Map<String, String>)
 
-/** Loads the runs of the trips that run on at least one day. */
+/** The agencies whose trips are left out of the lines (see spec.md, "Data Model for the Graphical Timetable"). */
+private val agenciesOnOwnTracks = setOf("S-Bahn Berlin GmbH", "S-Bahn Hamburg")
+
+/** Loads the runs of the trips that run on at least one day, except those of the [agenciesOnOwnTracks]. */
 internal fun loadRuns(railDir: Path): RailRuns {
     fun p(name: String) = sqlPath(railDir.resolve("$name.parquet"))
 
@@ -288,7 +291,7 @@ internal fun loadRuns(railDir: Path): RailRuns {
             WHERE a.agency_name IS NOT NULL
         """) { rs -> agencies[rs.getString(1)] = rs.getString(2) }
     }
-    return RailRuns(runs, agencies)
+    return RailRuns(runs.filter { agencies[it.routeId] !in agenciesOnOwnTracks }, agencies)
 }
 
 private const val NO_AGENCY = "No agency"
