@@ -92,7 +92,8 @@ class PipelineTest {
         assertContains(
             page,
             "<td class=\"name\">RE1</td><td class=\"type\">Regional <small>106</small></td>" +
-                "<td>Aheim Hbf</td><td>–</td><td>Cstadt</td>",
+                "<td>Aheim Hbf</td><td>–</td><td>Cstadt</td>" +
+                "<td class=\"stops\" title=\"Aheim Hbf&#10;Bdorf&#10;Cstadt\"><small>3 stops, 20 min</small></td>",
         )
     }
 

@@ -25,6 +25,19 @@ internal class Pattern(
 
     /** The trips of the pattern, each counted once per day it runs. */
     var tripDays = 0L
+
+    /** For each travel time in seconds between the first and last stop of a trip, its trip-days. */
+    val travelSecs = HashMap<Long, Long>()
+
+    /** The travel time that half of the trip-days do not exceed; null if no trip has times. */
+    val medianTravelSecs: Long?
+        get() {
+            var daysLeft = (travelSecs.values.sum() + 1) / 2
+            return travelSecs.keys.sorted().firstOrNull { secs ->
+                daysLeft -= travelSecs.getValue(secs)
+                daysLeft <= 0
+            }
+        }
 }
 
 /** How a pattern differs from the majority stations of its route. */
@@ -91,7 +104,7 @@ internal fun loadRoutes(railDir: Path, minDays: Int = 1): Routes {
         createTripGroupTable(db, railDir, minDays)
         db.forEachRow("""
             SELECT route_id, route_short_name, route_type, num_trip_days, station_ids, num_stops,
-                   first_station, last_station, stations
+                   first_station, last_station, stations, trip_travel_secs, trip_days
             FROM trip_groups WHERE num_trip_days > 0
             ORDER BY route_type, route_short_name, route_id, num_trip_days DESC, group_no
         """) { rs ->
@@ -103,6 +116,10 @@ internal fun loadRoutes(railDir: Path, minDays: Int = 1): Routes {
                 Pattern(stationIds, rs.getInt(6), rs.getString(7), rs.getString(8), rs.getString(9))
             }
             pattern.tripDays += rs.getLong(4)
+            val tripDays = (rs.getArray(11).array as Array<*>).map { (it as Number).toLong() }
+            (rs.getArray(10).array as Array<*>).forEachIndexed { i, secs ->
+                if (secs != null) pattern.travelSecs.merge((secs as Number).toLong(), tripDays[i], Long::plus)
+            }
         }
         db.forEachRow("SELECT station_id, station_name FROM station_names") { rs ->
             stationNames[rs.getString(1)] = rs.getString(2)

@@ -35,11 +35,11 @@ fun tripGroups(railDir: Path, outFile: Path, topFile: Path) {
         createTripGroupTable(db, railDir)
         val order = "ORDER BY route_type, route_short_name, route_id, group_no"
         db.exec("""
-            COPY (SELECT * EXCLUDE (station_ids, num_trip_days) FROM trip_groups $order)
+            COPY (SELECT * EXCLUDE (station_ids, num_trip_days, trip_travel_secs, trip_days) FROM trip_groups $order)
             TO ${sqlPath(outFile)} (FORMAT csv, HEADER)
         """)
         db.exec("""
-            COPY (SELECT * EXCLUDE (station_ids, num_trip_days, group_no) FROM trip_groups WHERE group_no = 1 $order)
+            COPY (SELECT * EXCLUDE (station_ids, num_trip_days, trip_travel_secs, trip_days, group_no) FROM trip_groups WHERE group_no = 1 $order)
             TO ${sqlPath(topFile)} (FORMAT csv, HEADER)
         """)
         val routes = db.queryLong("SELECT count(DISTINCT route_id) FROM trip_groups")
@@ -52,6 +52,8 @@ fun tripGroups(railDir: Path, outFile: Path, topFile: Path) {
  * Creates the table `trip_groups` with the columns of the trip groups CSV plus
  *  - `station_ids`: the list of station IDs behind the `stations` names;
  *  - `num_trip_days`: the trips of the group, each counted once per day it runs;
+ *  - `trip_travel_secs`, `trip_days`: for each trip of the group, the seconds from its first
+ *    departure to its last arrival and the number of days it runs;
  * and the table `station_names` (station_id, station_name).
  * Trips running on fewer than [minDays] days are left out.
  */
@@ -71,7 +73,8 @@ fun createTripGroupTable(db: Connection, railDir: Path, minDays: Int = 0) {
     db.exec("""
         CREATE TABLE trip_seq AS
         SELECT st.trip_id,
-               list(so.station_id ORDER BY st.stop_sequence) AS stations
+               list(so.station_id ORDER BY st.stop_sequence) AS stations,
+               max(st.arrival_secs) - min(st.departure_secs) AS travel_secs
         FROM ${p("stop_times")} st JOIN station_of so USING (stop_id)
         GROUP BY st.trip_id
     """)
@@ -105,7 +108,8 @@ fun createTripGroupTable(db: Connection, railDir: Path, minDays: Int = 0) {
     db.exec("""
         CREATE TABLE groups AS
         SELECT row_number() OVER () AS gid, t.route_id, ts.stations, count(*) AS num_trips,
-               coalesce(sum(sd.num_days), 0)::BIGINT AS num_trip_days
+               coalesce(sum(sd.num_days), 0)::BIGINT AS num_trip_days,
+               list(ts.travel_secs) AS trip_travel_secs, list(coalesce(sd.num_days, 0)) AS trip_days
         FROM ${p("trips")} t JOIN trip_seq ts USING (trip_id) LEFT JOIN service_days sd USING (service_id)
         WHERE coalesce(sd.num_days, 0) >= $minDays
         GROUP BY t.route_id, ts.stations
@@ -133,7 +137,7 @@ fun createTripGroupTable(db: Connection, railDir: Path, minDays: Int = 0) {
                len(g.stations) AS num_stops,
                g.num_trips,
                n.first_station, n.last_station, n.stations,
-               g.stations AS station_ids, g.num_trip_days
+               g.stations AS station_ids, g.num_trip_days, g.trip_travel_secs, g.trip_days
         FROM groups g
         JOIN ${p("routes")} r USING (route_id)
         JOIN group_names n USING (gid)

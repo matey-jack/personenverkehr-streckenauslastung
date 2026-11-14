@@ -5,13 +5,15 @@ import java.nio.file.Path
 
 /**
  * A core route of the route [routeId] as listed on the page, where it is simply called a "route".
- * [stationIds] run in the direction given by [hubOverview].
+ * [stationIds] run in the direction given by [hubOverview]. [travelSecs] is the median travel time
+ * between both ends, counted in trip-days over the trips of the core route in both directions.
  */
 internal data class ListedRoute(
     val routeId: String,
     val shortName: String,
     val type: Int,
     val stationIds: List<String>,
+    val travelSecs: Long? = null,
 ) {
     val ends = setOf(stationIds.first(), stationIds.last())
 
@@ -102,7 +104,9 @@ internal fun hubOverview(routes: List<ListedRoute>, stationNames: Map<String, St
  */
 internal fun listedRoutes(routes: List<Route>): List<ListedRoute> = routes
     .flatMap { route ->
-        route.coreRoutes.map { ListedRoute(route.id, it.shortName, route.type, it.pattern.stationIds) }
+        route.coreRoutes.map {
+            ListedRoute(route.id, it.shortName, route.type, it.pattern.stationIds, it.pattern.medianTravelSecs)
+        }
     }
     .distinctBy { Triple(it.type, it.shortName, it.stationIds.toSet()) }
 
@@ -116,7 +120,14 @@ private val routeTypeNames = mapOf(
     109 to "Suburban",
 )
 
-private fun html(text: String) = text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+private fun html(text: String) =
+    text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;")
+
+/** Rounded to minutes: "47 min", or "1:05 h" from an hour on. */
+private fun duration(secs: Long): String {
+    val minutes = (secs + 30) / 60
+    return if (minutes < 60) "$minutes min" else "%d:%02d h".format(minutes / 60, minutes % 60)
+}
 
 private const val STYLE = """
 :root { color-scheme: light dark; }
@@ -142,36 +153,11 @@ table { border-collapse: collapse; margin-left: 1em; }
 td { padding: 1px 1em 1px 0; }
 td.name { font-weight: 600; min-width: 5em; }
 td.type { min-width: 10em; }
+td.stops { cursor: help; }
 """
 
-/**
- * Both navigation variants are one document: `body.sidebar` shows the station list beside fully
- * expanded sections, `body.collapsible` hides it and starts with all sections closed.
- */
-private const val SCRIPT = """
-const sections = document.querySelectorAll('details');
-function openTarget() {
-  const target = document.getElementById(location.hash.slice(1));
-  if (target) { target.open = true; target.scrollIntoView(); }
-}
-function setNavigation(mode) {
-  document.body.className = mode;
-  sections.forEach(s => { s.open = mode === 'sidebar'; });
-  openTarget();
-}
-document.querySelectorAll('input[name=navigation]').forEach(radio => {
-  radio.addEventListener('change', () => setNavigation(radio.value));
-});
-document.getElementById('filter').addEventListener('input', event => {
-  const text = event.target.value.toLowerCase();
-  document.querySelectorAll('nav li').forEach(li => {
-    li.hidden = !li.textContent.toLowerCase().includes(text);
-  });
-});
-addEventListener('hashchange', openTarget);
-addEventListener('click', event => { if (event.target.closest('a[href^="#"]')) setTimeout(openTarget); });
-setNavigation('sidebar');
-"""
+/** The script of the page, kept in `src/main/resources`. */
+private val script = ListedRoute::class.java.getResource("hub_stations.js")!!.readText()
 
 /** Renders the overview as a self-contained HTML page. */
 internal fun hubStationsPage(overview: HubOverview, stationNames: Map<String, String>): String {
@@ -192,7 +178,10 @@ internal fun hubStationsPage(overview: HubOverview, stationNames: Map<String, St
             append("<tr><td class=\"name\">${html(route.shortName)}</td><td class=\"type\">$type</td>")
             append("<td>${station(start, link = start != hubId)}</td><td>–</td>")
             append("<td>${station(end, link = end != hubId)}</td>")
-            append("<td><small>${route.stationIds.size} stops</small></td></tr>\n")
+            val stations = route.stationIds.joinToString("&#10;") { html(stationNames.getValue(it)) }
+            val travelTime = route.travelSecs?.let { ", ${duration(it)}" } ?: ""
+            append("<td class=\"stops\" title=\"$stations\">")
+            append("<small>${route.stationIds.size} stops$travelTime</small></td></tr>\n")
         }
         append("</table>\n")
     }
@@ -228,7 +217,7 @@ internal fun hubStationsPage(overview: HubOverview, stationNames: Map<String, St
         append("<details id=\"isolated\">\n<summary>Isolated routes ")
         append("<small>${overview.isolated.size} touching no hub station</small></summary>\n")
         routeTable(overview.isolated)
-        append("</details>\n</main>\n<script>$SCRIPT</script>\n</body>\n</html>\n")
+        append("</details>\n</main>\n<script>$script</script>\n</body>\n</html>\n")
     }
 }
 
