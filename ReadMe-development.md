@@ -23,6 +23,7 @@ This applies to Claude Code sessions as well.
 
 Questions about the data are answered with Kotlin code in the repository, not with throwaway scripts, so that everyone sees the same result: a step in the `pipeline` task group that writes a report to `data/reports/` and prints a short summary. A report is a CSV file, or an HTML page for browsing: one self-contained file written with kotlinx.html, with its style and script in `src/main/resources`. Each step gets a row in the task table of [ReadMe.md](ReadMe.md) and a test against `mini_gtfs`.
 
+- On an HTML page with headings and tables, decide what has to stay visible while scrolling (page heading, navigation, section heading, table header) and make it stick to the top.
 - Concepts are refined by comparing variants ("how would the rate change if…"). Make variants cheap to compare, with summary lines or a `-P` option, instead of hard-wiring one.
 - Before validating a concept against the data, check what the data means by "the same station" and "how often": both changed the core route results more than the definition itself did.
 - A definition enters `spec.md` when Robert asks for it, concisely; it may be labelled provisional.

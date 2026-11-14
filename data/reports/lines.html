@@ -5,8 +5,8 @@
     <title>Reconstructed lines of the testing routes</title>
     <style>:root { color-scheme: light dark; }
 body { font-family: system-ui, sans-serif; font-size: 14px; margin: 0; padding: 0 1.5em 50vh; }
-/* The z-index keeps the header above the translucent text, which would otherwise be painted over it. */
-header { position: sticky; top: 0; z-index: 1; background: Canvas; padding-top: 0.5em; }
+/* The z-index keeps the sticky parts above the translucent text, which would otherwise be painted over them. */
+header { position: sticky; top: 0; z-index: 2; background: Canvas; padding-top: 0.5em; }
 h1 { margin: 0 0 0.4em; }
 nav { display: flex; flex-wrap: wrap; gap: 0.3em; border-bottom: 1px solid #8886; }
 nav button {
@@ -16,10 +16,18 @@ nav button {
 nav button.active { background: #fc06; font-weight: 600; }
 small { opacity: 0.65; font-weight: normal; }
 section { padding: 0.3em 0 1.5em; }
-h2 { font-size: 1.15em; margin: 1em 0 0.5em; padding: 0.1em 0.3em; background: #fc06; }
+/* Sticks below the header. The script provides the heights of the sticky parts. The colour lies on an opaque layer. */
+h2 {
+  position: sticky; top: var(--header-height, 0px); z-index: 1;
+  font-size: 1.15em; margin: 1em 0 0.5em; padding: 0.1em 0.3em; background: linear-gradient(#fc06, #fc06), Canvas;
+}
 h3 { font-size: 1em; margin: 1em 0 0.2em; }
 table { border-collapse: collapse; }
-th { text-align: left; font-weight: normal; opacity: 0.65; }
+/* Sticks below the section heading. Opacity would make its background translucent, so the text colour is mixed. */
+th {
+  position: sticky; top: calc(var(--header-height, 0px) + var(--heading-height, 0px)); z-index: 1;
+  text-align: left; font-weight: normal; background: Canvas; color: color-mix(in srgb, CanvasText 65%, Canvas);
+}
 td, th { padding: 1px 1.5em 1px 0.3em; vertical-align: top; }
 tr:hover { background: #fc03; }
 table.line tr.core td.name, table.routes td.name { font-weight: 600; }
@@ -1057,6 +1065,19 @@ function show(agency) {
     section.hidden = section.dataset.agency !== agency;
   });
 }
+
+// The heights of the header and the section headings change with the window width, as tabs and text wrap.
+const header = document.querySelector('header');
+// Heights are not rounded to whole pixels, which would leave gaps between the sticky parts.
+const height = element => element.getBoundingClientRect().height + 'px';
+const heights = new ResizeObserver(() => {
+  document.documentElement.style.setProperty('--header-height', height(header));
+  document.querySelectorAll('section').forEach(section => {
+    section.style.setProperty('--heading-height', height(section.querySelector('h2')));
+  });
+});
+heights.observe(header);
+document.querySelectorAll('h2').forEach(heading => heights.observe(heading));
 
 tabs.forEach(tab => tab.addEventListener('click', () => show(tab.textContent)));
 show(tabs[0].textContent);
