@@ -268,7 +268,6 @@ de:nrw:rb20:_106,RB20,106,8336,20,13,different +2 -12,0.21,"Düren, Bf","Eschwei
 162035_106,RB21,106,2928,3,5,equal,0.89,Niedernhausen Bahnhof,Wiesbaden Hbf,longer +9,0.08,Limburg (Lahn) Bahnhof,Wiesbaden Hbf,1,equal,,
 2233921_106,RB21,106,2004,21,7,shorter -1,0.24,Jena-Göschwitz,Weimar,longer +8,0.19,Erfurt Hbf,Gera Hbf,8,equal,,Erfurt Hbf
 527642_106,RB21,106,5334,5,9,longer +4,0.43,"Düren, Bf","Linnich, Bf",different +16 -8,0.23,"Heimbach, Bf","Düren, Bf",4,equal,"Jülich, An den Aspen Bf | Jülich, Broich Bf | Linnich, Bf | Linnich, Tetz Bf",
-7149172_106,RB21,106,50,2,7,equal,0.94,Gera Hbf,Erfurt Hbf,shorter -1,0.06,Hermsdorf-Klosterlausnitz,Erfurt Hbf,1,equal,,
 de:VBB:11000000|R-Bahn|RB21:_106,RB21,106,2040,10,12,equal,0.76,"Priort, Bahnhof",Hennigsdorf Bhf,longer +3,0.10,Hennigsdorf Bhf,"Priort, Bahnhof",1,equal,,
 de:beg:RB21:_106,RB21,106,2444,4,11,equal,0.80,Gräfenberg,Nürnberg Nordost,shorter -5,0.13,Nürnberg Nordost,Eschenau (Mittelfr),1,equal,,
 2233911_106,RB22,106,1865,4,7,equal,0.95,Ebermannstadt,Forchheim (Oberfr),longer +6,0.02,Bamberg,Ebermannstadt,1,equal,,
@@ -717,6 +716,7 @@ de:nasa:15|RZug|RE20:DBRegio_D_D_106,RE20,106,15,1,2,equal,1.00,Decin hl.n.,Sch�
 de:rmv:00001295:_106,RE20,106,586,1,9,equal,1.00,Frankfurt (Main) Hbf,Limburg (Lahn) Bahnhof,,,,,1,equal,,
 de:vvo:9-20:_106,RE20,106,8,1,13,equal,1.00,Decin hl.n.,Dresden Hbf,,,,,1,equal,,
 de:nvbw:90T200:_106,RE200,106,1949,4,3,equal,0.88,Ulm Hbf,Wendlingen (N),shorter -1,0.07,Merklingen Bahnhof,Ulm Hbf,1,equal,,
+7149172_106,RE21,106,50,2,7,equal,0.94,Gera Hbf,Erfurt Hbf,shorter -1,0.06,Hermsdorf-Klosterlausnitz,Erfurt Hbf,1,equal,,
 de:nasa:15|RZug|RE21:DBRegio_106,RE21,106,998,23,13,longer +1,0.29,Magdeburg Hbf,"Goslar, Bahnhof",equal,0.24,"Goslar, Bahnhof",Magdeburg Hbf,2,equal,Blumenberg,
 de:rlp:re21:_106,RE21,106,30,2,16,equal,0.97,Koblenz Hbf,Karlsruhe Hbf,shorter -1,0.03,Wörth (Rhein),Koblenz Hbf,1,equal,,
 6986899_106,RE22,106,2482,22,12,equal,0.30,Regensburg Hbf,Flughafen München,longer +1,0.15,Flughafen München,Regensburg Hbf,1,equal,,

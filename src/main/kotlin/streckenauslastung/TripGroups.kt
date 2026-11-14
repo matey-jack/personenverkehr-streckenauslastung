@@ -56,6 +56,11 @@ private val stationNameFixes = mapOf(
     "de:09185:90261" to "Brunnen(Oberbayern)",
 )
 
+/** Short names given to routes by route_id, in place of those in the data (see gtfs_findings.md, "Route names"). */
+private val routeNameFixes = mapOf(
+    "7149172_106" to "RE21", // RB21 of Erfurter Bahn Express, Erfurt – Gera
+)
+
 /**
  * Each station ID on the left counts as the station on the right (see gtfs_findings.md, "A station
  * can have several station IDs").
@@ -171,9 +176,10 @@ fun createTripGroupTable(db: Connection, railDir: Path, minDays: Int = 0) {
         FROM u JOIN station_names s USING (station_id)
         GROUP BY u.gid
     """)
+    val fixedRouteNames = routeNameFixes.entries.joinToString { (id, name) -> "('$id', '$name')" }
     db.exec("""
         CREATE TABLE trip_groups AS
-        SELECT g.route_id, r.route_short_name, r.route_type,
+        SELECT g.route_id, coalesce(fixed.short_name, r.route_short_name) AS route_short_name, r.route_type,
                row_number() OVER (
                    PARTITION BY g.route_id
                    -- name and id tie-breakers make group_no deterministic (e.g. both directions of a line)
@@ -185,6 +191,7 @@ fun createTripGroupTable(db: Connection, railDir: Path, minDays: Int = 0) {
                g.stations AS station_ids, g.num_trip_days, g.trip_travel_secs, g.trip_days
         FROM groups g
         JOIN ${p("routes")} r USING (route_id)
+        LEFT JOIN (VALUES $fixedRouteNames) fixed(route_id, short_name) USING (route_id)
         JOIN group_names n USING (gid)
     """)
 }

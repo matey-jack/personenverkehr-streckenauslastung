@@ -194,7 +194,7 @@ What this cannot see:
 
 Routes we use for testing, with the route_id of their core route:
  - RE50 Erfurt – Meiningen: `2233941_106`
- - RB21 Erfurt – Gera: `7149172_106`
+ - RE21 Erfurt – Gera: `7149172_106`
  - RE6a Hennigsdorf – Wittenberge: `de:VBB:12070424|R-Bahn|RE6:_106:a`
  - RB33 Potsdam – Jüterbog: `4740564_106`
  - RE2 Cottbus – Nauen: `de:VBB:11000000|R-Bahn|RE2:DB_106`
@@ -205,7 +205,7 @@ and then the additional routes: those of which only other trips use the line. Bo
 switch between the agencies of the testing routes.
 
 Relevant routes of one line that share their route_short_name get the suffixes `-1`, `-2`, … on it, in the order of
-their route_id. The suffix of a core route follows it: `RB21-2a`.
+their route_id. The suffix of a core route follows it: `S8-2a`.
 
 Things to be designed:
  - does it make sense to make a timetable for an entire day, so the user can scroll through the time axis? This would 

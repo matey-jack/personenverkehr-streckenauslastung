@@ -20,6 +20,10 @@ What the Delfi data set of 2026-11-09 turned out to contain, where that differs 
 - Names start with "S " or "S+U " where S-Bahn or U-Bahn trains call, mostly in Berlin: "S+U Berlin Hauptbahnhof".
 - Main stations are spelled in four ways: "Kassel Hauptbahnhof", "Cottbus, Hauptbahnhof", "Hamburg Hbf", "Eschweiler, Hbf".
 
+## Route names
+
+- Between Erfurt and Gera two routes are called RB21: one of Erfurter Bahn that stops everywhere, and one of Erfurter Bahn Express that stops like a regional express. `routeNameFixes` in `TripGroups.kt` names the express one RE21.
+
 ## Long-distance routes barely have a typical trip
 
 Routes of type 101 and 102 have up to about 200 different station patterns each, and the most frequent one often covers only 5 to 15% of the trip-days. A core route says much less about such a route than about a regional one.
