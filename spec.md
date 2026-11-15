@@ -140,6 +140,12 @@ network graph for the German long-distance train network. We include every hop b
 minimal number of daily trips for a minimum number of days in the timetable period. (My suggestion: at least 3 days per
 number of months in the timetable period that have at least 6 trips each.)
 
+Since the trips of long-distance trains have more diverse stopping patterns, we relax our concept of "core route" to 
+"core path": if two trips pass at the same stations, even if not stopping there, there are in the same "relaxed trip 
+group". Then we define the "core path(s)" of a route just as the "core route(s)" are defined on "trip groups" (with 
+same stopping sequence). If the most frequent trip group covers the majority stations, we'll just have one, if not, 
+we'll have 'a' and 'b' core paths. 
+
 The first step needs to be a filtering of all long-distance stations to be in scope and a grouping of stations from the 
 GTFS data into logical stations, manually giving priority to several stations in the same city. From that we'll cap all 
 the trips to just those stations and only signal further intermediate stops symbolically and further stops past the 
@@ -149,9 +155,7 @@ And the number of different trips by route should be reduced.
 
 Then we build the network from those hops with the following assumptions:
 
-- first use a manually entered list of NBS lines and mark those hops as going via the NBS. Those NBS will also need 
-  information on junction points that are not stations. We need to define a data model for that. We'll probably include 
-  distance information in that model, since it's an easy addition.
+- first use a manually entered list of NBS lines and mark those hops as going via the NBS. 
 - then for all hops that match a regional train route, assume that the long-distance train hops via that route's line.
 - then for the remaining larger hops, route them via the line segments added before, using the hop times of stopping
   long-distance trains to validate the travel time.
@@ -172,8 +176,7 @@ On the sidebar, include a filter asking for a minimal number of trips on a minim
 from the major routes and dial it up over time.
 
 TODOs:
- - define data format in which the NBS list is to be provided. Actually, that is so little data, it could be a constant 
-   in the code. But still, we need to define how the stations are identified which are connected via NBS'. 
+ - define data format in which the NBS list is to be provided. Work in progress:  [infrastructure-spec.md](infrastructure-spec.md)
  - define data format for the manual routing of trains when paths are ambiguous.
 
 # Visualizations
