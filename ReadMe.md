@@ -16,6 +16,7 @@ I am always writing the spec and docs first, often using present tense even for 
 - **[DuckDB](https://duckdb.org/)** (embedded, via JDBC) for filtering the GTFS CSV files and for exploration queries. It runs in memory; there is no database file.
 - **[Parquet](https://parquet.apache.org/)** files for intermediate results (compressed, columnar, readable by DuckDB, Python/Polars, pandas, …). Small human-facing reports are CSV.
 - **[kotlinx.html](https://github.com/Kotlin/kotlinx.html)** for writing HTML reports.
+- **YAML** files for manually entered data, read with [SnakeYAML Engine](https://bitbucket.org/snakeyaml/snakeyaml-engine).
 - **Gradle** with the wrapper (`./gradlew`), so no separate Gradle installation is needed. If no JDK 25 is installed, Gradle downloads one automatically.
 
 Why not H2: it is row-oriented and built for transactional workloads, slow at bulk imports and large aggregations, and its file format changes between major versions, which is bad for data files committed to the repository.
@@ -32,6 +33,7 @@ Each pipeline step is a separate Gradle task (`./gradlew tasks --group pipeline`
 | `./gradlew coreRouteCheck` | `data/rail/*.parquet` | `data/reports/core_route_check.csv`: for each route, how its two most frequent station patterns compare with the stations most of its trips serve (columns are described in `CoreRouteCheck.kt`). `-PminDays=5` ignores trips running on fewer than 5 days |
 | `./gradlew hubStations` | `data/rail/*.parquet` | `data/reports/hub_stations.html`: a page to browse the core routes by hub station |
 | `./gradlew longDistanceStations` | `data/rail/*.parquet` | `data/reports/long-distance_stations.html`: the stations with the most long-distance trip-days, with the numbers of long-distance and regional routes stopping there. `-Ptop=150` sets the number of stations |
+| `./gradlew directLines` | `data/rail/*.parquet`, `data/manual/direct_lines.yaml` | A check of the manually entered direct lines (see [direct_lines.md](direct_lines.md)), and `data/reports/stations.csv`: the ID and name of every station |
 | `./gradlew lines` | `data/rail/*.parquet` | `data/reports/lines.html`: for each testing route, its reconstructed line with the times of a few real trains and warnings about an uncertain order, and the routes stopping at each station. `-PstopAllowance=180` and `-PdetourFactor=1.5` set the numbers in the rule for detours |
 
 Paths can be overridden, e.g. `./gradlew filterRail -Pgtfs=/path/to/gtfs -Pout=data/rail`.

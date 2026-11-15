@@ -1,0 +1,81 @@
+# Direct lines; direct_lines.md describes the format and how to fill it.
+
+stations:
+  Mannheim Hbf: de:08222:2417
+  Hockenheim: de:08226:1620
+  Graben-Neudorf: de:08215:32585
+  Ubstadt-Weiher: de:08215:1861
+  Bruchsal: de:08215:1856
+  Vaihingen (Enz): de:08118:5879
+  Stuttgart-Zuffenhausen: de:08111:6465
+  Stuttgart-Feuerbach: de:08111:6157
+  Stuttgart Nord: de:08111:6295
+  Stuttgart Hbf: de:08111:6115
+  Erfurt Hbf: de:16051:8010101
+  Halle (Saale) Hbf: de:15002:8010159
+  Leipzig/Halle Flughafen: de:14730:8012183
+  Leipzig Messe: de:14713:8012478
+  Leipzig Hbf: de:14713:8010205
+
+junctions:
+  # The position is that of the Wikipedia article on the line to Graben-Neudorf, so only roughly that of the junction.
+  Waghäusel Saalbach: {lat: 49.212, lon: 8.4992}
+  Bruchsal Rollenberg: {lat: 49.147314, lon: 8.619874}
+  Halle-Planena: {lat: 51.409923, lon: 11.962941}
+  Gröbers: {lat: 51.432676, lon: 12.117065}
+
+segments:
+  # Schnellfahrstrecke Mannheim–Stuttgart (4080), km 0.000 at Mannheim Hbf.
+  - {from: Mannheim Hbf, to: Hockenheim, km: 20.865}
+  - {from: Hockenheim, to: Waghäusel Saalbach, km: 10.865}  # km 31.730
+  - {from: Waghäusel Saalbach, to: Bruchsal Rollenberg, km: 13.570}  # km 45.300
+  - {from: Bruchsal Rollenberg, to: Vaihingen (Enz), km: 33.170}  # km 78.470
+  # 20.8 km to the end of the line at km 99.266, which is km 8.2 of the Frankenbahn, then 1.6 km to its km 6.585.
+  - {from: Vaihingen (Enz), to: Stuttgart-Zuffenhausen, km: 22.4}
+  # Frankenbahn (4800), km 0.0 at Stuttgart Hbf.
+  - {from: Stuttgart-Zuffenhausen, to: Stuttgart-Feuerbach, km: 1.9}  # km 4.7
+  - {from: Stuttgart-Feuerbach, to: Stuttgart Nord, km: 2.0}  # km 2.7
+  - {from: Stuttgart Nord, to: Stuttgart Hbf, km: 2.7}
+  # Waghäusel Saalbach–Graben-Neudorf (4082): km 32.554 to 39.601.
+  - {from: Waghäusel Saalbach, to: Graben-Neudorf, km: 7.0}
+  # Verbindungsstrecke Ubstadt, 2.8 km to Ubstadt-Weiher (Abzw), then 0.3 km of the Rheintalbahn (km 46.600 to 46.291).
+  - {from: Bruchsal Rollenberg, to: Ubstadt-Weiher, km: 3.1}
+  # Verbindungsstrecke Bruchsal, 2.1 km to Bruchsal Nord, then 2.0 km of the Rheintalbahn (km 49.610 to 51.633).
+  - {from: Bruchsal Rollenberg, to: Bruchsal, km: 4.1}
+
+  # Schnellfahrstrecke Eltersdorf–Leipzig (5919), km 191.078 at Erfurt Hbf.
+  - {from: Erfurt Hbf, to: Halle-Planena, km: 83.306}  # km 274.384
+  - {from: Halle-Planena, to: Gröbers, km: 11.017}  # km 285.401
+  - {from: Gröbers, to: Leipzig/Halle Flughafen, km: 7.773}  # km 293.174
+  - {from: Leipzig/Halle Flughafen, to: Leipzig Messe, km: 12.488}  # km 305.662
+  - {from: Leipzig Messe, to: Leipzig Hbf, km: 6.234}  # km 311.896
+  # Connecting curve to the line Halle–Bebra and on to Halle Hbf: 8.9 km in all.
+  - {from: Halle-Planena, to: Halle (Saale) Hbf, km: 8.9}
+  # Magdeburg–Leipzig (6403): km 86.035 to 96.779.
+  - {from: Halle (Saale) Hbf, to: Gröbers, km: 10.744}
+
+direct_lines:
+  - name: SFS Mannheim–Stuttgart
+    nodes:
+      - Mannheim Hbf
+      - Hockenheim
+      - Waghäusel Saalbach
+      - Bruchsal Rollenberg
+      - Vaihingen (Enz)
+      - Stuttgart-Zuffenhausen
+      - Stuttgart-Feuerbach
+      - Stuttgart Nord
+      - Stuttgart Hbf
+  # Mannheim–Karlsruhe: leaves the SFS towards Graben-Neudorf.
+  - nodes: [Mannheim Hbf, Hockenheim, Waghäusel Saalbach, Graben-Neudorf]
+  # Heidelberg–Stuttgart: joins the SFS from the Rheintalbahn.
+  - nodes: [Ubstadt-Weiher, Bruchsal Rollenberg, Vaihingen (Enz)]
+  # Karlsruhe–Stuttgart: joins the SFS from the Rheintalbahn.
+  - nodes: [Bruchsal, Bruchsal Rollenberg, Vaihingen (Enz)]
+
+  - name: NBS Erfurt–Leipzig
+    nodes: [Erfurt Hbf, Halle-Planena, Gröbers, Leipzig/Halle Flughafen, Leipzig Messe, Leipzig Hbf]
+  - name: NBS Erfurt–Halle
+    nodes: [Erfurt Hbf, Halle-Planena, Halle (Saale) Hbf]
+  # Halle–Leipzig: joins the NBS from the line Magdeburg–Leipzig.
+  - nodes: [Halle (Saale) Hbf, Gröbers, Leipzig/Halle Flughafen]

@@ -21,13 +21,20 @@ The parquet files have everything we need and are committed in Git.
 - [ ] For each trip, count the days it runs. Find a "typical" weekday and the busiest days and hours.
 
 ## 5. Reconstructing lines (implemented for the five testing routes)
-- [ ] Review `data/reports/lines.html`.
+- [x] Review `data/reports/lines.html`.
 - [ ] Run it for more core routes. Neither kind of warning has occurred on real data yet.
 - [ ] Decide what to do about trains on separate tracks other than the S-Bahn of Berlin and Hamburg: the other S-Bahn networks still fill lines.
-- [x] RE2 shares its line with long-distance routes (17, 18) and the FEX. Keep it as a testing route? ✅
+- [x] RE2 shares its line with long-distance routes (17, 18) and the FEX. Keep it as a testing route? yes! ✅
+
+## 6. direst_lines.yaml
+
+- [ ] simplify the data format, so it doesn't repeat connections that can be seen from the GTFS data.
+  It should also describe the infrastructure only: all connections that a junction offers; not just say which are the 
+  paths taken by actual long-distance passenger trains. And make the information atomic, not end-to-end for highly 
+  connected lines like Mannheim–Stuttgart (the most connected line of all).
 
 ## Later
 - Path finding for trains (which stations are passed without stopping).
 - Train-physics model and fitting of acceleration, braking, maximum speed and buffer times.
-- Input file formats for path hints, train parameters and exact line data.
+- Input file formats for path hints, train parameters.
 - Graphical timetable visualization and critical-point (Zugfolgezeit) summary.

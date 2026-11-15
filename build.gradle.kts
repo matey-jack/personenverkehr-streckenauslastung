@@ -11,6 +11,7 @@ repositories {
 dependencies {
     implementation("org.duckdb:duckdb_jdbc:2.0.0.1")
     implementation("org.jetbrains.kotlinx:kotlinx-html-jvm:0.12.0")
+    implementation("org.snakeyaml:snakeyaml-engine:3.2")
 
     testImplementation(kotlin("test"))
     testImplementation(platform("org.junit:junit-bom:6.1.3"))
@@ -120,6 +121,19 @@ registerStep(
         (findProperty("rail") ?: "data/rail").toString(),
         (findProperty("out") ?: "data/reports/long-distance_stations.html").toString(),
         (findProperty("top") ?: "150").toString(),
+    )
+}
+
+registerStep(
+    "directLines",
+    "streckenauslastung.DirectLinesKt",
+    "Check the manually entered direct lines and write the list of station IDs.",
+) {
+    listOf(
+        (findProperty("rail") ?: "data/rail").toString(),
+        // Not named "directLines": that property is the task itself.
+        (findProperty("yaml") ?: "data/manual/direct_lines.yaml").toString(),
+        (findProperty("out") ?: "data/reports/stations.csv").toString(),
     )
 }
 
