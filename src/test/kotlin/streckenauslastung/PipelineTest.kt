@@ -134,6 +134,14 @@ class PipelineTest {
     }
 
     @Test
+    fun `routeCounts counts the routes by prefix, type and agency`(@TempDir tmp: Path) {
+        filterRail(gtfs, tmp.resolve("rail"))
+        val report = routeCounts(tmp.resolve("rail"))
+        assertContains(report, "prefix\troute_type\troutes\nRE\t106\t1\n")
+        assertContains(report, "prefix\troute_type\tagency\troutes\nRE\t106\tDB Regio\t1\n")
+    }
+
+    @Test
     fun `longDistanceStations counts the routes stopping at each station`(@TempDir tmp: Path) {
         filterRail(gtfs, tmp.resolve("rail"))
         val stations = loadRailStations(tmp.resolve("rail"))

@@ -123,3 +123,11 @@ registerStep(
         (findProperty("detourFactor") ?: "1.5").toString(),
     )
 }
+
+registerStep(
+    "routeCounts",
+    "streckenauslastung.RouteCountsKt",
+    "Exploration: print the numbers of rail routes by short-name prefix, route_type and agency.",
+) {
+    listOf((findProperty("rail") ?: "data/rail").toString())
+}
