@@ -32,7 +32,7 @@ import java.nio.file.Path
 import kotlin.math.roundToInt
 import kotlin.math.sign
 
-/** The core routes used for testing (see spec.md, "Reconstructing the line"), by their route_id. */
+/** The route cores used for testing (see the old test page in spec.md), by their ID. */
 internal val testRouteIds = listOf(
     "2233941_106",
     "7149172_106",
@@ -47,7 +47,7 @@ internal class TripTimes(val arrivals: List<Long?>, val departures: List<Long?>)
 /**
  * All trips of the route [routeId] that stop at the same [stations] in the same order. [arrivals]
  * and [departures] are the seconds at each stop of the fastest of these trips, null where the data
- * has no time. [medianTrip] is their median trip (see spec.md, "Reconstructing the line").
+ * has no time. [medianTrip] is their median trip (see the old test page in spec.md).
  */
 internal class Run(
     val routeId: String,
@@ -82,7 +82,10 @@ internal class Run(
     )
 }
 
-/** The numbers in the rule for detours (see spec.md, "Reconstructing the line"). */
+/**
+ * The rule for detours: between two of its stops, a trip takes a detour if it takes longer than [factor]
+ * times the fastest trip, plus [stopAllowanceSecs] for each of its stops after the first.
+ */
 class DetourRule(val factor: Double = 1.5, val stopAllowanceSecs: Long = 180)
 
 /** The [runs] in both directions, to look up by station. */
@@ -125,8 +128,8 @@ internal class RunIndex(val runs: List<Run>, private val rule: DetourRule) {
 internal const val STRONG_DIVERGENCE = 0.1
 
 /**
- * Two neighbouring stations [first] and [second] of a line that are ordered by travel time only
- * (see spec.md, "Reconstructing the line"). They were inserted between [from] and [to], at the
+ * Two neighbouring stations [first] and [second] of a line that are ordered by travel time only,
+ * because no trip stops at both. They were inserted between [from] and [to], at the
  * shares [firstShare] and [secondShare] of the way. [divergence] is null if it is unknown.
  */
 internal class TimeOrdered(
@@ -143,7 +146,7 @@ internal class TimeOrdered(
 
 /**
  * The [stations] of a line in their order, with their [positions] in seconds from the first station,
- * and its pairs of stations ordered by travel time only (see spec.md for the terms).
+ * and its pairs of stations ordered by travel time only.
  */
 internal class Line(val stations: List<String>, val positions: List<Double>, val timeOrdered: List<TimeOrdered>)
 
@@ -208,7 +211,7 @@ private class FilledHop(from: String, to: String, fillers: List<Filler>) {
     fun share(station: String) = shares.getValue(station)
 }
 
-/** Reconstructs the line of a core route with the stations [core] (see spec.md, "Reconstructing the line"). */
+/** Reconstructs the line of a route core with the stations [core]. */
 internal fun reconstructLine(core: List<String>, index: RunIndex): Line {
     var line = core.distinct()
     val hopSecs = line.zipWithNext { a, b -> index.fastestSecs(a, b) ?: 0L }
@@ -274,7 +277,7 @@ internal fun againstOrder(line: Line, index: RunIndex): List<AgainstOrder> {
     return found.map { (stations, routeIds) -> AgainstOrder(stations, routeIds) }
 }
 
-/** For each station of [line], the runs that use the line there (see spec.md), in the order of the runs. */
+/** For each station of [line], the runs that use the line there, in the order of the runs. */
 internal fun runsUsing(line: Line, index: RunIndex): Map<String, List<Run>> {
     val onLine = line.stations.toSet()
     val using = line.stations.associateWith { ArrayList<Run>() }
@@ -321,12 +324,12 @@ internal fun longestStretch(run: Run, place: Map<String, Int>, index: RunIndex):
     return best
 }
 
-/** At most this many trains are timed on a line besides that of its core route. */
+/** At most this many trains are timed on a line besides that of its route core. */
 internal const val ADDITIONAL_TRAINS = 3
 
 /**
- * A train whose times are shown along the line (see spec.md, "Reconstructing the line"): the median
- * trip of the run of [stretch]. [core] is the core route its trips belong to, if any.
+ * A train whose times are shown along the line (see the old test page in spec.md): the median
+ * trip of the run of [stretch]. [core] is the route core its trips belong to, if any.
  */
 internal class TimedTrain(val stretch: Stretch, val route: Route, val core: RouteCore?) {
     private val times = stretch.run.medianTrip
@@ -353,8 +356,8 @@ internal class TimedTrain(val stretch: Stretch, val route: Route, val core: Rout
 }
 
 /**
- * The trains to time on [line]: that of the core route [scope] first, if its trips have times, then
- * up to [ADDITIONAL_TRAINS] more. [coreOf] gives the core route that the trips of a run belong to.
+ * The trains to time on [line]: that of the route core [scope] first, if its trips have times, then
+ * up to [ADDITIONAL_TRAINS] more. [coreOf] gives the route core that the trips of a run belong to.
  */
 internal fun timedTrains(
     line: Line,
@@ -390,7 +393,7 @@ internal fun timedTrains(
             // The IDs as tie-breakers make the result the same on every run.
             .thenBy { it.run.routeId }
             .thenBy { it.run.stations.joinToString() }
-        // Trains of core routes come first: their trips are the typical ones. Among those and among
+        // Trains of route cores come first: their trips are the typical ones. Among those and among
         // the others, a train against the listed direction only gets its turn if no other one helps.
         val useful = stretches.filter { gain(it) > 0 }.groupBy { (coreOf(it.run) != null) to it.forward }
         val turns = listOf(true to true, true to false, false to true, false to false)
@@ -400,8 +403,8 @@ internal fun timedTrains(
 }
 
 /**
- * A station of a line with what stops there: [core] are the core routes with a trip using the line
- * here, [other] the routes where only trips of no such core route do. Both are in the order of the
+ * A station of a line with what stops there: [core] are the route cores with a trip using the line
+ * here, [other] the routes where only trips of no such route core do. Both are in the order of the
  * routes.
  */
 internal class LineStop(val stationId: String, val core: List<RouteCore>, val other: List<Route>)
@@ -412,8 +415,8 @@ internal val naturalOrder: Comparator<String> = compareBy { name ->
 }
 
 /**
- * The reconstructed line of the core route [core]: its [stops], the [trains] timed along it and
- * the warnings about it. [routeOf] gives the route of each core route.
+ * The reconstructed line of the route core [core]: its [stops], the [trains] timed along it and
+ * the warnings about it. [routeOf] gives the route of each route core.
  */
 internal class LineReport(
     val core: RouteCore,
@@ -426,7 +429,7 @@ internal class LineReport(
     /** The routes of the trips [againstOrder]. */
     fun routes(againstOrder: AgainstOrder) = routeOf.values.distinct().filter { it.id in againstOrder.routeIds }
 
-    /** The names of the relevant routes on this line (see spec.md, "Reconstructing the line"). */
+    /** The names of the relevant routes on this line (see the old test page in spec.md). */
     private val routeLabels: Map<Route, String> = run {
         val stopping = stops.flatMap { stop -> stop.core.map(routeOf::getValue) + stop.other }
         val relevant = (stopping + routeOf.getValue(core)).distinct()
@@ -446,10 +449,10 @@ internal class LineReport(
     /** The name of the route [route] on this line. */
     fun label(route: Route) = routeLabels.getValue(route)
 
-    /** The name of [train] on this line: that of its core route or, if its trips belong to none, of its route. */
+    /** The name of [train] on this line: that of its route core or, if its trips belong to none, of its route. */
     fun label(train: TimedTrain) = train.core?.let(::label) ?: label(train.route)
 
-    /** The name of the core route [core] on this line. */
+    /** The name of the route core [core] on this line. */
     fun label(core: RouteCore): String {
         val route = routeOf.getValue(core)
         val label = label(route)
@@ -460,24 +463,24 @@ internal class LineReport(
         }
     }
 
-    /** The core routes with a core stop on the line, sorted by name. */
+    /** The route cores with a trip stopping on the line, sorted by name. */
     val coreRoutes = stops.flatMap { it.core }.distinct().sortedWith(compareBy(naturalOrder, ::label))
 
-    /** The routes with other trips stopping on the line and no core route among the [coreRoutes], sorted by name. */
+    /** The routes with other trips stopping on the line and no route core among the [coreRoutes], sorted by name. */
     val additionalRoutes = (stops.flatMap { it.other }.toSet() - coreRoutes.map(routeOf::getValue).toSet())
         .sortedWith(compareBy(naturalOrder, ::label))
 }
 
-/** Reconstructs the line of the core route with the ID [coreRouteId] and finds the routes relevant for it. */
+/** Reconstructs the line of the route core with the ID [coreRouteId] and finds the routes relevant for it. */
 internal fun lineReport(coreRouteId: String, routes: List<Route>, index: RunIndex): LineReport {
     val routeOf = LinkedHashMap<RouteCore, Route>()
     for (route in routes) for (core in route.cores) routeOf[core] = route
-    val core = routeOf.keys.firstOrNull { it.id == coreRouteId } ?: error("No core route '$coreRouteId'")
+    val core = routeOf.keys.firstOrNull { it.id == coreRouteId } ?: error("No route core '$coreRouteId'")
     val line = reconstructLine(core.stationIds, index)
     val routeById = routes.associateBy { it.id }
     val using = runsUsing(line, index)
 
-    /** The core route that the trips of the run belong to, if any: the one with the same two ends. */
+    /** The route core that the trips of the run belong to, if any: the one with the same two ends. */
     fun Run.coreRoute() = routeById[routeId]?.cores?.firstOrNull {
         setOf(it.stationIds.first(), it.stationIds.last()) == setOf(stations.first(), stations.last())
     }
@@ -625,7 +628,7 @@ internal fun linesPage(
                     h2 {
                         val core = report.core
                         +"${report.label(core)} ${core.firstStation} – ${core.lastStation} "
-                        small { +"${report.stops.size} stations, ${coreStations.size} of them in the core route" }
+                        small { +"${report.stops.size} stations, ${coreStations.size} of them in the route core" }
                     }
                     table("line") {
                         tr {
@@ -636,7 +639,7 @@ internal fun linesPage(
                                     small { +clock(train.departureSecs) }
                                 }
                             }
-                            th { +"Routes with a core stop" }
+                            th { +"Route cores stopping" }
                             th { +"Routes with other trips stopping" }
                         }
                         for (stop in report.stops) {
@@ -672,7 +675,7 @@ internal fun linesPage(
                             }
                         }
                     }
-                    h3 { +"Routes with core stops on the line" }
+                    h3 { +"Route cores stopping on the line" }
                     table("routes") {
                         for (core in report.coreRoutes) {
                             val stations = report.stops.count { core in it.core }
@@ -697,7 +700,7 @@ internal fun linesPage(
 }
 
 /**
- * Writes the test page of spec.md, "Reconstructing the line", for the core routes [coreRouteIds].
+ * Writes the test page of the route cores [coreRouteIds] (see the old test page in spec.md).
  */
 fun lines(railDir: Path, outFile: Path, coreRouteIds: List<String>, rule: DetourRule = DetourRule()) {
     outFile.toAbsolutePath().parent?.let { Files.createDirectories(it) }
@@ -709,7 +712,7 @@ fun lines(railDir: Path, outFile: Path, coreRouteIds: List<String>, rule: Detour
     println("%,d lines -> %s".format(reports.size, outFile))
     for (report in reports) {
         println(
-            "  %-6s %3d stations (%d in the core route), %d + %d routes, %d + %d warnings (%d strong)".format(
+            "  %-6s %3d stations (%d in the route core), %d + %d routes, %d + %d warnings (%d strong)".format(
                 report.core.shortName,
                 report.stops.size,
                 report.core.stations.size,

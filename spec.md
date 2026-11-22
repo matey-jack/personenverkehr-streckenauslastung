@@ -296,9 +296,9 @@ This includes finding all the other relevant routes, including those that have o
 
 ## The old test page for showing the derived infrastructure data
 
-NOTE: this section uses old terminology and is only left here as a description of the "lines.html" report.
+NOTE: this section only describes the "lines.html" report.
 
-Routes we use for testing, with the route_id of their core route:
+Routes we use for testing, with the ID of their route core:
 
 - RE50 Erfurt – Meiningen: `2233941_106`
 - RE21 Erfurt – Gera: `7149172_106`
@@ -307,29 +307,29 @@ Routes we use for testing, with the route_id of their core route:
 - RE2 Cottbus – Nauen: `de:VBB:11000000|R-Bahn|RE2:DB_106`
 
 A test page lists the reconstructed line of each of them, and at each station the times of the timed trains and what
-stops there: the core routes with a trip using the line there, and the routes where only other trips do. Below the
-line it lists the warnings, with the strong ones set apart, then all these core routes, and then the additional
+stops there: the route cores with a trip using the line there, and the routes where only other trips do. Below the
+line it lists the warnings, with the strong ones set apart, then all these route cores, and then the additional
 routes: those of which only other trips use the line. Both lists are sorted by name. Tabs switch between the agencies
 of the testing routes.
 
 The "timed trains" show how long real trains take along the line. Each is the "median trip" of some trips of one
-route with the same stops in the same order: the fastest of them that at least half of their trip-days do not exceed
+route with the same stops in the same order: the fastest of them that at least half of their trip days do not exceed
 in travel time. A train is timed on its longest stretch of stops between which it uses the line and keeps one
 direction. Its column is headed by its name and the time of day at which it leaves its first station of the stretch,
 and gives the minutes after that at which it arrives at each station, and also those at which it leaves again if it
 stands there for two minutes or more.
 
-- The first timed train is that of the core route, in the direction in which the line is listed.
+- The first timed train is that of the route core, in the direction in which the line is listed.
 - If it leaves stations untimed, the next one is the train with the most stops on the line that stops at one of them.
 - Up to two more follow as long as stations are untimed: each time the train that stops at the most of them.
-- Trains of core routes are picked first, because their trips are the typical ones: another train is only picked if
-  no train of a core route stops at an untimed station.
-- Among the trains of core routes, and among the others, a train running against the listed direction is only picked
+- Trains of route cores are picked first, because their trips are the typical ones: another train is only picked if
+  no train of a route core stops at an untimed station.
+- Among the trains of route cores, and among the others, a train running against the listed direction is only picked
   if no train in the listed direction stops at an untimed station.
 - Among equal trains, the one with the smaller route name comes first.
 
 Relevant routes of one line that share their route_short_name get the suffixes `-1`, `-2`, … on it, in the order of
-their route_id. The suffix of a core route follows it: `S8-2a`.
+their route_id. The suffix of a route core follows it: `S8-2a`.
 
 Things to be designed:
 

@@ -125,7 +125,7 @@ class PipelineTest {
         lines(tmp.resolve("rail"), out, listOf("R1"))
         val page = withoutLayout(out.readText())
         assertContains(page, "<nav><button>DB Regio</button></nav></header><section data-agency=\"DB Regio\">")
-        assertContains(page, "<h2>RE1 Aheim Hbf – Cstadt <small>3 stations, 3 of them in the core route</small></h2>")
+        assertContains(page, "<h2>RE1 Aheim Hbf – Cstadt <small>3 stations, 3 of them in the route core</small></h2>")
         assertContains(
             page,
             "<tr class=\"core\"><td class=\"name\">Bdorf</td><td class=\"time\">8</td><td>RE1</td><td></td></tr>",
@@ -262,12 +262,12 @@ class PipelineTest {
     }
 
     @Test
-    fun `timedTrains times the core route first, then trains of core routes, then other trains`() {
+    fun `timedTrains times the route core first, then trains of route cores, then other trains`() {
         val line = Line("ABCDEF".map { it.toString() }, List(6) { 0.0 }, emptyList())
         val scope = core("re", "RE1", "AF")
         val ids = listOf("re", "rb", "s", "back", "short")
         val routes = ids.associateWith { route(it, it.uppercase(), group("AF", 1)) }
-        // The train of the core route leaves A at 08:00 and stops only at both ends.
+        // The train of the route core leaves A at 08:00 and stops only at both ends.
         val re =
             Run(
                 "re",
@@ -276,7 +276,7 @@ class PipelineTest {
                 listOf<Long?>(28800, null),
                 TripTimes(listOf<Long?>(null, 30000), listOf<Long?>(28800, null)),
             )
-        // Stops at the most stations, and waits at C for three minutes. Its trips belong to no core route.
+        // Stops at the most stations, and waits at C for three minutes. Its trips belong to no route core.
         val rb = Run(
             "rb",
             "ABCD".map { it.toString() },
@@ -288,7 +288,7 @@ class PipelineTest {
         val back = run("back", "FED", 0, 240, 480)
         // Stops nowhere that the others do not, so it is never picked.
         val short = run("short", "BCD", 0, 300, 700)
-        // The trips of a core route: they go first, although RB stops at more stations.
+        // The trips of a route core: they go first, although RB stops at more stations.
         val s = run("s", "BC", 0, 300)
         val sCore = core("s", "S1", "BC")
         val index = RunIndex(listOf(re, rb, back, short, s), DetourRule())
@@ -309,7 +309,7 @@ class PipelineTest {
     }
 
     @Test
-    fun `lineReport separates routes with core stops from routes with other trips`() {
+    fun `lineReport separates route cores stopping on the line from routes with other trips`() {
         val re = route("re", "RE1", group("ACE", 10))
         // RB1 has a route core from A to C and a candidate from A to E, with 35 of its 40 trip days.
         // B to E, with half of them, is no candidate.
@@ -326,7 +326,7 @@ class PipelineTest {
         val report = lineReport("re", listOf(re, rb, rb2), RunIndex(runs, DetourRule()))
 
         assertEquals("ABCDE".map { it.toString() }, report.stops.map { it.stationId })
-        // The two routes called RB1 are numbered; the core routes of the first one keep their own suffixes.
+        // The two routes called RB1 are numbered; the route cores of the first one keep their own suffixes.
         assertEquals(
             listOf("RE1 RB1-1a RB1-1b", "RB1-1a RB1-1b", "RE1 RB1-1a RB1-1b", "RB1-1b", "RE1 RB1-1b"),
             report.stops.map { stop -> stop.core.joinToString(" ") { report.label(it) } },

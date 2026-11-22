@@ -5,11 +5,6 @@ Increments to implement, test and review one at a time.
 Maybe create a visual glossary of all the terms, maybe as a simple Mermaid flowchart. But only after cleaning the doc.
 Make sure to include all terms, even those defined outside the "definitions" section.
 
-## preliminaries
-
-- fix lines.html minimally, just so it keeps working with the new definition.
-  Route core candidates are shown as routes of their own.
-
 ## Reconstructing lines, regional part
 
 Validate this the following way:
