@@ -31,3 +31,5 @@ td:first-child { padding-left: 0.3em; }
 td.name { font-weight: 600; min-width: 5em; }
 td.type { min-width: 10em; }
 td.stops { cursor: help; }
+td.stops, td.time { white-space: nowrap; }
+main > p { max-width: 50em; }

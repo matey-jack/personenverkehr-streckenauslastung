@@ -54,7 +54,7 @@ So the number of trips says little about how typical a kind of trip is; the numb
 
 ## Leaving out rarely-run trips changes little
 
-Once frequencies are counted in trip days, ignoring trips that run on only a few days hardly changes which pattern is the most frequent or the closest to the majority stations: the most frequent pattern equals the majority stations on 76% of the routes without a minimum and on 81% with a minimum of 20 days. The minimum removes whole routes, though: 134 of 1,129 at 20 days. `./gradlew coreRouteCheck -PminDays=…` shows the effect.
+Once frequencies are counted in trip days, ignoring trips that run on only a few days hardly changes which pattern is the most frequent or the closest to the majority stations: the most frequent pattern equals the majority stations on 76% of the routes without a minimum and on 81% with a minimum of 20 days. The minimum removes whole routes, though: 134 of 1,129 at 20 days.
 
 ## Reconstructing lines
 

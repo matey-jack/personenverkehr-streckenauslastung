@@ -78,32 +78,20 @@ registerStep(
 }
 
 registerStep(
-    "coreRoutes",
-    "streckenauslastung.CoreRoutesKt",
-    "Find the core routes of each rail route.",
+    "routeCores",
+    "streckenauslastung.RouteCoresKt",
+    "Find the route core and route core candidates of each rail route.",
 ) {
     listOf(
         (findProperty("rail") ?: "data/rail").toString(),
-        (findProperty("out") ?: "data/reports/core_routes.csv").toString(),
-    )
-}
-
-registerStep(
-    "coreRouteCheck",
-    "streckenauslastung.CoreRouteCheckKt",
-    "Exploration: compare the most frequent trips of each route with the stations most of its trips serve.",
-) {
-    listOf(
-        (findProperty("rail") ?: "data/rail").toString(),
-        (findProperty("out") ?: "data/reports/core_route_check.csv").toString(),
-        (findProperty("minDays") ?: "1").toString(),
+        (findProperty("out") ?: "data/reports/route_cores.csv").toString(),
     )
 }
 
 registerStep(
     "hubStations",
     "streckenauslastung.HubStationsKt",
-    "Exploration: write an HTML page of the stations where several core routes start or end.",
+    "Exploration: write an HTML page of the stations where several route cores start or end.",
 ) {
     listOf(
         (findProperty("rail") ?: "data/rail").toString(),

@@ -36,7 +36,7 @@ import kotlin.math.sign
 internal val testRouteIds = listOf(
     "2233941_106",
     "7149172_106",
-    "de:VBB:12070424|R-Bahn|RE6:_106:a",
+    "de:VBB:12070424|R-Bahn|RE6:_106",
     "4740564_106",
     "de:VBB:11000000|R-Bahn|RE2:DB_106",
 )
@@ -328,7 +328,7 @@ internal const val ADDITIONAL_TRAINS = 3
  * A train whose times are shown along the line (see spec.md, "Reconstructing the line"): the median
  * trip of the run of [stretch]. [core] is the core route its trips belong to, if any.
  */
-internal class TimedTrain(val stretch: Stretch, val route: Route, val core: CoreRoute?) {
+internal class TimedTrain(val stretch: Stretch, val route: Route, val core: RouteCore?) {
     private val times = stretch.run.medianTrip
 
     /** The seconds since midnight at which the train leaves its first station on the line. */
@@ -358,10 +358,10 @@ internal class TimedTrain(val stretch: Stretch, val route: Route, val core: Core
  */
 internal fun timedTrains(
     line: Line,
-    scope: CoreRoute,
+    scope: RouteCore,
     index: RunIndex,
     routeById: Map<String, Route>,
-    coreOf: (Run) -> CoreRoute?,
+    coreOf: (Run) -> RouteCore?,
 ): List<TimedTrain> {
     val place = line.stations.withIndex().associate { (i, station) -> station to i }
     val stretches = index.runs
@@ -404,7 +404,7 @@ internal fun timedTrains(
  * here, [other] the routes where only trips of no such core route do. Both are in the order of the
  * routes.
  */
-internal class LineStop(val stationId: String, val core: List<CoreRoute>, val other: List<Route>)
+internal class LineStop(val stationId: String, val core: List<RouteCore>, val other: List<Route>)
 
 /** Sorts names with numbers by the value of the numbers: RE3 comes before RE16. */
 internal val naturalOrder: Comparator<String> = compareBy { name ->
@@ -416,12 +416,12 @@ internal val naturalOrder: Comparator<String> = compareBy { name ->
  * the warnings about it. [routeOf] gives the route of each core route.
  */
 internal class LineReport(
-    val core: CoreRoute,
+    val core: RouteCore,
     val stops: List<LineStop>,
     val trains: List<TimedTrain>,
     val timeOrdered: List<TimeOrdered>,
     val againstOrder: List<AgainstOrder>,
-    val routeOf: Map<CoreRoute, Route>,
+    val routeOf: Map<RouteCore, Route>,
 ) {
     /** The routes of the trips [againstOrder]. */
     fun routes(againstOrder: AgainstOrder) = routeOf.values.distinct().filter { it.id in againstOrder.routeIds }
@@ -450,13 +450,13 @@ internal class LineReport(
     fun label(train: TimedTrain) = train.core?.let(::label) ?: label(train.route)
 
     /** The name of the core route [core] on this line. */
-    fun label(core: CoreRoute): String {
+    fun label(core: RouteCore): String {
         val route = routeOf.getValue(core)
         val label = label(route)
         return when {
             label == route.shortName -> core.shortName
-            route.coreRoutes.size == 1 -> label
-            else -> label + "ab"[route.coreRoutes.indexOf(core)]
+            route.cores.size == 1 -> label
+            else -> label + ('a' + route.cores.indexOf(core))
         }
     }
 
@@ -470,15 +470,17 @@ internal class LineReport(
 
 /** Reconstructs the line of the core route with the ID [coreRouteId] and finds the routes relevant for it. */
 internal fun lineReport(coreRouteId: String, routes: List<Route>, index: RunIndex): LineReport {
-    val routeOf = LinkedHashMap<CoreRoute, Route>()
-    for (route in routes) for (core in route.coreRoutes) routeOf[core] = route
+    val routeOf = LinkedHashMap<RouteCore, Route>()
+    for (route in routes) for (core in route.cores) routeOf[core] = route
     val core = routeOf.keys.firstOrNull { it.id == coreRouteId } ?: error("No core route '$coreRouteId'")
-    val line = reconstructLine(core.pattern.stationIds, index)
+    val line = reconstructLine(core.stationIds, index)
     val routeById = routes.associateBy { it.id }
     val using = runsUsing(line, index)
 
-    /** The core route that the trips of the run belong to, if any. */
-    fun Run.coreRoute() = routeById[routeId]?.coreRoutes?.firstOrNull { it.pattern.stations == stations.toSet() }
+    /** The core route that the trips of the run belong to, if any: the one with the same two ends. */
+    fun Run.coreRoute() = routeById[routeId]?.cores?.firstOrNull {
+        setOf(it.stationIds.first(), it.stationIds.last()) == setOf(stations.first(), stations.last())
+    }
     val stops = line.stations.map { station ->
         val runs = using.getValue(station)
         val cores = runs.mapNotNull { it.coreRoute() }.toSet()
@@ -594,9 +596,9 @@ internal fun linesPage(
     fun clock(secs: Long?) = if (secs == null) "" else "%02d:%02d".format(secs / 3600 % 24, secs / 60 % 60)
 
     /** A table row for something named [name] that stops at [stations] stations of the line. */
-    fun TABLE.routeRow(name: String, pattern: Pattern, route: Route, stations: Int) = tr {
+    fun TABLE.routeRow(name: String, core: RouteCore, route: Route, stations: Int) = tr {
         td("name") { +name }
-        td { +"${pattern.firstStation} – ${pattern.lastStation}" }
+        td { +"${core.firstStation} – ${core.lastStation}" }
         td { +agency(route) }
         td { small { +(if (stations == 1) "1 station" else "$stations stations") } }
     }
@@ -617,12 +619,12 @@ internal fun linesPage(
                 }
             }
             for (report in reports) {
-                val coreStations = report.core.pattern.stations
+                val coreStations = report.core.stations
                 section {
                     attributes["data-agency"] = agency(report.routeOf.getValue(report.core))
                     h2 {
-                        val pattern = report.core.pattern
-                        +"${report.label(report.core)} ${pattern.firstStation} – ${pattern.lastStation} "
+                        val core = report.core
+                        +"${report.label(core)} ${core.firstStation} – ${core.lastStation} "
                         small { +"${report.stops.size} stations, ${coreStations.size} of them in the core route" }
                     }
                     table("line") {
@@ -674,7 +676,7 @@ internal fun linesPage(
                     table("routes") {
                         for (core in report.coreRoutes) {
                             val stations = report.stops.count { core in it.core }
-                            routeRow(report.label(core), core.pattern, report.routeOf.getValue(core), stations)
+                            routeRow(report.label(core), core, report.routeOf.getValue(core), stations)
                         }
                     }
                     if (report.additionalRoutes.isNotEmpty()) {
@@ -682,7 +684,7 @@ internal fun linesPage(
                         table("routes") {
                             for (route in report.additionalRoutes) {
                                 val stations = report.stops.count { route in it.other }
-                                routeRow(report.label(route), route.coreRoutes.first().pattern, route, stations)
+                                routeRow(report.label(route), route.cores.first(), route, stations)
                             }
                         }
                     }
@@ -710,7 +712,7 @@ fun lines(railDir: Path, outFile: Path, coreRouteIds: List<String>, rule: Detour
             "  %-6s %3d stations (%d in the core route), %d + %d routes, %d + %d warnings (%d strong)".format(
                 report.core.shortName,
                 report.stops.size,
-                report.core.pattern.stations.size,
+                report.core.stations.size,
                 report.coreRoutes.size,
                 report.additionalRoutes.size,
                 report.timeOrdered.size,

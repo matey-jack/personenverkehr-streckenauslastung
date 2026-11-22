@@ -18,6 +18,7 @@ import kotlinx.html.main
 import kotlinx.html.meta
 import kotlinx.html.nav
 import kotlinx.html.ol
+import kotlinx.html.p
 import kotlinx.html.script
 import kotlinx.html.section
 import kotlinx.html.small
@@ -32,16 +33,17 @@ import java.nio.file.Files
 import java.nio.file.Path
 
 /**
- * A core route of the route [routeId] as listed on the page, where it is simply called a "route".
- * [stationIds] run in the direction given by [hubOverview]. [travelSecs] is the median travel time
- * between both ends, counted in trip-days over the trips of the core route in both directions.
+ * A route core of the route [routeId] as listed on the page, where it is simply called a "route".
+ * [stationIds] is its typical stop sequence, in the direction given by [hubOverview].
+ * [intermediateStops] and [travelSecs] are those of the route core.
  */
 internal data class ListedRoute(
     val routeId: String,
     val shortName: String,
     val type: Int,
     val stationIds: List<String>,
-    val travelSecs: Long? = null,
+    val intermediateStops: Distribution = Distribution(emptyMap()),
+    val travelSecs: Distribution = Distribution(emptyMap()),
 ) {
     val ends = setOf(stationIds.first(), stationIds.last())
 
@@ -52,7 +54,7 @@ internal data class ListedRoute(
 /** Stations with a rank of their own (see spec.md), by station ID. This one is Berlin Hauptbahnhof. */
 private val assignedRanks = mapOf("de:11000:900003201" to 20)
 
-/** A hub station with the core routes [ending] and [stopping] there (see spec.md for the terms). */
+/** A hub station with the route cores [ending] and [stopping] there (see spec.md for the terms). */
 internal class Hub(
     val stationId: String,
     val rank: Int,
@@ -60,10 +62,10 @@ internal class Hub(
     val stopping: List<ListedRoute>,
 )
 
-/** The [hubs] in their order and the [isolated] core routes, all in their direction as listed. */
+/** The [hubs] in their order and the [isolated] route cores, all in their direction as listed. */
 internal class HubOverview(val hubs: List<Hub>, val isolated: List<ListedRoute>)
 
-/** Groups [routes] by hub station (see spec.md, "Ideas on meaningfully grouping the Core Routes"). */
+/** Groups [routes] by hub station (see spec.md, "Ideas on meaningfully grouping the Routes (via their route cores)"). */
 internal fun hubOverview(routes: List<ListedRoute>, stationNames: Map<String, String>): HubOverview {
     fun byStation(routes: List<ListedRoute>, stations: (ListedRoute) -> Set<String>) =
         HashMap<String, MutableList<ListedRoute>>().also { map ->
@@ -114,18 +116,18 @@ internal fun hubOverview(routes: List<ListedRoute>, stationNames: Map<String, St
 }
 
 /**
- * The core routes to list, in the order of [routes]. Core routes with the same route type, short
- * name and stations are listed once.
+ * The route cores and route core candidates to list, in the order of [routes]. Those with the same
+ * route type, short name and ends are listed once.
  *
- * This is the only place that decides which core routes the page shows.
+ * This is the only place that decides which route cores the page shows.
  */
 internal fun listedRoutes(routes: List<Route>): List<ListedRoute> = routes
     .flatMap { route ->
-        route.coreRoutes.map {
-            ListedRoute(route.id, it.shortName, route.type, it.pattern.stationIds, it.pattern.medianTravelSecs)
+        route.cores.map {
+            ListedRoute(route.id, it.shortName, route.type, it.stationIds, it.intermediateStops, it.travelSecs)
         }
     }
-    .distinctBy { Triple(it.type, it.shortName, it.stationIds.toSet()) }
+    .distinctBy { Triple(it.type, it.shortName, it.ends) }
 
 /** Names of the route types occurring in the German data, see `Extended GTFS Route Types.md`. */
 private val routeTypeNames = mapOf(
@@ -141,6 +143,13 @@ private val routeTypeNames = mapOf(
 private fun duration(secs: Long): String {
     val minutes = (secs + 30) / 60
     return if (minutes < 60) "$minutes min" else "%d:%02d h".format(minutes / 60, minutes % 60)
+}
+
+/** Min, median and max as "1 / 2 / 4", or a single value if all three are the same; null without values. */
+private fun minMedianMax(values: Distribution, format: (Long) -> String): String? {
+    val all = listOfNotNull(values.min, values.median, values.max)
+    if (all.isEmpty()) return null
+    return all.distinct().singleOrNull()?.let(format) ?: all.joinToString(" / ", transform = format)
 }
 
 internal fun resource(name: String) = ListedRoute::class.java.getResource(name)!!.readText()
@@ -170,8 +179,11 @@ internal fun hubStationsPage(overview: HubOverview, stationNames: Map<String, St
                 td { station(route.stationIds.last(), hubId) }
                 td("stops") {
                     title = route.stationIds.joinToString("\n") { stationNames.getValue(it) }
-                    val travelTime = route.travelSecs?.let { ", ${duration(it)}" } ?: ""
-                    small { +"${route.stationIds.size} stops$travelTime" }
+                    val stops = minMedianMax(route.intermediateStops, Long::toString) ?: "?"
+                    small { +(if (stops == "1") "1 stop between" else "$stops stops between") }
+                }
+                td("time") {
+                    minMedianMax(route.travelSecs, ::duration)?.let { small { +it } }
                 }
             }
         }
@@ -207,6 +219,11 @@ internal fun hubStationsPage(overview: HubOverview, stationNames: Map<String, St
             }
             main {
                 h1 { +"Hub stations and their routes" }
+                p {
+                    +"The stops between the ends and the travel times of a route are given as min / median / max "
+                    +"over its trips between both ends, counted in trip days. "
+                    +"Hovering over the stops shows the typical stop sequence."
+                }
                 for (hub in overview.hubs) {
                     section {
                         id = anchors.getValue(hub.stationId)
@@ -240,9 +257,8 @@ internal fun hubStationsPage(overview: HubOverview, stationNames: Map<String, St
 }
 
 /**
- * Data exploration (see spec.md, "Ideas on meaningfully grouping the Core Routes"): writes an HTML
- * page of the hub stations with their core routes, followed by the isolated core routes.
- * The core routes are those of spec.md, "Core Routes".
+ * Data exploration (see spec.md, "Ideas on meaningfully grouping the Routes (via their route cores)"):
+ * writes an HTML page of the hub stations with their route cores, followed by the isolated route cores.
  */
 fun hubStations(railDir: Path, outFile: Path) {
     outFile.toAbsolutePath().parent?.let { Files.createDirectories(it) }
@@ -252,7 +268,7 @@ fun hubStations(railDir: Path, outFile: Path) {
     val overview = hubOverview(routes, stationNames)
     Files.writeString(outFile, hubStationsPage(overview, stationNames))
     println(
-        "%,d core routes, %,d hub stations, %,d isolated core routes -> %s"
+        "%,d route cores, %,d hub stations, %,d isolated route cores -> %s"
             .format(routes.size, overview.hubs.size, overview.isolated.size, outFile),
     )
     for ((rank, hubs) in overview.hubs.groupBy { minOf(it.rank, 2) }.toSortedMap()) {

@@ -93,7 +93,16 @@ Route and trip are defined as in GTFS:
 In order to visualize routes and use them as part of timetables, we define the term **core part of a route** or **route
 core** to be the set of all trips between the most frequent pair of end points of all trips, counted in trip days.
 The intermediate stops of those trips as well as the travel times might be different, so the route core only carries
-statistics on them: min, median, and max for each.
+statistics on them: min, median, and max for each, counted in trip days.
+
+Other pairs of end points of a route whose trips have at least 60% of the trip days of the route core are **route core
+candidates**. Everywhere a route core is used, its candidates are used as well, as route cores of their own. The route
+core is named "a" and its candidates "b", "c", and so on, in the order of their trip days (or "-1", "-2", … when the
+route's name already ends with a letter). If there are no such candidates, the route core will not have any suffix.
+
+The **typical stop sequence** of a route core is the most frequent sequence of stops between its two ends, counted in
+trip days over all trips of its route that stop at both ends, each cut down to the part between them. So it counts
+longer trips as well, but not shorter ones. The stations of a route core are those of its typical stop sequence.
 
 While a trip has a direction, we consider routes to be directionless. We normalize all route cores simply by using the
 alphabetically earlier station name as the start and the other as the end. (When displaying them to the user we might
@@ -293,7 +302,7 @@ Routes we use for testing, with the route_id of their core route:
 
 - RE50 Erfurt – Meiningen: `2233941_106`
 - RE21 Erfurt – Gera: `7149172_106`
-- RE6a Hennigsdorf – Wittenberge: `de:VBB:12070424|R-Bahn|RE6:_106:a`
+- RE6 Hennigsdorf – Wittenberge: `de:VBB:12070424|R-Bahn|RE6:_106`
 - RB33 Potsdam – Jüterbog: `4740564_106`
 - RE2 Cottbus – Nauen: `de:VBB:11000000|R-Bahn|RE2:DB_106`
 

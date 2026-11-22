@@ -58,29 +58,48 @@ class PipelineTest {
     }
 
     @Test
-    fun `coreRoutes finds the most frequent pattern`(@TempDir tmp: Path) {
+    fun `routeCores finds the most frequent pair of ends`(@TempDir tmp: Path) {
         filterRail(gtfs, tmp.resolve("rail"))
-        val out = tmp.resolve("core_routes.csv")
-        coreRoutes(tmp.resolve("rail"), out)
+        val out = tmp.resolve("route_cores.csv")
+        routeCores(tmp.resolve("rail"), out)
+        // All three trips run between Aheim and Cstadt; the one back to Aheim skips Bdorf.
         assertEquals(
             listOf(
-                "route_id,route_short_name,route_type,share,verdict,num_stops,first_station,last_station,stations",
-                "R1,RE1,106,0.67,equal,3,Aheim Hbf,Cstadt,Aheim Hbf > Bdorf > Cstadt",
+                "route_id,route_short_name,route_type,share,num_trip_days," +
+                    "min_stops_between,median_stops_between,max_stops_between," +
+                    "min_travel_mins,median_travel_mins,max_travel_mins,first_station,last_station,stations",
+                "R1,RE1,106,1.00,867,0,1,1,20,20,20,Aheim Hbf,Cstadt,Aheim Hbf > Bdorf > Cstadt",
             ),
             out.readLines(),
         )
     }
 
     @Test
-    fun `coreRouteCheck compares the most frequent patterns with the stations most trips serve`(@TempDir tmp: Path) {
-        filterRail(gtfs, tmp.resolve("rail"))
-        val out = tmp.resolve("core_route_check.csv")
-        coreRouteCheck(tmp.resolve("rail"), out, minDays = 1)
-        // Two of three trips form the top pattern; the third skips Bdorf, which still is a majority station.
-        assertEquals(
-            "R1,RE1,106,867,2,3,equal,0.67,Aheim Hbf,Cstadt,shorter -1,0.33,Cstadt,Aheim Hbf,1,equal,,",
-            out.readLines()[1],
+    fun `Route finds the route core and its candidates`() {
+        val names = mapOf("A" to "Zell", "B" to "Bdorf", "C" to "Cstadt", "D" to "Dorf", "X" to "Xheim")
+        val route = Route(
+            "R",
+            "RE6a",
+            106,
+            listOf(
+                group("AXC", 50, 1200L to 30L, 1500L to 20L),
+                group("CBA", 10, 1000L to 10L),
+                // Counts for the typical stop sequence of A–C, which makes it C > B > A, not C > X > A.
+                group("ABCD", 45),
+                // Has less than 60% of the trip days of A–C.
+                group("BCD", 30),
+            ),
+            names,
         )
+        val (a, b) = route.cores.also { assertEquals(2, it.size) }
+        assertEquals(listOf("R:a", "RE6a-1", "R:b", "RE6a-2"), listOf(a.id, a.shortName, b.id, b.shortName))
+        // Each starts at the end with the alphabetically earlier name.
+        assertEquals(listOf("C", "B", "A"), a.stationIds)
+        assertEquals(listOf("D", "C", "B", "A"), b.stationIds)
+        assertEquals(listOf(60L, 45L), listOf(a.tripDays, b.tripDays))
+        assertEquals(listOf(1L, 1L, 1L), a.intermediateStops.let { listOf(it.min, it.median, it.max) })
+        assertEquals(listOf(1000L, 1200L, 1500L), a.travelSecs.let { listOf(it.min, it.median, it.max) })
+        assertEquals(listOf(null, null, null), b.travelSecs.let { listOf(it.min, it.median, it.max) })
     }
 
     @Test
@@ -94,7 +113,8 @@ class PipelineTest {
             page,
             "<td class=\"name\">RE1</td><td class=\"type\">Regional <small>106</small></td>" +
                 "<td>Aheim Hbf</td><td>–</td><td>Cstadt</td>" +
-                "<td class=\"stops\" title=\"Aheim Hbf\nBdorf\nCstadt\"><small>3 stops, 20 min</small></td>",
+                "<td class=\"stops\" title=\"Aheim Hbf\nBdorf\nCstadt\"><small>0 / 1 / 1 stops between</small></td>" +
+                "<td class=\"time\"><small>20 min</small></td>",
         )
     }
 
@@ -152,9 +172,17 @@ class PipelineTest {
         )
     }
 
-    /** A pattern of the stations named by the letters of [stations]. */
-    private fun pattern(stations: String, tripDays: Long) =
-        Pattern(stations.map { it.toString() }, stations.length, "", "", "").also { it.tripDays = tripDays }
+    /** A trip group of the stations named by the letters of [stations], with the trip days of its [travelSecs]. */
+    private fun group(stations: String, tripDays: Long, vararg travelSecs: Pair<Long, Long>) =
+        TripGroup(stations.map { it.toString() }, tripDays, mapOf(*travelSecs))
+
+    /** A route with the trip groups [groups], whose stations are named by their IDs. */
+    private fun route(id: String, shortName: String, vararg groups: TripGroup) =
+        Route(id, shortName, 106, groups.toList(), emptyMap())
+
+    /** A route core with the typical stop sequence [stations], whose stations are named by their IDs. */
+    private fun core(id: String, shortName: String, stations: String) =
+        stations.map { it.toString() }.let { RouteCore(id, shortName, it, it, 10) }
 
     /**
      * A run stopping at the stations named by the letters of [stations] at the seconds [times], without
@@ -197,7 +225,7 @@ class PipelineTest {
     @Test
     fun `lineReport warns about an order by travel time only and about trips against the order`() {
         val routes = listOf("AD", "ABD", "ACD", "CBD").mapIndexed { i, stations ->
-            Route("r${i + 1}", "R${i + 1}", 106, listOf(pattern(stations, 10)))
+            route("r${i + 1}", "R${i + 1}", group(stations, 10))
         }
         val runs = listOf(
             run("r1", "AD", 0, 500),
@@ -236,10 +264,9 @@ class PipelineTest {
     @Test
     fun `timedTrains times the core route first, then trains of core routes, then other trains`() {
         val line = Line("ABCDEF".map { it.toString() }, List(6) { 0.0 }, emptyList())
-        val scope = CoreRoute("re", "RE1", pattern("AF", 10), Difference(pattern("AF", 10), emptySet()))
-        val routes = listOf("re", "rb", "s", "back", "short").associateWith {
-            Route(it, it.uppercase(), 106, listOf(pattern("AF", 1)))
-        }
+        val scope = core("re", "RE1", "AF")
+        val ids = listOf("re", "rb", "s", "back", "short")
+        val routes = ids.associateWith { route(it, it.uppercase(), group("AF", 1)) }
         // The train of the core route leaves A at 08:00 and stops only at both ends.
         val re =
             Run(
@@ -263,7 +290,7 @@ class PipelineTest {
         val short = run("short", "BCD", 0, 300, 700)
         // The trips of a core route: they go first, although RB stops at more stations.
         val s = run("s", "BC", 0, 300)
-        val sCore = CoreRoute("s", "S1", pattern("BC", 10), Difference(pattern("BC", 10), emptySet()))
+        val sCore = core("s", "S1", "BC")
         val index = RunIndex(listOf(re, rb, back, short, s), DetourRule())
 
         val trains = timedTrains(line, scope, index, routes) { run ->
@@ -283,11 +310,12 @@ class PipelineTest {
 
     @Test
     fun `lineReport separates routes with core stops from routes with other trips`() {
-        val re = Route("re", "RE1", 106, listOf(pattern("ACE", 10)))
-        // RB1 has two core routes: RB1a from A to C is the most frequent, RB1b from A to E is what most trips serve.
-        val rb = Route("rb", "RB1", 106, listOf(pattern("ABC", 40), pattern("ABCDE", 35), pattern("BCDE", 25)))
-        // Another route called RB1. Its core route is elsewhere; one of its trips runs from D to E.
-        val rb2 = Route("rb2", "RB1", 106, listOf(pattern("QR", 10), pattern("DE", 1)))
+        val re = route("re", "RE1", group("ACE", 10))
+        // RB1 has a route core from A to C and a candidate from A to E, with 35 of its 40 trip days.
+        // B to E, with half of them, is no candidate.
+        val rb = route("rb", "RB1", group("ABC", 40), group("ABCDE", 35), group("BCDE", 20))
+        // Another route called RB1. Its route core is elsewhere; one of its trips runs from D to E.
+        val rb2 = route("rb2", "RB1", group("QR", 10), group("DE", 1))
         val runs = listOf(
             run("re", "ACE", 0, 600, 1200),
             run("rb", "ABCDE", 0, 400, 800, 1300, 1700),
@@ -325,14 +353,15 @@ class PipelineTest {
         assertContains(page, "<h3>Additional routes with other trips stopping on the line</h3>")
         assertContains(
             page,
-            "<td class=\"name\">RB1-2</td><td> – </td><td>No agency</td><td><small>2 stations</small></td>",
+            "<td class=\"name\">RB1-2</td><td>Q – R</td><td>No agency</td><td><small>2 stations</small></td>",
         )
     }
 
     @Test
-    fun `listedRoutes lists both core routes of a route`() {
-        // ABC is the most frequent pattern, but A, B, C and D are all served on most trip-days.
-        val route = Route("R", "RE1", 106, listOf(pattern("ABC", 40), pattern("ABCD", 35), pattern("BCD", 25)))
+    fun `listedRoutes lists the route core and its candidates with their typical stop sequences`() {
+        // A–C is the route core, A–D its candidate. Most trips between A and C run via X, but more
+        // trips stopping at both A and C run via B.
+        val route = route("R", "RE1", group("AXC", 50), group("ABC", 10), group("ABCD", 45))
         assertEquals(
             listOf("RE1a" to listOf("A", "B", "C"), "RE1b" to listOf("A", "B", "C", "D")),
             listedRoutes(listOf(route)).map { it.shortName to it.stationIds },
@@ -345,7 +374,7 @@ class PipelineTest {
         val re1 = ListedRoute("r1", "RE1", 106, listOf("A", "B", "C"))
         val re2 = ListedRoute("r2", "RE2", 106, listOf("D", "A"))
         val ice = ListedRoute("r3", "ICE", 101, listOf("D", "A", "C"))
-        // Both core routes of S1 end at E, which makes E no hub. S1a ends at F, where RB9 stops,
+        // Both route cores of S1 end at E, which makes E no hub. S1a ends at F, where RB9 stops,
         // which makes F a hub.
         val s1a = ListedRoute("r4", "S1a", 109, listOf("E", "F"))
         val s1b = ListedRoute("r4", "S1b", 109, listOf("E", "F", "G"))

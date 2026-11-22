@@ -7,17 +7,8 @@ Make sure to include all terms, even those defined outside the "definitions" sec
 
 ## preliminaries
 
-- update the concept of route core in the code, and also track "route core candidates", which are start/end pairs that
-  have a trip day count of at least 60% of the winning route core. If there are such candidates, name the winning
-  route core "a" and the candidates "b", "c", and so on, similar to the current implementation that only has "a" and
-  "b".
-
-- fix lines.html minimally, just so it keeps working with the new definition. (Bare minimum is that it still compiles.)
-
-- extend hub_stations.html so that it shows min/median/max intermediate stops and travel time for each route
-  core (and candidate) instead of just one value for each.
-    + The tooltip on the route should show the most frequent stop sequence (by trip days) of all trips that
-      include both ends of the route core. (Which means including longer trips, but not shorter ones, in this count.)
+- fix lines.html minimally, just so it keeps working with the new definition.
+  Route core candidates are shown as routes of their own.
 
 ## Reconstructing lines, regional part
 
