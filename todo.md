@@ -7,13 +7,20 @@ Make sure to include all terms, even those defined outside the "definitions" sec
 
 ## Reconstructing lines, regional part
 
+Pragmatic definition: Regional routes are route_type 106 and 109, except the S-Bahn Berlin and Hamburg, because those 
+have so many stops they crowd out the graph. (Also they mostly have their own tracks, thus don't interfere with other 
+rail services.)
+
 Validate this the following way:
 
 - derive the entire network and store it as Json
 - then create an interactive network viewer where the user selects a set of hub stations and the app shows the network
   for all (the core parts of) the routes that touch those stations.
 - visualize that network as SVG using the station-coordinates
+  + (the SVG content needs to be recentered whenever new stations enter or leave it)
 - the visualization should contain all junctions and terminals as labeled nodes.
+- route core ends should not be labeled stations; this information can be seen from the graph, because the route path 
+  ends at a point between junctions and the route core name includes the name of the end stations.
 - optionally lines are just straight SVG lines or they can be shown as line segments between all the stops.
 - On the side of this, show a list of all routes and when clicking on one of them, highlight it in the graph.
 - Also, when hovering over a line, show a tooltip with all the route cores passing there, and below a separator all

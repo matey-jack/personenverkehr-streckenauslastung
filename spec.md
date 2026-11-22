@@ -57,7 +57,7 @@ TODO: this partially supersedes information in later level 1 sections and those 
 ## Infrastructure terms
 
 - A **station** is a node in the network where at least one trip stops.
-- A **line** is a physical connection between two junctions with optionally some stops in between.
+- A **line** is a physical connection between two junctions or terminals with optionally some stops in between.
 - A **line section** is the part of a line atomically connecting two stations with no intermediate stations.
 - A **junction** is a node in the network that connects to at least three line sections.
 - A **terminal** is a node that connects only to one line section.
@@ -66,7 +66,8 @@ TODO: this partially supersedes information in later level 1 sections and those 
   with the homonymous timetable term, simply a **stop**.
 
 Note that the definitions of line section and junction are circular, which is why it is non-trivial to reconstruct the
-infrastructure data from the GTFS trips.
+infrastructure data from the GTFS trips. Also note that if two lines would connect in a single station, that station 
+would not be a junction, but a stopping station, and the two lines would be just one.
 
 (Our internal model of lines differs from the numbering of railway lines in that our lines always end at junctions or
 junction stations. Whereas official railway line numbers usually have the main line keeping its number on both sides
@@ -118,6 +119,9 @@ information.)
 Note that from a single trip or even from all the trips of a single route, we won't know if a hop actually corresponds
 to a line section.
 
+For all the derivations that follow, first apply the station deduplication and the station fixes that are also used for 
+the hub_stations.html.
+
 ### Derivation from regional train data only
 
 One of the basic tasks of the data derivation is to determine whether a hop corresponds to a line section or not.
@@ -127,8 +131,13 @@ order.
 
 Heuristics:
 
+- Start by collecting all hops of regional train trips and note how many trip-days are having that hop and the median 
+  travel time for the hop. 
 - A hop of a regional train is not a line section if there is another trip (of any route) which has a span between the
-  hop's end points and the travel times are consistent. (For instance, a maximum of 2 extra minutes per extra stop.)
+  hop's end points and the travel times are consistent. (For instance, a maximum of 2 extra minutes per extra stop 
+  plus a 20% extra permitted time difference. Those values will be tuned later.)
+  + Print warnings for anything suspicious during this round; print the median travel time and occurrence count (in 
+    trip-days) for all the hops involved.
 - All other hops define line sections.
 - From the set of those line sections, we can tell which stations are junctions and terminals.
 - Finally, from the set of junctions and terminals we can join line sections to lines!
@@ -138,8 +147,10 @@ sequence of stations, with the ends always being junctions or terminals and the 
 stations.
 
 In some rare cases, even two different regional train trips might take two different paths between two junctions. If
-there is at least one intermediate stop in both paths, we can tell them apart. Otherwise, we need some more
-heuristics or a manually added hint.
+there is at least one intermediate stop in both paths, we can tell them apart. If the travel time matches one route 
+better, we can derive the path from that.
+Otherwise, we need some more heuristics or a manually added hint. This is partly what the network graph is for: we 
+don't have to get it right on the first try. We can tune the rules or add rules for specific lines (aka manual hints).  
 
 The lack of alternative train paths on short routes also means that we do not expect to have to use the "travel time is
 consistent" rule much.
