@@ -7,15 +7,18 @@ Make sure to include all terms, even those defined outside the "definitions" sec
 
 ## Reconstructing lines, regional part
 
-Pragmatic definition: Regional routes are route_type 106 and 109, except the S-Bahn Berlin and Hamburg, because those 
-have so many stops they crowd out the graph. (Also they mostly have their own tracks, thus don't interfere with other 
-rail services.)
+Pragmatic definitions: 
+ - Regional routes are route_type 106 and 109, except the S-Bahn Berlin and Hamburg, because those have so many stops 
+   they crowd out the graph. (Also they mostly have their own tracks, thus don't interfere with other rail services.) 
+ - Stopping sequences that occur only in a single trip are to be included as valuable (usually off-hours) input data.
+ - But trips that occur only on less than 10 (configurable) specific dates (instead of a weekly pattern) should be 
+   excluded to remove extreme cases and clutter.
 
 Validate this the following way:
 
-- derive the entire network and store it as Json
+- derive the entire network (considering regional trains only) and store it as Json
 - then create an interactive network viewer where the user selects a set of hub stations and the app shows the network
-  for all (the core parts of) the routes that touch those stations.
+  for all (the core parts of) the regional routes that touch those stations.
 - visualize that network as SVG using the station-coordinates
   + (the SVG content needs to be recentered whenever new stations enter or leave it)
 - the visualization should contain all junctions and terminals as labeled nodes.
