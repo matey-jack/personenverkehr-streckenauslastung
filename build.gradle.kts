@@ -1,5 +1,7 @@
 plugins {
     kotlin("jvm") version "2.4.21"
+    // @Serializable classes for the JSON files of the network (see Network.kt).
+    kotlin("plugin.serialization") version "2.4.21"
     // Formatter and linter; `./gradlew ktlintFormat` fixes most findings, `check` runs `ktlintCheck`.
     id("org.jlleitschuh.gradle.ktlint") version "14.2.0"
 }
@@ -11,6 +13,7 @@ repositories {
 dependencies {
     implementation("org.duckdb:duckdb_jdbc:2.0.0.1")
     implementation("org.jetbrains.kotlinx:kotlinx-html-jvm:0.12.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.13.0")
 
     testImplementation(kotlin("test"))
     testImplementation(platform("org.junit:junit-bom:6.1.3"))
@@ -130,4 +133,20 @@ registerStep(
     "Exploration: print the numbers of rail routes by short-name prefix, route_type and agency.",
 ) {
     listOf((findProperty("rail") ?: "data/rail").toString())
+}
+
+registerStep(
+    "network",
+    "streckenauslastung.NetworkKt",
+    "Derive the regional rail network and write it as JSON, with a report of its warnings.",
+) {
+    listOf(
+        (findProperty("rail") ?: "data/rail").toString(),
+        (findProperty("out") ?: "data/network/network.json").toString(),
+        (findProperty("warnings") ?: "data/reports/network_warnings.csv").toString(),
+        (findProperty("stopAllowance") ?: "180").toString(),
+        (findProperty("detourFactor") ?: "1.33").toString(),
+        (findProperty("extraAllowance") ?: "120").toString(),
+        (findProperty("minDates") ?: "10").toString(),
+    )
 }

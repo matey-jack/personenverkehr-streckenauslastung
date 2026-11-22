@@ -1,10 +1,12 @@
 package streckenauslastung
 
+import kotlinx.serialization.json.Json
 import org.junit.jupiter.api.io.TempDir
 import java.nio.file.Path
 import kotlin.io.path.readLines
 import kotlin.io.path.readText
 import kotlin.io.path.toPath
+import kotlin.io.path.writeText
 import kotlin.math.roundToInt
 import kotlin.test.Test
 import kotlin.test.assertContains
@@ -425,6 +427,113 @@ class PipelineTest {
         // Under hub A, A is not a link to itself; D is a link to its own section.
         assertContains(page, "<td><a href=\"#hub1\">Station D</a></td><td>–</td><td>Station A</td>")
         assertContains(page, "0 routes starting or ending, 2 stopping</small></h2><h3>Stopping here</h3>")
+    }
+
+    @Test
+    fun `network writes the lines of the regional network`(@TempDir tmp: Path) {
+        filterRail(gtfs, tmp.resolve("rail"))
+        val out = tmp.resolve("network.json")
+        val warnings = tmp.resolve("network_warnings.csv")
+        network(tmp.resolve("rail"), out, warnings)
+        val file = Json.decodeFromString<NetworkFile>(out.readText())
+        assertEquals(listOf("Aheim Hbf", "Bdorf", "Cstadt"), file.nodes.name)
+        assertEquals(listOf(5200000, 5210000, 5220000), file.nodes.lat)
+        // T3 runs from Cstadt to Aheim without stopping at Bdorf, as fast as the trips stopping there.
+        assertEquals(listOf(listOf(0, 1, 2)), file.lines.nodes)
+        assertEquals(listOf(listOf<Long?>(480, 660)), file.lines.medianSecs)
+        assertEquals(listOf(listOf(578L, 578L)), file.lines.tripDays)
+        assertEquals(listOf("kind,stations,station_ids,involved"), warnings.readLines())
+    }
+
+    @Test
+    fun `gtfsMetadata reads the JSON5 file describing the GTFS data set`(@TempDir tmp: Path) {
+        assertEquals(null, gtfsMetadata(tmp))
+        tmp.resolve("metadata.json5").writeText("{\n  // the date\n  \"download_date\": \"2026-11-09\",\n}\n")
+        assertEquals("\"2026-11-09\"", gtfsMetadata(tmp)?.get("download_date").toString())
+    }
+
+    @Test
+    fun `SpanRule allows a factor, time per stop and an extra time`() {
+        val rule = SpanRule(factor = 1.5, stopAllowanceSecs = 60, extraSecs = 100)
+        // 1.5 * 200 + 2 * 60 + 100 = 520
+        assertEquals(listOf(true, false), listOf(520L, 521L).map { rule.isConsistent(it, 200, 2) })
+        assertEquals(true, rule.isConsistent(null, 200, 2))
+        // The hop is faster than 1.5 * 200 + 100 = 400.
+        assertEquals(listOf(false, true), listOf(400L, 401L).map { rule.isFaster(200, it) })
+    }
+
+    /** A stop pattern stopping at the stations named by the letters of [stations] at the seconds [times]. */
+    private fun pattern(stations: String, vararg times: Long, days: Long = 10): StopPattern {
+        val secs = times.toList()
+        return StopPattern("r", stations.map { it.toString() }, listOf(TimedTrip(secs, secs, days)))
+    }
+
+    @Test
+    fun `deriveNetwork finds line sections, joins them to lines and warns about suspicious hops`() {
+        val patterns = listOf(
+            pattern("ABCD", 0, 300, 600, 900),
+            // Skips B and C, and the trips stopping there take little longer: no line section.
+            pattern("AD", 0, 700),
+            // A branch, which makes C a junction.
+            pattern("CE", 0, 400),
+            pattern("BC", 0, 300),
+            // Far slower from B to C than the trips without a stop, so B to C stays a line section.
+            pattern("BYC", 0, 1000, 2000),
+            // The trips stopping at G are much faster.
+            pattern("DF", 0, 1000),
+            pattern("DGF", 0, 200, 400),
+            // A ring without junctions.
+            pattern("PQR", 0, 300, 600),
+            pattern("RSP", 0, 300, 600),
+        )
+        val network = deriveNetwork(patterns, { it }, SpanRule())
+        assertEquals(
+            listOf("AB", "BC", "BYC", "CDGF", "CE", "PQRSP"),
+            network.lines.map { it.stations.joinToString("") },
+        )
+        assertEquals(listOf(true), network.lines.filter { it.isRing }.map { it.stations.first() == "P" })
+        assertEquals(
+            listOf(
+                WarningKind.INCONSISTENT_SPANS,
+                WarningKind.FASTER_SPAN,
+                WarningKind.PARALLEL_LINES,
+                WarningKind.RING,
+            ),
+            network.warnings.map { it.kind },
+        )
+        assertEquals(
+            listOf(
+                "kind,stations,station_ids,involved",
+                "inconsistent-spans,B – C,B C,\"B > C: 5.0 min, 20 trip days; B > Y > C: 33.3 min, 10 trip days\"",
+                "faster-span,D – F,D F,\"D > F: 16.7 min, 10 trip days; D > G > F: 6.7 min, 10 trip days\"",
+                "parallel-lines,B – C,B C,\"B > C: 5.0 min, 20 trip days; B > Y > C: 16.7 + 16.7 min, 10 + 10 trip days\"",
+                "ring,P,P,\"P > Q > R > S > P: 5.0 + 5.0 + 5.0 + 5.0 min, 10 + 10 + 10 + 10 trip days\"",
+            ),
+            warningsCsv(network.warnings) { it }.lines().dropLast(1),
+        )
+    }
+
+    @Test
+    fun `stopPatterns leaves out the stop patterns that run on fewer than the minimum of dates`() {
+        fun trip(stations: String, weekly: Boolean, vararg dates: Int) = LoadedTrip(
+            "r",
+            stations.map { it.toString() },
+            TimedTrip(listOf(null, null), listOf(null, null), dates.size.toLong()),
+            weekly,
+            dates.map { "202611%02d".format(it) }.toSet(),
+        )
+        val trips = listOf(
+            trip("AB", true),
+            // Together these run on 9 dates.
+            trip("AC", false, 1, 2, 3, 4, 5, 6),
+            trip("AC", false, 5, 6, 7, 8, 9),
+            trip("AD", false, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10),
+            // One trip of the pattern has a weekly pattern.
+            trip("AE", false, 1),
+            trip("AE", true),
+        )
+        assertEquals(listOf("AB", "AD", "AE"), stopPatterns(trips, 10).map { it.stations.joinToString("") })
+        assertEquals(4, stopPatterns(trips, 9).size)
     }
 
     /** The page without the line breaks and indentation between its tags. */

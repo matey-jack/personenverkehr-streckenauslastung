@@ -27,9 +27,8 @@ My reading of the spec, as the `network` step will implement it:
 - **Input**: the trips of `todo.md`, stations deduplicated and fixed as for `hub_stations.html`.
 - **Hops**: every pair of consecutive stops of an input trip, directionless, with its trip days and its median travel
   time (weighted by trip days, from departure to arrival).
-- **Consistent span**: a span of an input trip between the two ends of a hop is consistent if its median travel time
-  is at most 1.2 times that of the hop plus 2 minutes per stop between the ends. Both numbers are `-P` options. A hop
-  without times has no consistent span unless the span also has no times.
+- **Consistent span**: by the rule in `spec.md`, whose three numbers are `-P` options. Without times on either side,
+  a span counts as consistent.
 - **Sections**: the hops without a consistent span. A hop with only inconsistent spans stays a section and gets a
   warning; so does a hop that some span with more stops runs faster than the hop itself.
 - **Lines**: chains of sections between junctions and terminals. A ring without any junction is one line, starting
@@ -87,7 +86,7 @@ entries, cheaper to compute than to download.
 ```json
 {
   "format": "streckenauslastung-network", "version": 1,
-  "source": {"gtfs": "2026-11-09", "minDates": 10, "detourRule": {"factor": 1.2, "stopAllowanceSecs": 120}},
+  "source": {"routeTypes": [106, 109], "excludedAgencies": ["…"], "minDates": 10, "detourFactor": 1.33, "stopAllowanceSecs": 180, "extraSecs": 120},
   "nodes": {"id": ["de:12054:900230999", "…"], "name": ["Potsdam Hbf", "…"], "lat": [5239172, "…"], "lon": [1306692, "…"], "isStation": [true, "…"]},
   "lines": {"nodes": [[0, 17, 18, 4], "…"], "medianSecs": [[120, 95, null], "…"], "tripDays": [[812, 790, 790], "…"]}
 }
@@ -145,8 +144,8 @@ Where it lives and its stack: see `todo.md`, "Frontend project". The structure b
 ## 5. Increments
 
 1. **`network` step** (Kotlin): input filter, hops, sections, lines, `network.json`, the warnings report and a
-   printed summary. Extend `mini_gtfs` with a junction, a terminal, a skipped station and a date-list trip. Move
-   `DetourRule` out of `Lines.kt` to share it.
+   printed summary. Done; the rule for consistent spans is `SpanRule`, separate from the `DetourRule` of `Lines.kt`,
+   which compares with the fastest trip and counts the stop at the end as well.
 2. **Review the warnings** on the real data: duplicate station IDs into `stationParts`, tune the two numbers of the
    rule. Findings go to `gtfs_findings.md`.
 3. **Services**: route cores, stop patterns, paths, regional hub stations in `services.json`; tests for the path

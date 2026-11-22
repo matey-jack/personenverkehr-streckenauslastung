@@ -134,8 +134,9 @@ Heuristics:
 - Start by collecting all hops of regional train trips and note how many trip-days are having that hop and the median 
   travel time for the hop. 
 - A hop of a regional train is not a line section if there is another trip (of any route) which has a span between the
-  hop's end points and the travel times are consistent. (For instance, a maximum of 2 extra minutes per extra stop 
-  plus a 20% extra permitted time difference. Those values will be tuned later.)
+  hop's end points and the travel times are consistent: the median travel time of the span is at most 1.33 times
+  that of the hop, plus 3 minutes per extra stop, plus 2 minutes. (With these values, most of the remaining warnings
+  are real detours or real pairs of lines; they may be tuned further.)
   + Print warnings for anything suspicious during this round; print the median travel time and occurrence count (in 
     trip-days) for all the hops involved.
 - All other hops define line sections.

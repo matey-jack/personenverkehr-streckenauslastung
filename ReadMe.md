@@ -32,6 +32,7 @@ Each pipeline step is a separate Gradle task (`./gradlew tasks --group pipeline`
 | `./gradlew hubStations` | `data/rail/*.parquet` | `data/reports/hub_stations.html`: a page to browse the route cores by hub station |
 | `./gradlew longDistanceStations` | `data/rail/*.parquet` | `data/reports/long-distance_stations.html`: the stations with the most long-distance trip-days, with the numbers of long-distance and regional routes stopping there. `-Ptop=150` sets the number of stations |
 | `./gradlew lines` | `data/rail/*.parquet` | `data/reports/lines.html`: for each testing route, its reconstructed line with the times of a few real trains and warnings about an uncertain order, and the routes stopping at each station. `-PstopAllowance=180` and `-PdetourFactor=1.5` set the numbers in the rule for detours |
+| `./gradlew network` | `data/rail/*.parquet` | `data/network/network.json`: the regional rail network, its nodes and lines (the format is described in `Network.kt`); `data/reports/network_warnings.csv`: the suspicious hops and lines, with the travel times and trip days of everything involved. `-PdetourFactor=1.33`, `-PstopAllowance=180` (per stop), `-PextraAllowance=120` (seconds) and `-PminDates=10` set the numbers of the rules |
 | `./gradlew routeCounts` | `data/rail/*.parquet` | stdout: the numbers of routes by short-name prefix (the part before the first digit) and `route_type`, by each of them alone, by prefix, `route_type` and agency, and by agency alone |
 
 Paths can be overridden, e.g. `./gradlew filterRail -Pgtfs=/path/to/gtfs -Pout=data/rail`.
