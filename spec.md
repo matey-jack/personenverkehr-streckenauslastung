@@ -83,9 +83,9 @@ Route and trip are defined as in GTFS:
 - A **trip day** is one day on which a trip runs according to its calendar. Counting trip days weights each trip by
   the number of days it runs.
 - A **stop** is the fact that the trip stops at a station.
-- A **path** is the sequence of stations a trip is passing between its end points. Given the end points, this is
-  equivalent to knowing the sequence of junctions or the sequence of line sections that the train is passing. (This
-  assumes that there are never two different lines between the same two junction stations.)
+- A **path** is the sequence of line sections a trip is passing between its end points, or equivalently the sequence
+  of stations. The sequence of junctions alone is not always enough, because there can be two different lines between
+  the same two junctions.
 - A **route** is a collection of related trips. Ideally a route would have all trips with the same stopping part, set
   apart by an hourly rhythm or an integer fraction of an hour (30 mins, 20 mins, 15 min, 10 mins, etc). In practice,
   routes contain many odd trips, especially in the early or late hours of the day when trips are cut short. This
@@ -251,6 +251,10 @@ dangling route runs from A to B, where another route stops but no other route en
 Hub stations are ordered by rank, then by the number of routes stopping there, then by name. Each route is
 given the direction from its end that comes first in this order to its other end, where a station that is no hub
 station comes after all hub stations.
+
+**Regional hub stations** are found by the same rules, but only from the route cores of the routes in the regional
+network: the routes of its route types and agencies that keep at least one trip under its 10-date rule (see `todo.md`,
+"Reconstructing lines, regional part").
 
 An overview page lists the hub stations in this order.
 With each hub station we list the routes starting or ending there, and below those the routes merely stopping

@@ -12,7 +12,11 @@ Pragmatic definitions:
    they crowd out the graph. (Also they mostly have their own tracks, thus don't interfere with other rail services.) 
  - Stopping sequences that occur only in a single trip are to be included as valuable (usually off-hours) input data.
  - But trips that occur only on less than 10 (configurable) specific dates (instead of a weekly pattern) should be 
-   excluded to remove extreme cases and clutter.
+   excluded to remove extreme cases and clutter. This is decided per stop pattern of a route: its trips are excluded
+   if none of them has a weekly pattern and together they run on fewer than 10 dates. (Delfi publishes many regular
+   trips as lists of a few dates each; applied per trip, the rule would exclude 42% of the regional trips.)
+ - The 10-date rule does not apply to route cores: they are computed from all trips of their route, as everywhere.
+ - The hub stations offered by the viewer are the regional hub stations (see `spec.md`).
 
 Validate this the following way:
 
@@ -28,6 +32,29 @@ Validate this the following way:
 - On the side of this, show a list of all routes and when clicking on one of them, highlight it in the graph.
 - Also, when hovering over a line, show a tooltip with all the route cores passing there, and below a separator all
   the other routes with at least one trip passing there.
+
+### Frontend project (proposal, to be decided)
+
+The viewer starts a frontend of its own, which the timetable pages later share, all on the same network and
+timetable data.
+
+Where it lives, one of:
+
+- a folder `web/` in this repository, beside the Kotlin code at the root;
+- PREFERRED: two sub-folders, `pipeline/` for the Kotlin code and `web/` for the frontend, so both are clearly 
+  separated.
+  + Everything used by the pipeline only moves under the pipeline/ directory, including all data files and Gradle files.
+  + ReadMe.md is broken into a generic one at the root and a pipeline-specific one in pipeline/. (And one in web/ to be 
+    added.)
+  + the Github workflows and the Stop hook need their paths changed; maybe we need another Stop hook for the TypeScript 
+    checker and some logic to know which one to run?
+- REJECTED: a repository of its own, which would need the data published and versioned between the two.
+
+In one repository, the data format, the pipeline that writes it and the app that reads it change in one commit, and
+the Pages workflow deploys both.
+
+Stack: Vite with strict TypeScript as a static site on GitHub Pages; Preact (optionally with Signals) for both HTML 
+and SVG; Vitest and biome. (I used this stack in a previous app to my great satisfaction.)
 
 ## Reconstructing lines, long-distance part
 
