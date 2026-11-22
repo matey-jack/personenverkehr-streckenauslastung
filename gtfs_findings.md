@@ -2,7 +2,7 @@
 
 What the Delfi data set of 2026-11-09 turned out to contain, where that differs from what one would expect. Numbers refer to the filtered rail data in `data/rail`.
 
-## A GTFS route is not a line
+## A GTFS route is not a "line" (aka route as communicated to passengers)
 
 - The same line is often split over several routes: 197 combinations of route_short_name and route_type occur on more than one route_id. Berlin's S1 has four route_ids, one per variant of the line.
 - One route can bundle unrelated sections. RS3 contains trips Achern–Ottenhöfen as well as trips around Ulm; RB45 contains Limburg–Gießen and Gießen–Fulda.
@@ -39,6 +39,18 @@ Routes of type 101 and 102 have up to about 200 different station patterns each,
 ## Route type 100 contains bus-like routes
 
 Some routes of type 100 are served at street stops, for example line 20 in Regensburg and line 430 in Ludwigsburg.
+
+## Irregular day patterns
+
+GTFS gives the days a trip runs through its service: a weekly pattern between a start and an end date (`calendar`),
+plus single dates that are added or removed (`calendar_dates`).
+
+In the Delfi data set of 2026-11-09 every service covers the same seven weeks, 2026-10-24 to 2026-12-12. Of its 9,422
+rail services, 3,505 have no weekly pattern at all and run only on the dates added for them. Such services are
+one-offs and construction timetables, but also regular trips that Delfi publishes as a list of dates.
+
+So the number of trips says little about how typical a kind of trip is; the number of days they run does (see
+"trip-day" under "Core Routes").
 
 ## Leaving out rarely-run trips changes little
 

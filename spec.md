@@ -1,12 +1,12 @@
-Aim of the project: estimate the operational timetables of railway lines and stations from the published timetable. 
+Aim of the project: estimate the operational timetables of railway lines and stations from the published timetable.
 Then use this data to visualize the timetable and estimate capacity usage.
-Caveat: most lines also carry freight trains which cannot be estimated from the published timetables. But the
-operational timetables might show gaps that hint at scheduled paths for freight trains.
+Caveat: most lines also carry freight trains which cannot be estimated from the published timetables.
+But the operational timetables might show gaps that hint at scheduled paths for freight trains.
 
 For the purpose of this app, the difference between the published and operational timetable is that the operational one
 has the passing times of all trains, even the ones that don't stop in a station. Estimating those needs two steps:
 
-- knowing which path a train takes
+- knowing which path a train takes. We build a simplified data model of the rail network to do this.
 - estimating the passing times at the intermediate stations using a simplified physical model of trains: first using
   acceleration/decelaration and max speeds of stopping trains to estimate distances between stops; then using the
   acc/dec and max speeds of the fast train with those distances to get the passing times. Both calculations also need to
@@ -14,13 +14,12 @@ has the passing times of all trains, even the ones that don't stop in a station.
 
 The estimations of the physical train parameters and buffer times need to be fitted to match the published timetable.
 
-For selected lines, exact distance and max speed information can be given and will replace the estimated distances. It
-will also make our estimates of train properties more accurate by fitting against this data.
+For selected lines, exact distance and max speed information can be given and will replace the estimated distances.
+It will also make our estimates of train properties more accurate by fitting against this data.
 
 # Inputs
 
-The basic input data is a GTFS data set for all of Germany. From this relevant train data has to be extracted. Possibly
-be stored in a binary format to make subsequent steps faster.
+The basic input data is a GTFS data set for all of Germany. We discard all transit modes that are not heavy rail.
 
 Other inputs can be given optionally:
 
@@ -32,10 +31,16 @@ All of those are given in text files whose format we need to define.
 
 # Program architecture
 
-There are several separately runnable programs to prepare the data, especially the parts where its just filtering (and
-possibly storing in a binary format).
-Intermediate results are written into files, so that most of the development and running can be done from intermediate
-files without the need to read the full GTFS data set.
+We follow an incremental approach using a lot of separately running programs (all accessing the same data model).
+
+The first set of programs visualizes the input data in different ways, so we can verify small cleanups, like
+station-groupings or name fixes.
+
+The second set derives the infrastructure data and again visualizes it for verification.
+Later this will also allow us to incorporate and edit any manual additions to infrastructure and train pathing.
+Network diagrams are already a nice intermediate result to explore and enjoy.
+
+And the final set creates the actual timetables that we are after.
 
 # Basic data filtering
 
@@ -43,46 +48,25 @@ We filter all routes by the route_type, keeping only types 100 to 199 see `Exten
 We then filter all trips, keeping only ones relating to the retained route_ids.
 And then similarly filter stop_times, stops, and so on.
 
-# Data exploration
-
-GTFS has a mix of very regular services (like every hour of every day with the exact same stops and travel times) and
-irregular services (only on specific days or specific times of day, and individual parts of a route or even a longer
-route or a different set of stops).
-
-We are interested of getting data for the most typical kind of situation – when all the regular trains run – and
-additionally for the most crowded of hours of the workday (commuter time) or the year (around public holidays or start
-and end of school vacations).
-
-The data exploration should help us find those times and do a data pre-selection so that all other data won't be used
-in most of the app.
-
-## Regular trips vs. one-offs
-
-GTFS gives the days a trip runs through its service: a weekly pattern between a start and an end date (`calendar`),
-plus single dates that are added or removed (`calendar_dates`).
-
-In the Delfi data set of 2026-11-09 every service covers the same seven weeks, 2026-10-24 to 2026-12-12. Of its 9,422
-rail services, 3,505 have no weekly pattern at all and run only on the dates added for them. Such services are
-one-offs and construction timetables, but also regular trips that Delfi publishes as a list of dates.
-
-So the number of trips says little about how typical a kind of trip is; the number of days they run does (see
-"trip-day" under "Core Routes").
+Fun fact: I really had to run this only one time. Thereafter working from the filtered data only.
 
 # Data Model and Term Definitions
 
-TODO: this partially supercedes information in later level 1 sections and those need to be adapted.
+TODO: this partially supersedes information in later level 1 sections and those need to be adapted.
 
 ## Infrastructure terms
 
 - A **station** is a node in the network where at least one trip stops.
 - A **line** is a physical connection between two junctions with optionally some stops in between.
-- A **line section** is the part of a line atomically connecting two stops or junctions with no intermediate stops or
-  junctions.
-- A **junction** is a node in the network that connects to at least three line segments.
-- A **terminal** is a node that connects only to one line segment.
-- A **station** is a **junction station** when it is also a **junction**. 
-- Stations that are neither terminal nor a junction are called a **stopping station** or, if there is no confusion with 
-  homonymous timetable term, simply a **stop**. 
+- A **line section** is the part of a line atomically connecting two stations with no intermediate stations.
+- A **junction** is a node in the network that connects to at least three line sections.
+- A **terminal** is a node that connects only to one line section.
+- A **station** is a **junction station** when it is also a **junction**.
+- Stations that are neither terminal nor a junction are called a **stopping station** or, if there is no confusion with
+  homonymous timetable term, simply a **stop**.
+
+Note that definition of line section and junction is circular, which is why it is non-trivial to reconstruct the
+infrastructure data from the GTFS trips.
 
 (Our internal model of lines differs from the numbering of railway lines in that our lines always end at junctions or
 junction stations. Whereas official railway line numbers usually have the main line keeping its number on both sides
@@ -95,140 +79,126 @@ Route and Trip are defined as in GTFS:
 
 - A **trip** is a sequence of stations with times. It represents a train running once per day for a number of days
   specified by its calendar properties.
+- A **trip day** is the number of days each trip runs on in the calendar.
 - A **stop** is the fact that the trip stops at a station.
+- A **path** is the sequence of stations a trip is passing between its end points. Given the end points, this is
+  equivalent to knowing the sequence of junctions or the sequence of line sections that the train is passing. (This
+  assumes that there are never two different lines between the same two junction stations.)
 - A **route** is a collection of related trips. Ideally a route would have all trips with the same stopping part, set
-  apart by an hourly rhythm or an integer fraction of an hour (30 mins, 20 mins, 15 min, 10 mins, etc).
+  apart by an hourly rhythm or an integer fraction of an hour (30 mins, 20 mins, 15 min, 10 mins, etc). In practice,
+  routes contain many odd trips, especially in the early or late hours of the day when trips are cut short. This
+  includes serving only part of a route, prolonging the route, or serving more or less intermediate stops.
 
-In practice, routes contain many odd trips, especially in the early or late hours of the day when trips are cut short.
-This includes serving only part of a route, prolonging the route, or serving more or less intermediate stops. While a
-trip has a direction, we consider routes to be directionless. We normalize all routes using an ordering
+In order to visualize routes and use them as part of timetables, we define the term **core part of a route** or **route
+core** to be the set of all trips between the most frequent end points of all trips, weighted by trip days.
+The intermediate stops of those trips as well as the travel times might be different, so the route core only carries
+statistics on them: min, median, and max for each.
 
-We already need to apply some heuristics to the data to find the prototypical trip for a route, that is, how it
-is running during normal daytime hours and when there are no alterations due to construction works. We call this
-the **core route**. We do this in two steps: first, find the typical end points of the route. Then, find the typical 
-stopping pattern between those end points. We can show the variety of trips by specifying the min, median, and max 
-number of stops between the core end points, as well as the min, median, and max running time between those end points.
+While a trip has a direction, we consider routes to be directionless. We normalize all route cores simply by using the
+alphabetically earlier station name as the start and the other as the end. (When displaying them to the user we might
+normalize in a different way, for example putting the current station first, when showing all routes starting or ending
+at specific station. In user-facing communication we also sometimes just use "route" when displaying the route core
+information. )
 
 ## Heuristics to derive infrastructure data from timetable information
 
-- A **hop** is a trip segment with exactly two stops, usually referred to as A and B. 
+- A **hop** is a trip segment with exactly two stops, usually referred to as A and B.
 - A **span** is a trip segment with more than two stops.
-- A **path** is the sequence of stations a trip is passing between its end points. Given the end points, this is 
-  equivalent to knowing the sequence of junctions or the sequence of line segments that the train is passing. (This 
-  assumes that there are never two line segments between the same two junctions.) 
+
+Note that from a single trip or even from all the trips of a single route, we won't know if a hop actually corresponds
+to a
 
 ### Derivation from regional train data only
 
-One of the basic tasks of the data derivation is to determine whether a hop corresponds to a line segment or not.
-Unlike what we do for long-distance trains, we include all regional rail trips to make sure we don't miss a single 
-station. Sometimes only a very earyl or late hours trains stops at all stations and thus testifies about their 
-ordering. 
+One of the basic tasks of the data derivation is to determine whether a hop corresponds to a line section or not.
+Unlike what we do for long-distance trains, we include all regional rail trips to make sure we don't miss a single
+station. Sometimes only a very earyl or late hours trains stops at all stations and thus testifies about their
+ordering.
 
 Heuristics:
-- A hop of a regional train is not a line segment if there is another trip (of any route) which has a span between the 
+
+- A hop of a regional train is not a line section if there is another trip (of any route) which has a span between the
   hop's end points and the travel times are consistent. (For instance, a maximum of 2 extra minutes per extra stop.)
-- All other hops define line segments. 
-- From the set of those line segments, we can tell which stations are junctions and terminals.
-- Finally, from the set of junctions and terminals we can join line segments to lines!
+- All other hops define line sections.
+- From the set of those line sections, we can tell which stations are junctions and terminals.
+- Finally, from the set of junctions and terminals we can join line sections to lines!
 
-Since we do all of this from GTFS data alone, all junctions so far will also be stations. A line is thus defined as a 
-sequence of stations, with the ends always being junctions or terminals and the intermediates always being simple 
-stops. 
+Since we do all of this from GTFS data alone, all junctions so far will also be stations. A line is thus defined as a
+sequence of stations, with the ends always being junctions or terminals and the intermediates always being simple
+stops.
 
-In some rare cases, even two different regional train trips might take two different paths between two junctions. If 
-there is at least one intermediate stop in both paths, we can tell them apart. Otherwise, we need some more 
-heuristics or a manually added hint. 
+In some rare cases, even two different regional train trips might take two different paths between two junctions. If
+there is at least one intermediate stop in both paths, we can tell them apart. Otherwise, we need some more
+heuristics or a manually added hint.
 
-The lack of alternative train paths on short routes also means that we do not expect to have to use the "travel time is 
-consistent" rule much.  
+The lack of alternative train paths on short routes also means that we do not expect to have to use the "travel time is
+consistent" rule much.
 
 ### Derivation of the long-distance network
 
-To keep everything easier to follow, we first filter all the long-distance trips: include only trips that run at least 
+To keep everything easier to follow, we first filter all the long-distance trips: include only trips that run at least
 N times a day on at least M days.
 
 #### Step 1: derive the super-network of long-distance stations only.
 
-This uses a similar algorithm as above: fill in stations between hops using other trips. But we use trips of 
-long-distance trains only. Unlike the regional network, trains will often have alternate paths through the network, 
-which is why the travel-time rule becomes important here: There might be a path A-B-C-D and additionally another path 
-A-D which is another direct line segment with no intermediate stations. (There might be junctions, but we can't derive 
+This uses a similar algorithm as above: fill in stations between hops using other trips. But we use trips of
+long-distance trains only. Unlike the regional network, trains will often have alternate paths through the network,
+which is why the travel-time rule becomes important here: There might be a path A-B-C-D and additionally another path
+A-D which is another direct line section with no intermediate stations. (There might be junctions, but we can't derive
 them from the data.)
 
-Even on this level, routing might not have an obvious solution. We need to find the edge cases, manually resolve them, 
-and define a data format to store those resolutions. In the simplest form, a mini-app in the HTML page just has a text 
-log of the decisions at the bottom of the page. And an upload/download button for those. Later the same data format 
+Even on this level, routing might not have an obvious solution. We need to find the edge cases, manually resolve them,
+and define a data format to store those resolutions. In the simplest form, a mini-app in the HTML page just has a text
+log of the decisions at the bottom of the page. And an upload/download button for those. Later the same data format
 will be consumed by our data processing pipeline. That is, we commit the resolution file as part of the project.
 
-A pathing problem for a very long hop usually resolves to a path using existing line segments. (So we need to save 
+A pathing problem for a very long hop usually resolves to a path using existing line sections. (So we need to save
 which ones.)
 
-A pathing problem for a short hop resolves to either a path or to defining its own line segment. 
+A pathing problem for a short hop resolves to either a path or to defining its own line section.
 
 #### Step 2: map the super-network to the regional one
 
-We take line segments from the super-network and map them to lines (or paths of lines) of the regional network.
+We take line sections from the super-network and map them to lines (or paths of lines) of the regional network.
 
-Again, this is driven by the travel-time heuristic, this time with an added bonus for long-distance trains which have a 
+Again, this is driven by the travel-time heuristic, this time with an added bonus for long-distance trains which have a
 higher top speed in addition to having less stops.
 
 The two kinds of resolutions are the same as above:
- - either map a hop onto a path
- - or define a new line segment by the hop
 
+- either map a hop onto a path
+- or define a new line section by the hop
 
 # Extracting meaningful "typical" routes and trips
 
-## Core Routes
+## Ideas on meaningfully grouping the Routes (via their route cores)
 
-TODO: definitions here need to be adapted for the two-step derivation of core routes explained above.
-
-Provisional definition:
-
-- A "trip-day" is one trip on one day it runs. That's basically trips weighted by on how many calendar days they are 
-  running. All frequencies are counted in trip-days, so that a trip which runs on a single day weighs less than one 
-  that runs daily.
-- A "pattern" is the set of stations served by a trip, regardless of direction and order.
-- The "majority stations" of a route are the stations served on more than half of its trip-days.
-- The "difference" of a pattern is the number of its stations that are not majority stations, plus the number of
-  majority stations it lacks.
-- Each route has one or two core routes: its most frequent pattern, and the pattern with the smallest difference (the
-  most frequent one of those, if several have it). Often both are the same pattern, which then is the only core route.  
-  A route without any majority station only has its most frequent pattern as core route.
-- Two core routes of the same route get the suffixes `:a` (most frequent) and `:b` (smallest difference) on the
-  route_id, and `a` and `b` on the route_short_name. If the route_short_name ends with a letter, the suffixes on it
-  are `-1` and `-2` instead.
-
-## Ideas on meaningfully grouping the Core Routes
-
-The two core routes of a route mostly share their ends. So below, "several routes" means core routes of more than one
-route.
-
-- A core route is "connected" to the stations where it starts, stops or ends.
-- The "rank" of a station is the number of core routes starting or ending there.
-  Berlin Hauptbahnhof gets a capital bonus: its rank is 20.
+- A route (core) is "connected" to the stations where it starts, stops or ends.
+- The "rank" of a station is the number of routes starting or ending there.
+  Berlin Hauptbahnhof gets a capital bonus: its rank is 20. (This is to signify its importance despite having mostly
+  through traffic, as part of Berlin's multi-station through-running route concept.)
 - A station is a "hub station" if
-    - core routes of several routes start or end there, or
-    - core routes of several routes are connected to it, and one of them is connected to no hub station of a higher
+    - routes of several routes start or end there, or
+    - routes of several routes are connected to it, and one of them is connected to no hub station of a higher
       rank.
-- A core route is "dangling" as long as it is connected to no hub station, while the hub stations are found from the
-  highest rank down. A core route that is still dangling in the end is an "isolated core route". It shares no station
-  with a core route of another route.
+- A route is "dangling" as long as it is connected to no hub station, while the hub stations are found from the
+  highest rank down. A route that is still dangling in the end is an "isolated route". It shares no station
+  with a route of another route.
 
 Only hub stations of a higher rank count in the second rule, so that stations of similar size are treated alike: if a
-dangling core route runs from A to B, where another route stops but no other route ends, both A and B are hub stations.
+dangling route runs from A to B, where another route stops but no other route ends, both A and B are hub stations.
 
-Hub stations are ordered by rank, then by the number of core routes stopping there, then by name. Each core route is
+Hub stations are ordered by rank, then by the number of routes stopping there, then by name. Each route is
 given the direction from its end that comes first in this order to its other end, where a station that is no hub
 station comes after all hub stations.
 
 An overview page lists the hub stations in this order.
-With each hub station we list the core routes starting or ending there, and below those the core routes merely stopping
+With each hub station we list the routes starting or ending there, and below those the routes merely stopping
 at that station.
-The core route is listed by route short name, route type, start and end station.
+The route is listed by route short name, route type, start and end station.
 As a navigation aid, the station names in routes are clickable.
 
-And below all the hub stations we list all isolated core routes.
+And below all the hub stations we list all isolated routes.
 
 ## Deducing the long-distance train network from the GTFS data (plus minimal manually added data)
 
@@ -248,8 +218,6 @@ network graph for the German long-distance train network. We include every hop b
 minimal number of daily trips for a minimum number of days in the timetable period. (My suggestion: at least 3 days per
 number of months in the timetable period that have at least 6 trips each.)
 
-
-
 The first step needs to be a filtering of all long-distance stations to be in scope and a grouping of stations from the
 GTFS data into logical stations, manually giving priority to several stations in the same city. From that we'll cap all
 the trips to just those stations and only signal further intermediate stops symbolically and further stops past the
@@ -258,17 +226,17 @@ And the number of different trips by route should be reduced.
 
 Then we build the network from those hops with the following assumptions:
 
-- first use a manually entered list of NBS lines and mark those hops as going via the NBS.Those NBS will also need 
-  information on junction points that are not stations. We need to define a data model for that. We'll probably include 
+- first use a manually entered list of NBS lines and mark those hops as going via the NBS.Those NBS will also need
+  information on junction points that are not stations. We need to define a data model for that. We'll probably include
   distance information in that model, since it's an easy addition.
 - then for all hops that match a regional train route, assume that the long-distance train hops via that route's line.
-- then for the remaining larger hops, route them via the line segments added before, using the hop times of stopping
+- then for the remaining larger hops, route them via the line sections added before, using the hop times of stopping
   long-distance trains to validate the travel time.
 - finally, there will only be a very few cases where a train does very large hops and could route them via different
   paths that both would roughly match its travel time. We can list those cases in a CSV file, then I'll go ride the
   trains to check the path and write that in the file.
 
-We can build a test page from this which shows the list of all long-distance core routes in a sidebar and an SVG of the
+We can build a test page from this which shows the list of all long-distance routes in a sidebar and an SVG of the
 network on the main page. Use the station coordinates to place stations in the SVG. Show only one station by city and
 label it with only the name of the city. When a route is selected and shown on the map, show the actual names of the
 stations in each city, but only one per city, preferring Hbf if there are more than one. When that doesn't break all
@@ -282,7 +250,8 @@ from the major routes and dial it up over time.
 
 TODOs:
 
-- define data format in which the NBS list is to be provided. Actually, that is so little data, it could be a constant in
+- define data format in which the NBS list is to be provided. Actually, that is so little data, it could be a constant
+  in
   the code. But still, we need to define how the stations are identified which are connected via NBS'.
 - define data format for the manual routing of trains when paths are ambiguous.
 
@@ -310,9 +279,7 @@ derive that from the trip data.
 
 Graphical Timetable:
 
-- the scope is one core route: start and end of that core route, and the line (or sequence of lines if the route
-  passes through junctions) it runs on. For routes that we list twice with a/b core routes, those count as different
-  ones: the user chooses which one sets the scope.
+- the scope is one route between its core end stations.
 - the timetable includes all other routes running on those lines or parts of them.
 - for now, we start with routes that don't share track with long-distance trains, so there is much less guessing about
   the behavior of trains between stops.
@@ -321,57 +288,21 @@ Graphical Timetable:
 - label each graph with the route_short_name.
 - routes that branch on or off the line are drawn starting from the station they first or last stop on that line,
   labeled with an arrow and the route's terminal in that direction.
-- while the core route defines the scope in the space-dimension, the time-dimension will use the exact data of trips
+- while the route defines the scope in the space-dimension, the time-dimension will use the exact data of trips
   of this route and others that use the line.
 - the first only needs to work for single- and double-tracked lines. We'll allow-list selectable routes manually at
   first. For now, the trips of the S-Bahn in Berlin and Hamburg are left out entirely: they run on tracks of their
   own beside the main lines.
 
 First task: design the algorithm / ruleset to reconstruct the line data (sequence of all possible stops, at least all
-that GTFS allows us to see) from the trip data given one core route that defines the scope of this specific timetable.
+that GTFS allows us to see) from the trip data given one route that defines the scope of this specific timetable.
 This includes finding all the other relevant routes, including those that have only non-core trips running on that line.
-(That is trips whose pattern is not a core route of their route.)
+(That is trips which end in other stations as the route core.)
 
-### Reconstructing the line (provisional)
 
-Stations are those of "Core Routes". Trips of a route with the same stops count as one trip, with the times of the
-fastest of them. For this task we ignore the direction: a trip running the other way counts with its stations in
-reverse order.
+## The old test page for showing the derived infrastructure data
 
-- A "hop" is a pair of neighbouring stations A, B of the line. The line starts as the stations of the core route, in
-  the order of its most frequent trip.
-- A "filler" of a hop is a trip of any route that stops at A, later at B, and at other stations in between, none of
-  which is on the line yet.
-- A filler is a "detour", and ignored, if it takes longer from A to B than 1.5 times the fastest trip from A to B plus
-  3 minutes for each of its stops after A up to and including B.
-- The "share" of a station X between A and B is the travel time from A to X as a share of the travel times from A to X
-  and from X to B: the median over the fillers stopping at X.
-- Each hop gets the in-between stations of all its fillers inserted. A station comes before another one if a filler
-  stops at both in this order. Where no filler does, or fillers contradict each other, the smaller share comes first.
-  This is repeated until no hop has a filler left: later rounds add the stations of trips that stop at only one of A
-  and B.
-- Each station has a "position": the travel time from the first station of the line. For the stations of the core
-  route these are the travel times of the fastest trip over each hop, added up. An inserted station lies at its share
-  of the way between the positions of A and B.
-
-A trip "uses the line" between two of its consecutive stops if both are stations of the line, and it is no detour
-between them. A route is relevant for the timetable if one of its trips uses the line.
-
-Two kinds of warnings point at stations whose order is uncertain:
-
-- Two neighbouring stations inserted into the same hop are "ordered by travel time only" if no filler stops at both.
-  The warning is a strong one if the fastest filler stopping at only the one takes over 10% longer from A to B than
-  the fastest filler stopping at only the other: then the two kinds of trips are hard to compare, or run on
-  different lines.
-- A trip goes "against the order" if it uses the line between three consecutive stops and does not keep one direction
-  along the line.
-
-What this cannot see:
-
-- a trip that stops at only one station of the line (it counts as crossing the line),
-- a trip that passes the whole line without stopping,
-- whether trips run on separate tracks beside the line, like an S-Bahn beside a main line: their stations become
-  stations of the line.
+NOTE: this section uses old terminology and is only left here as a description of the "lines.html" report.
 
 Routes we use for testing, with the route_id of their core route:
 
