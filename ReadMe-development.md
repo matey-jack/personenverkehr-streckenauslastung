@@ -25,7 +25,7 @@ Questions about the data are answered with Kotlin code in the repository, not wi
 
 - On an HTML page with headings and tables, decide what has to stay visible while scrolling (page heading, navigation, section heading, table header) and make it stick to the top.
 - Concepts are refined by comparing variants ("how would the rate change if…"). Make variants cheap to compare, with summary lines or a `-P` option, instead of hard-wiring one.
-- Before validating a concept against the data, check what the data means by "the same station" and "how often": both changed the core route results more than the definition itself did.
+- Before validating a concept against the data, check what the data means by "the same station" and "how often": both changed the route core results more than the definition itself did.
 - A definition enters `spec.md` when Robert asks for it, concisely; it may be labelled provisional.
 - For a quick SQL query that is not worth keeping, use the DuckDB JDBC driver that Gradle has downloaded. DuckDB 2 only accepts the lambda syntax `lambda x: ...`, not `x -> ...`.
 
