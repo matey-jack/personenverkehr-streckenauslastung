@@ -2,7 +2,9 @@ package streckenauslastung
 
 import kotlinx.serialization.json.Json
 import org.junit.jupiter.api.io.TempDir
+import java.nio.file.Files
 import java.nio.file.Path
+import java.nio.file.StandardCopyOption
 import kotlin.io.path.readLines
 import kotlin.io.path.readText
 import kotlin.io.path.toPath
@@ -440,9 +442,28 @@ class PipelineTest {
         assertEquals(listOf(5200000, 5210000, 5220000), file.nodes.lat)
         // T3 runs from Cstadt to Aheim without stopping at Bdorf, as fast as the trips stopping there.
         assertEquals(listOf(listOf(0, 1, 2)), file.lines.nodes)
-        assertEquals(listOf(listOf<Long?>(480, 660)), file.lines.medianSecs)
+        assertEquals(listOf(listOf(480L, 660L)), file.lines.medianSecs)
         assertEquals(listOf(listOf(578L, 578L)), file.lines.tripDays)
         assertEquals(listOf("kind,stations,station_ids,involved"), warnings.readLines())
+    }
+
+    @Test
+    fun `loadRegionalTrips leaves out the trips with a missing time`(@TempDir tmp: Path) {
+        val rail = tmp.resolve("rail")
+        filterRail(gtfs, rail)
+        val stopTimes = rail.resolve("stop_times.parquet")
+        val withGap = tmp.resolve("stop_times.parquet")
+        openDuckDb().use { db ->
+            val gap = "trip_id = 'T1' AND stop_sequence = 2"
+            db.exec(
+                "COPY (SELECT * REPLACE (CASE WHEN $gap THEN NULL ELSE arrival_secs END AS arrival_secs) " +
+                    "FROM ${sqlPath(stopTimes)}) TO ${sqlPath(withGap)} (FORMAT parquet)",
+            )
+        }
+        Files.move(withGap, stopTimes, StandardCopyOption.REPLACE_EXISTING)
+        val input = loadRegionalTrips(rail)
+        assertEquals(1, input.untimed)
+        assertEquals(2, input.trips.size)
     }
 
     @Test
@@ -457,7 +478,6 @@ class PipelineTest {
         val rule = SpanRule(factor = 1.5, stopAllowanceSecs = 60, extraSecs = 100)
         // 1.5 * 200 + 2 * 60 + 100 = 520
         assertEquals(listOf(true, false), listOf(520L, 521L).map { rule.isConsistent(it, 200, 2) })
-        assertEquals(true, rule.isConsistent(null, 200, 2))
         // The hop is faster than 1.5 * 200 + 100 = 400.
         assertEquals(listOf(false, true), listOf(400L, 401L).map { rule.isFaster(200, it) })
     }
@@ -518,7 +538,7 @@ class PipelineTest {
         fun trip(stations: String, weekly: Boolean, vararg dates: Int) = LoadedTrip(
             "r",
             stations.map { it.toString() },
-            TimedTrip(listOf(null, null), listOf(null, null), dates.size.toLong()),
+            TimedTrip(listOf(0, 60), listOf(0, 60), dates.size.toLong()),
             weekly,
             dates.map { "202611%02d".format(it) }.toSet(),
         )

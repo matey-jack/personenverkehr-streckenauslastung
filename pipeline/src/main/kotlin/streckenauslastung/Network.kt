@@ -14,14 +14,10 @@ import kotlin.math.roundToInt
 /** The route types of the regional network (see todo.md, "Reconstructing lines, regional part"). */
 internal val regionalRouteTypes = listOf(106, 109)
 
-/** The seconds at which one trip arrives at and departs from each of its stops, null where unknown, and its days. */
-internal class TimedTrip(val arrivals: List<Long?>, val departures: List<Long?>, val days: Long) {
+/** The seconds at which one trip arrives at and departs from each of its stops, and its days. */
+internal class TimedTrip(val arrivals: List<Long>, val departures: List<Long>, val days: Long) {
     /** The seconds from leaving stop [from] to reaching stop [to], both given by index, in either order. */
-    fun secs(from: Int, to: Int): Long? {
-        val (first, last) = if (from < to) from to to else to to from
-        val departure = departures[first] ?: return null
-        return arrivals[last]?.minus(departure)
-    }
+    fun secs(from: Int, to: Int) = arrivals[maxOf(from, to)] - departures[minOf(from, to)]
 }
 
 /**
@@ -52,19 +48,17 @@ internal fun stopPatterns(trips: List<LoadedTrip>, minDates: Int): List<StopPatt
 /**
  * The rule for consistent spans (see pipeline/spec.md, "Derivation from regional train data only"): a span
  * between the two ends of a hop is consistent if its median travel time is at most [factor] times
- * that of the hop plus [stopAllowanceSecs] for each stop between the ends, plus [extraSecs]. Without
- * times on either side, a span counts as consistent.
+ * that of the hop plus [stopAllowanceSecs] for each stop between the ends, plus [extraSecs].
  */
 class SpanRule(val factor: Double = 1.33, val stopAllowanceSecs: Long = 180, val extraSecs: Long = 120) {
-    fun isConsistent(spanSecs: Long?, hopSecs: Long?, stopsBetween: Int) = spanSecs == null || hopSecs == null ||
+    fun isConsistent(spanSecs: Long, hopSecs: Long, stopsBetween: Int) =
         spanSecs <= factor * hopSecs + stopAllowanceSecs * stopsBetween + extraSecs
 
     /**
      * Whether a span is faster than the hop, although it has more stops: the hop takes longer than
      * [factor] times the span plus [extraSecs].
      */
-    fun isFaster(spanSecs: Long?, hopSecs: Long?) =
-        spanSecs != null && hopSecs != null && hopSecs > factor * spanSecs + extraSecs
+    fun isFaster(spanSecs: Long, hopSecs: Long) = hopSecs > factor * spanSecs + extraSecs
 }
 
 /** The two stations of a hop or line section, without a direction: [a] is the one with the smaller ID. */
@@ -72,28 +66,27 @@ internal data class Hop(val a: String, val b: String)
 
 internal fun hop(x: String, y: String) = if (x < y) Hop(x, y) else Hop(y, x)
 
-/** The travel times of some trips over the same stretch, each with its trip days. */
+/** The travel times of some trips over the same stretch, each with its trip days; at least one trip once in use. */
 internal class TravelTimes {
     private val times = ArrayList<Pair<Long, Long>>()
 
-    /** The trip days of all the trips, with times or without. */
+    /** The trip days of all the trips. */
     var tripDays = 0L
         private set
 
-    fun add(secs: Long?, days: Long) {
+    fun add(secs: Long, days: Long) {
         tripDays += days
-        if (secs != null) times += secs to days
+        times += secs to days
     }
 
-    /** The median of the travel times, counted in trip days; null if no trip has times. */
-    fun median(): Long? {
-        val total = times.sumOf { it.second }
+    /** The median of the travel times, counted in trip days. */
+    fun median(): Long {
         var sum = 0L
         for ((secs, days) in times.sortedBy { it.first }) {
             sum += days
-            if (2 * sum >= total) return secs
+            if (2 * sum >= tripDays) return secs
         }
-        return null
+        error("no travel times")
     }
 }
 
@@ -272,20 +265,22 @@ private fun lineWarnings(lines: List<NetLine>): List<NetworkWarning> {
 /** The name and coordinates of a station; the coordinates are null if the data has none. */
 internal class StationInfo(val name: String, val lat: Double?, val lon: Double?)
 
-/** The regional trips and the stations of the rail data. */
-internal class RegionalInput(val trips: List<LoadedTrip>, val stations: Map<String, StationInfo>)
+/** The regional trips and the stations of the rail data, and the number of [untimed] trips left out. */
+internal class RegionalInput(val trips: List<LoadedTrip>, val stations: Map<String, StationInfo>, val untimed: Int)
 
 /**
  * Loads the trips of the regional routes that run on at least one day (see todo.md,
  * "Reconstructing lines, regional part"), with their stops mapped to stations as for the hub stations.
+ * Trips without an arrival or departure time at some stop are left out.
  */
 internal fun loadRegionalTrips(railDir: Path): RegionalInput {
     fun p(name: String) = sqlPath(railDir.resolve("$name.parquet"))
 
-    fun secsList(array: java.sql.Array?, size: Int): List<Long?> =
-        (array?.array as Array<*>?)?.map { (it as Number?)?.toLong() } ?: List(size) { null }
+    fun secsList(array: java.sql.Array): List<Long>? =
+        (array.array as Array<*>).map { (it as Number?)?.toLong() ?: return null }
 
     val trips = ArrayList<LoadedTrip>()
+    var untimed = 0
     val stations = HashMap<String, StationInfo>()
     val excluded = agenciesOnOwnTracks.joinToString { "'${it.replace("'", "''")}'" }
     openDuckDb().use { db ->
@@ -320,11 +315,15 @@ internal fun loadRegionalTrips(railDir: Path): RegionalInput {
             ORDER BY t.route_id, t.trip_id
         """) { rs ->
             val all = (rs.getArray(2).array as Array<*>).map { it.toString() }
+            val arrivals = secsList(rs.getArray(3))
+            val departures = secsList(rs.getArray(4))
+            if (arrivals == null || departures == null) {
+                untimed++
+                return@forEachRow
+            }
             // Two stops in a row at the same station are one stop, from the first arrival to the last departure.
             val firsts = all.indices.filter { it == 0 || all[it] != all[it - 1] }
             val lasts = all.indices.filter { it == all.lastIndex || all[it] != all[it + 1] }
-            val arrivals = secsList(rs.getArray(3), all.size)
-            val departures = secsList(rs.getArray(4), all.size)
             trips += LoadedTrip(
                 rs.getString(1),
                 firsts.map { all[it] },
@@ -347,7 +346,7 @@ internal fun loadRegionalTrips(railDir: Path): RegionalInput {
             stations[rs.getString(1)] = StationInfo(rs.getString(2), double(3), double(4))
         }
     }
-    return RegionalInput(trips, stations)
+    return RegionalInput(trips, stations, untimed)
 }
 
 /** The parameters the network is derived with. */
@@ -376,7 +375,7 @@ internal class NetworkNodes(
 @Serializable
 internal class NetworkLines(
     val nodes: List<List<Int>>,
-    val medianSecs: List<List<Long?>>,
+    val medianSecs: List<List<Long>>,
     val tripDays: List<List<Long>>,
 )
 
@@ -395,7 +394,7 @@ internal class NetworkLines(
  * - [lines]: the nodes of each line in order, from an end to an end; a ring repeats its first node at
  *   the end. A line is listed in the direction in which its node names come first alphabetically.
  *   For each section, from one node to the next, `medianSecs` is the median travel time of the
- *   trips over the hop, counted in trip days (null without times), and `tripDays` their trip days.
+ *   trips over the hop, counted in trip days, and `tripDays` their trip days.
  */
 @Serializable
 internal class NetworkFile(
@@ -444,7 +443,7 @@ internal fun warningsCsv(warnings: List<NetworkWarning>, name: (String) -> Strin
     for (warning in warnings) {
         val involved = warning.involved.joinToString("; ") { part ->
             val minutes = part.parts.joinToString(" + ") { times ->
-                times.median()?.let { String.format(Locale.ROOT, "%.1f", it / 60.0) } ?: "?"
+                String.format(Locale.ROOT, "%.1f", times.median() / 60.0)
             }
             val days = part.parts.joinToString(" + ") { it.tripDays.toString() }
             "${part.stations.joinToString(" > ", transform = name)}: $minutes min, $days trip days"
@@ -499,6 +498,7 @@ fun network(railDir: Path, outFile: Path, warningsFile: Path, rule: SpanRule = S
     val keptRoutes = patterns.map { it.routeId }.toSet()
     val keptTrips = patterns.sumOf { it.trips.size }
     val allPatterns = input.trips.map { it.routeId to it.stations }.toSet().size
+    println("%,d regional trips left out for missing times".format(input.untimed))
     println(
         "%,d regional trips in %,d stop patterns of %,d routes; the 10-date rule leaves out %,d trips, %,d stop patterns and %,d routes"
             .format(

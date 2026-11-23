@@ -23,11 +23,11 @@ is described there. That is increment 8 below.
 
 My reading of the spec, as the `network` step will implement it:
 
-- **Input**: the trips of `todo.md`, stations deduplicated and fixed as for `hub_stations.html`.
+- **Input**: the trips of `todo.md`, stations deduplicated and fixed as for `hub_stations.html`. Trips without an
+  arrival or departure time at some stop are left out (none in the data so far), so every hop and span has times.
 - **Hops**: every pair of consecutive stops of an input trip, directionless, with its trip days and its median travel
   time (weighted by trip days, from departure to arrival).
-- **Consistent span**: by the rule in `pipeline/spec.md`, whose three numbers are `-P` options. Without times on either side,
-  a span counts as consistent.
+- **Consistent span**: by the rule in `pipeline/spec.md`, whose three numbers are `-P` options.
 - **Sections**: the hops without a consistent span. A hop with only inconsistent spans stays a section and gets a
   warning; so does a hop that some span with more stops runs faster than the hop itself.
 - **Lines**: chains of sections between junctions and terminals. A ring without any junction is one line, starting
@@ -58,8 +58,8 @@ only the second.
 - **Node**: ID, name, coordinates, whether it is a station. Today every node is a station; the junctions that are not
   stations (`todo.md`) become nodes without one, so the model says "node" from the start. Whether a node is a junction,
   terminal or stopping station follows from the lines and is not stored.
-- **Line**: its nodes in order. Its sections are the pairs of neighbouring nodes; each has its median travel time (or
-  none) and trip days.
+- **Line**: its nodes in order. Its sections are the pairs of neighbouring nodes; each has its median travel time and
+  trip days.
 - The derivation parameters and the GTFS data set it was made from.
 
 **Services** (refers to the network by index):
@@ -94,7 +94,7 @@ entries, cheaper to compute than to download.
   "format": "streckenauslastung-network", "version": 1,
   "source": {"routeTypes": [106, 109], "excludedAgencies": ["…"], "minDates": 10, "detourFactor": 1.33, "stopAllowanceSecs": 180, "extraSecs": 120},
   "nodes": {"id": ["de:12054:900230999", "…"], "name": ["Potsdam Hbf", "…"], "lat": [5239172, "…"], "lon": [1306692, "…"], "isStation": [true, "…"]},
-  "lines": {"nodes": [[0, 17, 18, 4], "…"], "medianSecs": [[120, 95, null], "…"], "tripDays": [[812, 790, 790], "…"]}
+  "lines": {"nodes": [[0, 17, 18, 4], "…"], "medianSecs": [[120, 95, 240], "…"], "tripDays": [[812, 790, 790], "…"]}
 }
 ```
 
