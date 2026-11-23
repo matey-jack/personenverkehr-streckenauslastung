@@ -37,7 +37,14 @@ My reading of the spec, as the `network` step will implement it:
   a warning. Two paths about equally good: a warning.
 - **Warnings** are printed as a summary and written to `data/reports/network_warnings.csv`, each with the median
   travel times and trip days of the hops involved. Kinds: inconsistent spans, faster spans, two lines between the
-  same junctions (usually duplicate station IDs, see `pipeline/gtfs_findings.md`), unconnectable or ambiguous paths.
+  same junctions (usually duplicate station IDs, see `pipeline/gtfs_findings.md`), loops, rings, unconnectable or
+  ambiguous paths.
+- A **loop** is a line whose two ends are the same junction: it leaves the junction and comes back to it, so it
+  hangs on the rest of the network at that one node. A **ring** is a closed chain of stopping stations without any
+  junction: it does not touch the rest of the network at all, and its start is arbitrary. Both can be real (a
+  balloon loop, an isolated circular line), but more likely come from a missing section or a station split into
+  two IDs. (We had neither loops nor rings in the first regional data set that we processed. Note that something like 
+  Berlin's Ringbahn has several junctions splitting the loop into several plain lines.)
 
 ## 3. Data format
 
