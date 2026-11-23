@@ -50,7 +50,7 @@ rail services, 3,505 have no weekly pattern at all and run only on the dates add
 one-offs and construction timetables, but also regular trips that Delfi publishes as a list of dates.
 
 So the number of trips says little about how typical a kind of trip is; the number of days they run does (see
-"trip day" under "Timetable terms" in `spec.md`).
+"trip day" under "Timetable terms" in [../spec.md](../spec.md)).
 
 ## Leaving out rarely-run trips changes little
 
@@ -58,7 +58,7 @@ Once frequencies are counted in trip days, ignoring trips that run on only a few
 
 ## Reconstructing lines
 
-What the five testing routes of `spec.md`, "The old test page for showing the derived infrastructure data", show about its rules:
+What the five testing routes of [spec.md](spec.md), "The old test page for showing the derived infrastructure data", show about its rules:
 
 - Trips that take another way between two stations of a line are common around junctions. Without the rule for detours, the RB33 line gets Werder (Havel), Potsdam Golm and Potsdam Park Sanssouci between Pirschheide and Charlottenhof, and the RE2 line gets Flughafen BER and Lichtenberg. The numbers of the rule matter little: with a factor of 1.2 and 2 minutes per stop the lines are the same.
 - Trains stand before a terminus: RB33 takes much longer over its last hop into Potsdam Hbf than the trains passing through. That is why the rule for detours allows the 3 minutes for the stop at the end of a hop as well.

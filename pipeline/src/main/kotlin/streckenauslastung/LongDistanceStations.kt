@@ -131,7 +131,7 @@ internal fun longDistanceStationsPage(stations: List<RailStation>): String {
 }
 
 /**
- * Data exploration (see spec.md, "Deducing the long-distance train network"): writes an HTML page
+ * Data exploration (see pipeline/spec.md, "Derivation of the long-distance network"): writes an HTML page
  * of the [top] stations with the most long-distance trip-days.
  */
 fun longDistanceStations(railDir: Path, outFile: Path, top: Int) {

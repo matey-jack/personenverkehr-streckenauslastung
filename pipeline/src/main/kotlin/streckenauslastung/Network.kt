@@ -50,7 +50,7 @@ internal fun stopPatterns(trips: List<LoadedTrip>, minDates: Int): List<StopPatt
         .map { (key, same) -> StopPattern(key.first, key.second, same.map { it.times }) }
 
 /**
- * The rule for consistent spans (see spec.md, "Derivation from regional train data only"): a span
+ * The rule for consistent spans (see pipeline/spec.md, "Derivation from regional train data only"): a span
  * between the two ends of a hop is consistent if its median travel time is at most [factor] times
  * that of the hop plus [stopAllowanceSecs] for each stop between the ends, plus [extraSecs]. Without
  * times on either side, a span counts as consistent.
@@ -132,7 +132,7 @@ internal class Network(
 }
 
 /**
- * Derives the line sections and lines from the stop [patterns] (see spec.md, "Derivation from
+ * Derives the line sections and lines from the stop [patterns] (see pipeline/spec.md, "Derivation from
  * regional train data only"). [name] gives the name of a station, which orders lines and stations.
  */
 internal fun deriveNetwork(patterns: List<StopPattern>, name: (String) -> String, rule: SpanRule): Network {
@@ -386,7 +386,7 @@ internal class NetworkLines(
  * - [format] is always "streckenauslastung-network"; [version] is raised with every change that
  *   readers have to adapt to.
  * - [source]: the GTFS data set as described by `data/rail/metadata.json5` (null without that file) and
- *   the parameters the network is derived with (see the `network` step in ReadMe.md).
+ *   the parameters the network is derived with (see the `network` step in pipeline/ReadMe.md).
  * - Tables are objects of columns of equal length; other tables refer to a row by its index.
  * - [nodes]: the GTFS station ID (after the joins of `stationParts` in `TripGroups.kt`), name,
  *   latitude and longitude in units of 10⁻⁵ degrees (null where the data has none) and whether the

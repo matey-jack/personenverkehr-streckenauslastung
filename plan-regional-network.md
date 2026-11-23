@@ -3,8 +3,8 @@
 A working document for the increment in `todo.md`. Once it is settled, fold what is left of it into `spec.md` and
 `todo.md` and delete this file.
 
-The input is defined by `todo.md` ("Pragmatic definitions") and the derivation by `spec.md` ("Derivation from regional
-train data only"). Numbers below come from throwaway DuckDB prototypes on `data/rail`, with the station IDs of
+The input is defined by `todo.md` ("Pragmatic definitions") and the derivation by `pipeline/spec.md` ("Derivation from regional
+train data only"). Numbers below come from throwaway DuckDB prototypes on `pipeline/data/rail`, with the station IDs of
 `station_of` in `TripGroups.kt` but without `stationParts`:
 
 - 88,800 regional trips (route types 106 and 109 without the agencies "S-Bahn Berlin GmbH" and "S-Bahn Hamburg"),
@@ -14,8 +14,7 @@ train data only"). Numbers below come from throwaway DuckDB prototypes on `data/
 
 ## 1. Open questions
 
-None blocking. The frontend proposal waits for a decision (`todo.md`, "Frontend project"); increments 1 to 3 do not
-depend on it.
+None blocking.
 
 The TODO at "Data Model and Term Definitions" in `spec.md` still stands: the per-route reconstruction of `lines.html`
 is described there. That is increment 8 below.
@@ -27,7 +26,7 @@ My reading of the spec, as the `network` step will implement it:
 - **Input**: the trips of `todo.md`, stations deduplicated and fixed as for `hub_stations.html`.
 - **Hops**: every pair of consecutive stops of an input trip, directionless, with its trip days and its median travel
   time (weighted by trip days, from departure to arrival).
-- **Consistent span**: by the rule in `spec.md`, whose three numbers are `-P` options. Without times on either side,
+- **Consistent span**: by the rule in `pipeline/spec.md`, whose three numbers are `-P` options. Without times on either side,
   a span counts as consistent.
 - **Sections**: the hops without a consistent span. A hop with only inconsistent spans stays a section and gets a
   warning; so does a hop that some span with more stops runs faster than the hop itself.
@@ -38,7 +37,7 @@ My reading of the spec, as the `network` step will implement it:
   a warning. Two paths about equally good: a warning.
 - **Warnings** are printed as a summary and written to `data/reports/network_warnings.csv`, each with the median
   travel times and trip days of the hops involved. Kinds: inconsistent spans, faster spans, two lines between the
-  same junctions (usually duplicate station IDs, see `gtfs_findings.md`), unconnectable or ambiguous paths.
+  same junctions (usually duplicate station IDs, see `pipeline/gtfs_findings.md`), unconnectable or ambiguous paths.
 
 ## 3. Data format
 
@@ -103,13 +102,13 @@ entries, cheaper to compute than to download.
 ```
 
 The format is documented in the KDoc of the Kotlin classes that write it, as `RouteCores.kt` documents the columns of
-`route_cores.csv`; the TypeScript types mirror them without repeating the prose. The files go to `data/network/` and
+`route_cores.csv`; the TypeScript types mirror them without repeating the prose. The files go to `pipeline/data/network/` and
 are committed like the reports. They are written with `kotlinx.serialization` (a new dependency), which the later
 Kotlin timetable steps also use to read them.
 
 ## 4. Frontend project
 
-Where it lives and its stack: see `todo.md`, "Frontend project". The structure below assumes a folder `web/`.
+Where it lives and its stack: see `todo.md`, "Frontend project".
 
 ### Structure
 
@@ -117,11 +116,11 @@ Where it lives and its stack: see `todo.md`, "Frontend project". The structure b
 - `web/src/geo/`: projection, equirectangular with the x axis scaled by cos 51°, into kilometres, once on loading.
 - `web/src/network/`: the network viewer.
 - Later `web/src/timetable/`, with hash routing between the pages (`#/network`, `#/timetable/…`).
-- In development, Vite serves `data/network/` as its public folder; the build copies it into the site.
+- In development, Vite serves `pipeline/data/network/` as its public folder; the build copies it into the site.
 
 ### The network viewer
 
-- Sidebar: the regional hub stations (`spec.md`), searchable, multi-select.
+- Sidebar: the regional hub stations (`pipeline/spec.md`), searchable, multi-select.
 - Shown: the regional route cores connected to a selected hub, their paths, the line runs these use.
 - Nodes: the junctions and terminals on the shown lines, labelled. A path that ends at a stopping station just ends
   there, unlabelled.
@@ -138,8 +137,8 @@ Where it lives and its stack: see `todo.md`, "Frontend project". The structure b
 - `tests.yml`: a job running `npm ci`, `npm run check` (types, lint) and `npm test` in `web/`.
 - `pages.yml`: also run the `network` step and `npm run build`; the app goes to `site/app/`.
 - A Stop hook like `gradle-check.sh` for changes under `web/`.
-- `ReadMe.md`: the new step in the task table, how to start the frontend. `ReadMe-development.md`: the frontend
-  checks.
+- `pipeline/ReadMe.md`: the new step in the task table. `web/ReadMe.md`: how to start the frontend.
+  `web/ReadMe-development.md`: the frontend checks.
 
 ## 5. Increments
 
@@ -147,10 +146,10 @@ Where it lives and its stack: see `todo.md`, "Frontend project". The structure b
    printed summary. Done; the rule for consistent spans is `SpanRule`, separate from the `DetourRule` of `Lines.kt`,
    which compares with the fastest trip and counts the stop at the end as well.
 2. **Review the warnings** on the real data: duplicate station IDs into `stationParts`, tune the two numbers of the
-   rule. Findings go to `gtfs_findings.md`.
+   rule. Findings go to `pipeline/gtfs_findings.md`.
 3. **Services**: route cores, stop patterns, paths, regional hub stations in `services.json`; tests for the path
    search and the regional hub stations.
-4. **Frontend scaffold**, once its place and stack are decided: checks, CI, Pages, Dependabot; decoder and indexes
+4. **Frontend scaffold**: checks, CI, Pages, Dependabot; decoder and indexes
    with tests against the JSON written from `mini_gtfs`.
 5. **Viewer**: hub selection, drawing, fitting, labels.
 6. **Viewer**: route list with highlighting, tooltip, mode toggle.

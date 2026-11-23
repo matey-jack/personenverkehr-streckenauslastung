@@ -7,9 +7,9 @@ import java.nio.file.Path
 import kotlin.io.path.exists
 
 /**
- * Step 1 – basic data filtering (see spec.md, "Basic data filtering").
+ * Step 1 – basic data filtering (see pipeline/spec.md, "Basic data filtering").
  *
- * Keeps only routes with route_type 100..199 (rail, see "Extended GTFS Route Types.md"),
+ * Keeps only routes with route_type 100..199 (rail, see "pipeline/Extended GTFS Route Types.md"),
  * then the trips, stop_times, stops, calendar data and agencies that belong to them.
  * Output: one Parquet file per GTFS table in [outDir].
  *
@@ -87,7 +87,7 @@ fun main(args: Array<String>) {
     require(args.size == 2) { "usage: FilterRail <gtfs-dir> <out-dir>" }
     val gtfsDir = Path.of(args[0])
     require(gtfsDir.resolve("routes.txt").exists()) {
-        "No routes.txt in '$gtfsDir'. Download and unpack the GTFS data set first (see ReadMe.md)."
+        "No routes.txt in '$gtfsDir'. Download and unpack the GTFS data set first (see pipeline/ReadMe.md)."
     }
     filterRail(gtfsDir, Path.of(args[1]))
 }

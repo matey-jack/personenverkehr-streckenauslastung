@@ -1,50 +1,16 @@
 # Personenverkehr Streckenauslastung
 
-This project uses German [GTFS data from Delfi]. Since the dataset is 40 GB large, I did not commit it to the repository. Unpack it into the folder `20261109_fahrplaene_gesamtdeutschland_gtfs` to run the project.
+Estimates the operational timetables of German railway lines from the published timetable, to visualize them and the
+capacity usage of the lines. [spec.md](spec.md) describes the aim and the terms in detail.
 
-[GTFS data from Delfi]: https://www.opendata-oepnv.de/ht/de/organisation/delfi/startseite?tx_vrrkit_view%5Baction%5D=details&tx_vrrkit_view%5Bcontroller%5D=View&tx_vrrkit_view%5Bdataset_name%5D=deutschlandweite-sollfahrplandaten-gtfs&cHash=af4be4c0a9de59953fb9ee2325ef818f
+The project has two parts, each in a folder of its own:
 
-A condensed and compressed view of the data, however, is part of the repository, so that a lot of the code can be run without the download.
+- [pipeline/](pipeline/ReadMe.md): Kotlin programs that read the published timetable (GTFS), derive the network and
+  timetables from it and write them as data files, plus HTML reports to check them.
+- `web/`: the frontend that shows the data written by the pipeline: the network viewer and later the timetable pages.
 
 ## Way of working
 
 I am always writing the spec and docs first, often using present tense even for things that are not implemented yet. There's `todo.md` which breaks the things to implement into increments that I'll test and review individually.
 
-## Technology
-
-- **Kotlin** (on the JVM, Java 25) for all programs: data preparation, the train-physics model, fitting, and later serving the visualizations.
-- **[DuckDB](https://duckdb.org/)** (embedded, via JDBC) for filtering the GTFS CSV files and for exploration queries. It runs in memory; there is no database file.
-- **[Parquet](https://parquet.apache.org/)** files for intermediate results (compressed, columnar, readable by DuckDB, Python/Polars, pandas, …). Small human-facing reports are CSV.
-- **[kotlinx.html](https://github.com/Kotlin/kotlinx.html)** for writing HTML reports.
-- **Gradle** with the wrapper (`./gradlew`), so no separate Gradle installation is needed. If no JDK 25 is installed, Gradle downloads one automatically.
-
-Why not H2: it is row-oriented and built for transactional workloads, slow at bulk imports and large aggregations, and its file format changes between major versions, which is bad for data files committed to the repository.
-
-## Running
-
-Each pipeline step is a separate Gradle task (`./gradlew tasks --group pipeline` lists them). On Windows use `gradlew.bat` instead of `./gradlew`.
-
-| Task | Input | Output |
-|---|---|---|
-| `./gradlew filterRail` | `20261109_fahrplaene_gesamtdeutschland_gtfs/*.txt` | `data/rail/*.parquet`: routes with `route_type` 100–199 and their trips, stop_times, stops (incl. parent stations), calendar, calendar_dates, agency |
-| `./gradlew tripGroups` | `data/rail/*.parquet` | `data/reports/trip_groups.csv`: for each route, the groups of trips with the same sequence of stations; `data/reports/trip_groups_top.csv`: only the most frequent group of each route |
-| `./gradlew routeCores` | `data/rail/*.parquet` | `data/reports/route_cores.csv`: the route core and route core candidates of each route (columns are described in `RouteCores.kt`) |
-| `./gradlew hubStations` | `data/rail/*.parquet` | `data/reports/hub_stations.html`: a page to browse the route cores by hub station |
-| `./gradlew longDistanceStations` | `data/rail/*.parquet` | `data/reports/long-distance_stations.html`: the stations with the most long-distance trip-days, with the numbers of long-distance and regional routes stopping there. `-Ptop=150` sets the number of stations |
-| `./gradlew lines` | `data/rail/*.parquet` | `data/reports/lines.html`: for each testing route, its reconstructed line with the times of a few real trains and warnings about an uncertain order, and the routes stopping at each station. `-PstopAllowance=180` and `-PdetourFactor=1.5` set the numbers in the rule for detours |
-| `./gradlew network` | `data/rail/*.parquet` | `data/network/network.json`: the regional rail network, its nodes and lines (the format is described in `Network.kt`); `data/reports/network_warnings.csv`: the suspicious hops and lines, with the travel times and trip days of everything involved. `-PdetourFactor=1.33`, `-PstopAllowance=180` (per stop), `-PextraAllowance=120` (seconds) and `-PminDates=10` set the numbers of the rules |
-| `./gradlew routeCounts` | `data/rail/*.parquet` | stdout: the numbers of routes by short-name prefix (the part before the first digit) and `route_type`, by each of them alone, by prefix, `route_type` and agency, and by agency alone |
-
-Paths can be overridden, e.g. `./gradlew filterRail -Pgtfs=/path/to/gtfs -Pout=data/rail`.
-
-On every push to `main`, GitHub Actions writes the HTML reports and deploys them to GitHub Pages, with the hub stations page as start page (`.github/workflows/pages.yml`).
-
-`./gradlew test` runs the tests against a tiny hand-made GTFS data set in `src/test/resources/mini_gtfs`.
-
-Static checks, CI and the rules for working on the code (for example: no merges) are described in [ReadMe-development.md](ReadMe-development.md).
-
-Data conventions in the Parquet files:
-- All GTFS columns are kept as text, so IDs keep any leading zeros. Exceptions: `route_type` and `stop_sequence` are integers.
-- `stop_times` gets two extra columns `arrival_secs` / `departure_secs`: seconds since midnight of the service day. GTFS times can be 24:00:00 or later for trips running past midnight, so these can exceed 86400.
-
-GitHub rejects files over 100 MB. Check the size of `data/rail/*.parquet` before committing it.
+The rules for working on the code (for example: no merges) are described in [ReadMe-development.md](ReadMe-development.md).

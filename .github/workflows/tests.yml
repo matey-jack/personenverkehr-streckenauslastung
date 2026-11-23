@@ -30,6 +30,7 @@ jobs:
 
       # ktlint, compiler with warnings as errors, and unit tests.
       - name: Lint, compile and test
+        working-directory: pipeline
         run: ./gradlew check
 
       - name: Upload test report
@@ -38,5 +39,5 @@ jobs:
         with:
           name: reports
           path: |
-            build/reports/tests/test/
-            build/reports/ktlint/
+            pipeline/build/reports/tests/test/
+            pipeline/build/reports/ktlint/

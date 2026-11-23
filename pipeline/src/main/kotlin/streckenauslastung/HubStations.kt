@@ -51,10 +51,10 @@ internal data class ListedRoute(
     val stops = stationIds.toSet() - ends
 }
 
-/** Stations with a rank of their own (see spec.md), by station ID. This one is Berlin Hauptbahnhof. */
+/** Stations with a rank of their own (see pipeline/spec.md), by station ID. This one is Berlin Hauptbahnhof. */
 private val assignedRanks = mapOf("de:11000:900003201" to 20)
 
-/** A hub station with the route cores [ending] and [stopping] there (see spec.md for the terms). */
+/** A hub station with the route cores [ending] and [stopping] there (see pipeline/spec.md for the terms). */
 internal class Hub(
     val stationId: String,
     val rank: Int,
@@ -65,7 +65,7 @@ internal class Hub(
 /** The [hubs] in their order and the [isolated] route cores, all in their direction as listed. */
 internal class HubOverview(val hubs: List<Hub>, val isolated: List<ListedRoute>)
 
-/** Groups [routes] by hub station (see spec.md, "Ideas on meaningfully grouping the Routes (via their route cores)"). */
+/** Groups [routes] by hub station (see pipeline/spec.md, "Ideas on meaningfully grouping the Routes (via their route cores)"). */
 internal fun hubOverview(routes: List<ListedRoute>, stationNames: Map<String, String>): HubOverview {
     fun byStation(routes: List<ListedRoute>, stations: (ListedRoute) -> Set<String>) =
         HashMap<String, MutableList<ListedRoute>>().also { map ->
@@ -129,7 +129,7 @@ internal fun listedRoutes(routes: List<Route>): List<ListedRoute> = routes
     }
     .distinctBy { Triple(it.type, it.shortName, it.ends) }
 
-/** Names of the route types occurring in the German data, see `Extended GTFS Route Types.md`. */
+/** Names of the route types occurring in the German data, see `pipeline/Extended GTFS Route Types.md`. */
 private val routeTypeNames = mapOf(
     100 to "Railway",
     101 to "High Speed",
@@ -257,7 +257,7 @@ internal fun hubStationsPage(overview: HubOverview, stationNames: Map<String, St
 }
 
 /**
- * Data exploration (see spec.md, "Ideas on meaningfully grouping the Routes (via their route cores)"):
+ * Data exploration (see pipeline/spec.md, "Ideas on meaningfully grouping the Routes (via their route cores)"):
  * writes an HTML page of the hub stations with their route cores, followed by the isolated route cores.
  */
 fun hubStations(railDir: Path, outFile: Path) {

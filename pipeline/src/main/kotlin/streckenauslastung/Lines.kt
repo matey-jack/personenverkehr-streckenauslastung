@@ -32,7 +32,7 @@ import java.nio.file.Path
 import kotlin.math.roundToInt
 import kotlin.math.sign
 
-/** The route cores used for testing (see the old test page in spec.md), by their ID. */
+/** The route cores used for testing (see the old test page in pipeline/spec.md), by their ID. */
 internal val testRouteIds = listOf(
     "2233941_106",
     "7149172_106",
@@ -47,7 +47,7 @@ internal class TripTimes(val arrivals: List<Long?>, val departures: List<Long?>)
 /**
  * All trips of the route [routeId] that stop at the same [stations] in the same order. [arrivals]
  * and [departures] are the seconds at each stop of the fastest of these trips, null where the data
- * has no time. [medianTrip] is their median trip (see the old test page in spec.md).
+ * has no time. [medianTrip] is their median trip (see the old test page in pipeline/spec.md).
  */
 internal class Run(
     val routeId: String,
@@ -328,7 +328,7 @@ internal fun longestStretch(run: Run, place: Map<String, Int>, index: RunIndex):
 internal const val ADDITIONAL_TRAINS = 3
 
 /**
- * A train whose times are shown along the line (see the old test page in spec.md): the median
+ * A train whose times are shown along the line (see the old test page in pipeline/spec.md): the median
  * trip of the run of [stretch]. [core] is the route core its trips belong to, if any.
  */
 internal class TimedTrain(val stretch: Stretch, val route: Route, val core: RouteCore?) {
@@ -429,7 +429,7 @@ internal class LineReport(
     /** The routes of the trips [againstOrder]. */
     fun routes(againstOrder: AgainstOrder) = routeOf.values.distinct().filter { it.id in againstOrder.routeIds }
 
-    /** The names of the relevant routes on this line (see the old test page in spec.md). */
+    /** The names of the relevant routes on this line (see the old test page in pipeline/spec.md). */
     private val routeLabels: Map<Route, String> = run {
         val stopping = stops.flatMap { stop -> stop.core.map(routeOf::getValue) + stop.other }
         val relevant = (stopping + routeOf.getValue(core)).distinct()
@@ -700,7 +700,7 @@ internal fun linesPage(
 }
 
 /**
- * Writes the test page of the route cores [coreRouteIds] (see the old test page in spec.md).
+ * Writes the test page of the route cores [coreRouteIds] (see the old test page in pipeline/spec.md).
  */
 fun lines(railDir: Path, outFile: Path, coreRouteIds: List<String>, rule: DetourRule = DetourRule()) {
     outFile.toAbsolutePath().parent?.let { Files.createDirectories(it) }

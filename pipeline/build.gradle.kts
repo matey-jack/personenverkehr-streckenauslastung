@@ -43,8 +43,8 @@ tasks.test {
     jvmArgs(enableNativeAccess)
 }
 
-// Each step of the pipeline is a separately runnable program (see ReadMe.md, "Program architecture").
-// Paths are relative to the project root; override with -Pgtfs=... / -Pout=... if needed.
+// Each step of the pipeline is a separately runnable program (see spec.md, "Program architecture").
+// Paths are relative to pipeline/; override with -Pgtfs=... / -Pout=... if needed.
 fun registerStep(name: String, mainClass: String, description: String, args: () -> List<String>) =
     tasks.register<JavaExec>(name) {
         group = "pipeline"

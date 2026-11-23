@@ -7,7 +7,7 @@ import java.nio.file.Path
 import java.sql.Connection
 
 /**
- * Data exploration, first task (see spec.md, "Data exploration"):
+ * Data exploration, first task (see pipeline/ReadMe-development.md, "Data exploration"):
  * for each rail route, group its trips by the stations they serve and count the trips per group.
  *
  * Choices made here (to be reviewed):
@@ -48,7 +48,7 @@ fun tripGroups(railDir: Path, outFile: Path, topFile: Path) {
     }
 }
 
-/** Names given to stations by station ID, in place of those in the data (see gtfs_findings.md, "Station names"). */
+/** Names given to stations by station ID, in place of those in the data (see pipeline/gtfs_findings.md, "Station names"). */
 private val stationNameFixes = mapOf(
     "de:08111:6115" to "Stuttgart Hbf",
     "de:08111:6118" to "Stuttgart Hbf (tief)",
@@ -58,13 +58,13 @@ private val stationNameFixes = mapOf(
     "de:09185:90261" to "Brunnen(Oberbayern)",
 )
 
-/** Short names given to routes by route_id, in place of those in the data (see gtfs_findings.md, "Route names"). */
+/** Short names given to routes by route_id, in place of those in the data (see pipeline/gtfs_findings.md, "Route names"). */
 private val routeNameFixes = mapOf(
     "7149172_106" to "RE21", // RB21 of Erfurter Bahn Express, Erfurt – Gera
 )
 
 /**
- * Each station ID on the left counts as the station on the right (see gtfs_findings.md, "A station
+ * Each station ID on the left counts as the station on the right (see pipeline/gtfs_findings.md, "A station
  * can have several station IDs").
  */
 private val stationParts = mapOf(

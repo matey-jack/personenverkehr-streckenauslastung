@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Claude Code Stop hook: when Claude finishes a turn and Kotlin/Gradle files have changed
-# (uncommitted, or committed but not yet pushed), run `./gradlew check`: ktlint, the compiler
+# Claude Code Stop hook: when Claude finishes a turn and files of the pipeline have changed
+# (uncommitted, or committed but not yet pushed), run its `./gradlew check`: ktlint, the compiler
 # with warnings as errors, and the tests.
 # On failure it exits with code 2, which makes Claude Code show the output to Claude and let it
 # continue to fix the problem. If the check fails again on that follow-up stop, the hook only
@@ -10,8 +10,9 @@ cd "${CLAUDE_PROJECT_DIR:-$(dirname "$0")/../..}" || exit 0
 input=$(cat)
 
 changed=$( { git status --porcelain | cut -c4-; git diff --name-only '@{upstream}...HEAD' 2>/dev/null; } |
-    grep -E '\.(kt|kts)$|^src/|^gradle/|^\.editorconfig$' )
+    grep -E '^pipeline/(src/|gradle/|[^/]*\.kts$)|^\.editorconfig$' )
 [ -z "$changed" ] && exit 0
+cd pipeline || exit 0
 
 if output=$(./gradlew check -q --console=plain 2>&1); then
     exit 0

@@ -1,10 +1,10 @@
 # Keeps libraries, Gradle plugins, Kotlin, Gradle itself and the GitHub Actions on their latest
 # stable versions. The JDK is not a dependency here: it stays on the latest LTS and is upgraded
-# by hand (see ReadMe-development.md).
+# by hand (see pipeline/ReadMe-development.md).
 version: 2
 updates:
   - package-ecosystem: gradle
-    directory: /
+    directory: /pipeline
     schedule:
       interval: weekly
     groups:

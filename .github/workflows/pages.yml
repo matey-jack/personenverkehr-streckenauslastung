@@ -28,13 +28,14 @@ jobs:
       - uses: gradle/actions/setup-gradle@v6
 
       - name: Write the HTML reports
+        working-directory: pipeline
         run: ./gradlew hubStations lines longDistanceStations
 
       # The hub stations page is the start page of the site.
       - name: Collect the HTML reports
         run: |
           mkdir site
-          cp data/reports/*.html site/
+          cp pipeline/data/reports/*.html site/
           mv site/hub_stations.html site/index.html
 
       - uses: actions/configure-pages@v6

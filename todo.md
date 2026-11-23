@@ -2,6 +2,10 @@
 
 Increments to implement, test and review one at a time.
 
+Each increment lives in exactly one todo file: one that concerns only the pipeline or only the frontend goes to
+`pipeline/todo.md` or `web/todo.md` (created with their first item), one that touches both
+stays here as a whole and is not cut into a pipeline part and a frontend part.
+
 Maybe create a visual glossary of all the terms, maybe as a simple Mermaid flowchart. But only after cleaning the doc.
 Make sure to include all terms, even those defined outside the "definitions" section.
 
@@ -16,7 +20,7 @@ Pragmatic definitions:
    if none of them has a weekly pattern and together they run on fewer than 10 dates. (Delfi publishes many regular
    trips as lists of a few dates each; applied per trip, the rule would exclude 42% of the regional trips.)
  - The 10-date rule does not apply to route cores: they are computed from all trips of their route, as everywhere.
- - The hub stations offered by the viewer are the regional hub stations (see `spec.md`).
+ - The hub stations offered by the viewer are the regional hub stations (see [pipeline/spec.md](pipeline/spec.md)).
 
 Validate this the following way:
 
@@ -33,25 +37,16 @@ Validate this the following way:
 - Also, when hovering over a line, show a tooltip with all the route cores passing there, and below a separator all
   the other routes with at least one trip passing there.
 
-### Frontend project (proposal, to be decided)
+### Frontend project
 
-The viewer starts a frontend of its own, which the timetable pages later share, all on the same network and
-timetable data.
+The viewer starts a frontend of its own in `web/`, beside `pipeline/`, which the timetable pages later share, all on
+the same network and timetable data. In one repository, the data format, the pipeline that writes it and the app that
+reads it change in one commit, and the Pages workflow deploys both. (A repository of its own would need the data
+published and versioned between the two.)
 
-Where it lives, one of:
-
-- a folder `web/` in this repository, beside the Kotlin code at the root;
-- PREFERRED: two sub-folders, `pipeline/` for the Kotlin code and `web/` for the frontend, so both are clearly 
-  separated.
-  + Everything used by the pipeline only moves under the pipeline/ directory, including all data files and Gradle files.
-  + ReadMe.md is broken into a generic one at the root and a pipeline-specific one in pipeline/. (And one in web/ to be 
-    added.)
-  + the Github workflows and the Stop hook need their paths changed; maybe we need another Stop hook for the TypeScript 
-    checker and some logic to know which one to run?
-- REJECTED: a repository of its own, which would need the data published and versioned between the two.
-
-In one repository, the data format, the pipeline that writes it and the app that reads it change in one commit, and
-the Pages workflow deploys both.
+To set up with the frontend: its `ReadMe.md`, `ReadMe-development.md` and a `CLAUDE.md` pointing to the latter, as in
+`pipeline/`; its `.gitignore`; an `npm` entry in `.github/dependabot.yml`; a Stop hook for its checks beside
+`gradle-check.sh`, each running only when files of its own part changed.
 
 Stack: Vite with strict TypeScript as a static site on GitHub Pages; Preact (optionally with Signals) for both HTML 
 and SVG; Vitest and biome. (I used this stack in a previous app to my great satisfaction.)
