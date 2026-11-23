@@ -57,15 +57,18 @@ similar; to be described.
 
 ## Adding junctions that are not stations
 
-In the GTFS-derived data, lines always branch of at stations, which is an acceptable approximation for regional lines
-where the distance from the station to the actual physical junction is not large. On long-distance lines this is more
-pressing, because the distances and thus errors are so much bigger. On local lines with only a few km between stations,
-junctions will only be displaced by that much, because the derivation algorithm always assumes the station to be a
-junction.
+In the GTFS-derived data, lines always branch off at stations, which is an acceptable approximation for regional lines
+where the distance from the station to the actual physical junction is not large. On long-distance lines this causes large inaccuracies, because the distances and thus errors are so much bigger. 
 
-Thus, we'll later define another manual input format for defining the positions of such junctions. But for now, we'll
-build everything above in a way that it gives as good results as possible, even with the missing
-junctions.
+Since all line segments in our derived network originate from a hop in the GTFS timetable, all junctions that we add will replace at least two hop-based line segments with at least one junction and three new segments. For example, hops Leipzig–Erfurt and Halle–Erfurt are replaced with the new junction Planena and the sections Halle–Planena, Leipzig–Planena, and Planena–Erfurt. All new sections inserted this way need a length property, since we don't have travel time information to estimate the position of the junction. In the general case, there can be more hops that are replaced together by several junctions, including existing stations, and more than two sections. The Mannheim-Stuttgart line is a good example of this. In important case is also that a hop like Aschaffenburg to Würzburg or Karlsruhe to Mannheim is replaced by turning an existing station on a regional line into a junction and connecting it with a new junction on a "direct line". This allows the pathing algorithm to use the combination of regional and direct line instead of having to guess whether the hop defines its own line section or not.
+
+Ironically, the data format for this will be exactly (or very close) to what Claude Fable suggest for the case. (But at the time I wasn't ready to see it.) I would create a separate json5 file for each subnetwork and include the following parts:
+ - declaration of GTFS stations to connect to: station ID plus a short name to be used in the remainder of the file.
+ - declaration of new junctions: a name and geo-coordinates. The name must be globally unique among junctions, so that the program can use `Abzweig $name` as an ID that will automatically be different from any station names.
+ - list of hops that are to be replaced or re-routed via the new junctions. This data will also be accessed by the network-derivation algorithm, automatically taking the hint that this hop is to be routed via the declared subnetwork.
+ - finally list of new sections with their length in km.
+ 
+
 
 ## Later
 
