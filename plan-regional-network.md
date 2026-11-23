@@ -32,13 +32,37 @@ My reading of the spec, as the `network` step will implement it:
   warning; so does a hop that some span with more stops runs faster than the hop itself.
 - **Lines**: chains of sections between junctions and terminals. A ring without any junction is one line, starting
   and ending at its alphabetically first station. Lines are listed from the end with the alphabetically earlier name.
-- **Paths**: for each two consecutive stops of a trip, the paths through the sections between them that the detour
-  rule allows (a search that stops at that time limit); of these, the one whose time matches the hop best. No path:
-  a warning. Two paths about equally good: a warning.
+- **Route cores** are computed in the `network` step itself, from all loaded regional trips (before the 10-date
+  rule), so their station IDs are those of the network.
+- **Paths** are found per hop and joined: the path of a stop pattern or route core is the paths of its hops in
+  order, with neighbouring runs on the same line in the same direction merged into one.
+  - A hop that is a line section takes that section, without a search.
+  - Any other hop is searched on the line graph: junctions and terminals, plus the two ends of the hop, which split
+    the lines they lie on. The candidates are the k shortest simple paths by the sum of the section medians (Yen's
+    algorithm, `-PpathCandidates=5`), of which those that the span rule allows with the passed stations as stops
+    between. (The rule itself is no bound for the search: its allowance per stop exceeds the time of many
+    sections.)
+  - Of these, the path whose estimated time matches the hop's median best. The estimate is the sum of the section
+    medians minus a saving for each station passed without stopping. The step measures that saving as the median
+    of (span − hop) / stops between over the consistent spans, and prints it.
+  - The hop's median is taken per stop pattern, so that two routes running non-stop between the same stations on
+    different lines each get their own line; the candidates are computed once per hop.
+- **Checks**: every line section is the path of at least one hop (itself); if not, the step fails.
 - **Warnings** are printed as a summary and written to `data/reports/network_warnings.csv`, each with the median
-  travel times and trip days of the hops involved. Kinds: inconsistent spans, faster spans, two lines between the
-  same junctions (usually duplicate station IDs, see `pipeline/gtfs_findings.md`), loops, rings, unconnectable or
-  ambiguous paths.
+  travel times and trip days of the hops involved. Kinds:
+  - from the derivation: inconsistent spans, faster spans, two lines between the same junctions (usually duplicate
+    station IDs, see `pipeline/gtfs_findings.md`), loops, rings;
+  - from the paths:
+    - *unconnectable*: no path between the ends of a hop; the path of its route core is `null`, and the hop adds
+      nothing to the coverage of its route. Expected only for route cores, whose trips may be left out of the
+      network by the 10-date rule.
+    - *ambiguous*: the two best candidates use different lines and their estimates are within 60 s or 10 % of
+      each other.
+    - *detour*: no candidate is allowed by the span rule; the shortest one is taken.
+    - *reversal*: a path uses a line section twice, for example into a branch and back.
+    - *route core left out*: the typical stop sequence of a route core is in no stop pattern kept by the
+      10-date rule.
+  - The summary also counts the hops pathed directly, by search, ambiguous and as detour.
 - A **loop** is a line whose two ends are the same junction: it leaves the junction and comes back to it, so it
   hangs on the rest of the network at that one node. A **ring** is a closed chain of stopping stations without any
   junction: it does not touch the rest of the network at all, and its start is arbitrary. Both can be real (a
@@ -64,17 +88,21 @@ only the second.
 
 **Services** (refers to the network by index):
 
-- **Route**: ID, short name (after `routeNameFixes`), route type, agency.
+- **Route**: ID, short name (after `routeNameFixes`), route type, agency, coverage.
 - **Route core**: its route, suffix, trip days, typical stop sequence and path.
-- **Stop pattern** (the trip group of `TripGroups.kt`, after the 10-date rule): its route, stops, number of trips,
-  trip days and path. These are the untimed trips of this iteration; timed trips later each refer to a stop pattern.
 - **Hub station**: node and rank of each regional hub station, in hub order.
 
 A **path** is a list of runs along lines: (line, from position, to position), where from > to means against the
 direction in which the line is listed. The stops are a subsequence of the nodes along the path.
 
-The frontend builds the reverse index itself (section → route cores and routes passing it): a few hundred thousand
-entries, cheaper to compute than to download.
+The **coverage** of a route is where its trips run: for each line that the path of one of its stop patterns (the trip
+groups of `TripGroups.kt`, after the 10-date rule) uses, the range from the lowest to the highest position used,
+as a run with from < to. It rounds up only where a route uses two separate parts of one line. The stop patterns
+themselves are pathed for the coverage and the warnings, but not stored; the timed trips of a later iteration get a
+table of their own.
+
+The frontend builds the reverse index itself (section → route cores passing it, routes covering it): cheaper to
+compute than to download.
 
 ### JSON representation
 
@@ -82,12 +110,12 @@ entries, cheaper to compute than to download.
   repeated per row, and one generic decoder turns any table into rows.
 - **References are array indices**, never IDs. GTFS IDs like `de:VBB:11000000|R-Bahn|RE2:DB_106` appear once.
 - **Coordinates as integers** in units of 10⁻⁵ degrees (about 1 m).
-- **Paths as flat integer arrays**: `[line, from, to, line, from, to, ...]`.
+- **Paths and coverages as flat integer arrays**: `[line, from, to, line, from, to, ...]`.
 - **Absent values as `null`**.
 - A header with `format` and `version` (raised on every incompatible change), the GTFS data set and the derivation
   parameters, so the frontend can refuse a file it does not understand.
-- No compression of our own: GitHub Pages serves JSON gzipped. Expected sizes: network about 0.5 MB, services about
-  2 MB before gzip.
+- No compression of our own: GitHub Pages serves JSON gzipped. Expected sizes: network about 0.5 MB, services well
+  under that, before gzip.
 
 ```json
 {
@@ -101,9 +129,8 @@ entries, cheaper to compute than to download.
 ```json
 {
   "format": "streckenauslastung-services", "version": 1, "network": {"version": 1},
-  "routes": {"id": ["…"], "shortName": ["RE2", "…"], "type": [106, "…"], "agency": ["DB Regio", "…"]},
+  "routes": {"id": ["…"], "shortName": ["RE2", "…"], "type": [106, "…"], "agency": ["DB Regio", "…"], "coverage": [[3, 0, 3, 8, 0, 7], "…"]},
   "routeCores": {"route": [0, "…"], "suffix": ["a", "…"], "tripDays": [1230, "…"], "stops": [[0, 17, 4], "…"], "path": [[3, 0, 3, 8, 5, 0], "…"]},
-  "patterns": {"route": [0, "…"], "stops": [[0, 4], "…"], "trips": [12, "…"], "tripDays": [240, "…"], "path": [[3, 0, 3], "…"]},
   "hubs": {"node": [4, "…"], "rank": [20, "…"]}
 }
 ```
@@ -135,9 +162,14 @@ Where it lives and its stack: see `todo.md`, "Frontend project".
   transition whenever these change.
 - Mode toggle: straight lines between consecutive junctions, terminals and path ends, or one segment per section
   with the stops as small dots.
-- Route list in natural order of the names; clicking one highlights its path and dims the rest.
-- Tooltip on a line piece (the section in segment mode): the route cores passing it, a separator, the other routes
-  with a stop pattern passing it.
+- Route list in natural order of the names; clicking one highlights it and dims the rest: the paths of its route
+  cores bold, the rest of its coverage thin. The cores are drawn over the coverage, which may miss a core whose stop
+  sequence the 10-date rule leaves out.
+- Tooltip on a line piece (the section in segment mode): the route cores passing any of its sections, a separator,
+  the other routes covering any of them. Since pieces depend on the shown path ends, the frontend
+  joins the sections of a piece when hovering. Trips left out by the 10-date rule do not count. Short names are
+  listed once each; two different routes with the same short name get the suffixes `-1`, `-2`, … in the order of
+  their IDs, as in `lines.html`.
 
 ### CI and docs
 
@@ -154,7 +186,7 @@ Where it lives and its stack: see `todo.md`, "Frontend project".
    which compares with the fastest trip and counts the stop at the end as well.
 2. **Review the warnings** on the real data: duplicate station IDs into `stationParts`, tune the two numbers of the
    rule. Findings go to `pipeline/gtfs_findings.md`.
-3. **Services**: route cores, stop patterns, paths, regional hub stations in `services.json`; tests for the path
+3. **Services**: routes with their coverage, route cores with their paths, regional hub stations in `services.json`; tests for the path
    search and the regional hub stations.
 4. **Frontend scaffold**: checks, CI, Pages, Dependabot; decoder and indexes
    with tests against the JSON written from `mini_gtfs`.
