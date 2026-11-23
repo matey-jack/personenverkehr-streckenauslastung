@@ -138,15 +138,17 @@ registerStep(
 registerStep(
     "network",
     "streckenauslastung.NetworkKt",
-    "Derive the regional rail network and write it as JSON, with a report of its warnings.",
+    "Derive the regional rail network and the routes on it, write them as JSON, with a report of the warnings.",
 ) {
     listOf(
         (findProperty("rail") ?: "data/rail").toString(),
         (findProperty("out") ?: "data/network/network.json").toString(),
+        (findProperty("servicesOut") ?: "data/network/services.json").toString(),
         (findProperty("warnings") ?: "data/reports/network_warnings.csv").toString(),
         (findProperty("stopAllowance") ?: "180").toString(),
         (findProperty("detourFactor") ?: "1.33").toString(),
         (findProperty("extraAllowance") ?: "90").toString(),
         (findProperty("minDates") ?: "10").toString(),
+        (findProperty("pathCandidates") ?: "5").toString(),
     )
 }

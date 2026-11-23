@@ -59,7 +59,7 @@ private val stationNameFixes = mapOf(
 )
 
 /** Short names given to routes by route_id, in place of those in the data (see pipeline/gtfs_findings.md, "Route names"). */
-private val routeNameFixes = mapOf(
+internal val routeNameFixes = mapOf(
     "7149172_106" to "RE21", // RB21 of Erfurter Bahn Express, Erfurt – Gera
 )
 

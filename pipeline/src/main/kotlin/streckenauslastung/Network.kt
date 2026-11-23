@@ -100,6 +100,14 @@ internal enum class WarningKind(val label: String, val text: String) {
     PARALLEL_LINES("parallel-lines", "two or more lines connect the same two stations"),
     LOOP("loop", "a line starts and ends at the same junction"),
     RING("ring", "a line forms a ring without any junction"),
+    UNCONNECTABLE("unconnectable", "no way through the network connects the two stations of a hop"),
+    AMBIGUOUS("ambiguous", "two ways on different lines match the travel time of a hop about equally well"),
+    DETOUR("detour", "no way between the two stations of a hop is allowed by the span rule; the shortest is taken"),
+    REVERSAL("reversal", "the path of a stop pattern or route core uses a line section twice"),
+    CORE_LEFT_OUT(
+        "route-core-left-out",
+        "the typical stop sequence of a route core is in no stop pattern kept by the 10-date rule",
+    ),
 }
 
 /** A warning of the kind [kind] about the [stations] (the ends of the hop or lines), with what is [involved]. */
@@ -113,11 +121,17 @@ internal class NetLine(val stations: List<String>, val sections: List<TravelTime
     val isRing get() = stations.first() == stations.last() && stations.size > 2
 }
 
-/** The derived network: its line sections with their travel times, its lines and the warnings. */
+/**
+ * The derived network: all [hops] and its line [sections] with their travel times, its lines and the
+ * warnings. [passSavingSecs] is the time a train saves for each station it passes without stopping:
+ * the median of (span − hop) / stops between over the consistent spans, counted in trip days.
+ */
 internal class Network(
+    val hops: Map<Hop, TravelTimes>,
     val sections: Map<Hop, TravelTimes>,
     val lines: List<NetLine>,
     val warnings: List<NetworkWarning>,
+    val passSavingSecs: Long,
 ) {
     val degree: Map<String, Int> = HashMap<String, Int>().also { degree ->
         for (section in sections.keys) for (station in listOf(section.a, section.b)) degree.merge(station, 1, Int::plus)
@@ -140,6 +154,7 @@ internal fun deriveNetwork(patterns: List<StopPattern>, name: (String) -> String
     }
     val warnings = ArrayList<NetworkWarning>()
     val sections = LinkedHashMap<Hop, TravelTimes>()
+    val savings = TravelTimes()
     for ((hop, hopTimes) in hops) {
         val spans = spans(hop, at)
         val hopSecs = hopTimes.median()
@@ -160,6 +175,9 @@ internal fun deriveNetwork(patterns: List<StopPattern>, name: (String) -> String
             sections[hop] = hopTimes
             if (spans.isNotEmpty()) warn(WarningKind.INCONSISTENT_SPANS, spans)
         } else {
+            for ((stations, times) in consistent) {
+                savings.add((times.median() - hopSecs) / (stations.size - 2), times.tripDays)
+            }
             val faster = consistent.filter { rule.isFaster(it.value.median(), hopSecs) }
             if (faster.isNotEmpty()) warn(WarningKind.FASTER_SPAN, faster)
         }
@@ -167,7 +185,8 @@ internal fun deriveNetwork(patterns: List<StopPattern>, name: (String) -> String
     val lines = joinLines(sections, name)
     warnings += lineWarnings(lines)
     val order = compareBy<NetworkWarning> { it.kind }.thenBy(stationOrder(name)) { it.stations }
-    return Network(sections, lines, warnings.sortedWith(order))
+    val passSavingSecs = if (savings.tripDays > 0) savings.median() else 0
+    return Network(hops, sections, lines, warnings.sortedWith(order), passSavingSecs)
 }
 
 /**
@@ -192,7 +211,7 @@ private fun spans(hop: Hop, at: Map<String, List<Pair<StopPattern, Int>>>): Map<
 }
 
 /** Orders lists of stations by their names, then by their IDs. */
-private fun stationOrder(name: (String) -> String): Comparator<List<String>> = Comparator { x, y ->
+internal fun stationOrder(name: (String) -> String): Comparator<List<String>> = Comparator { x, y ->
     for ((a, b) in x.zip(y)) {
         val byName = name(a).compareTo(name(b))
         if (byName != 0) return@Comparator byName
@@ -265,8 +284,16 @@ private fun lineWarnings(lines: List<NetLine>): List<NetworkWarning> {
 /** The name and coordinates of a station; the coordinates are null if the data has none. */
 internal class StationInfo(val name: String, val lat: Double?, val lon: Double?)
 
-/** The regional trips and the stations of the rail data, and the number of [untimed] trips left out. */
-internal class RegionalInput(val trips: List<LoadedTrip>, val stations: Map<String, StationInfo>, val untimed: Int)
+/** The short name (after `routeNameFixes`), route type and agency name of a route. */
+internal class RouteInfo(val shortName: String, val type: Int, val agency: String?)
+
+/** The regional trips, routes and the stations of the rail data, and the number of [untimed] trips left out. */
+internal class RegionalInput(
+    val trips: List<LoadedTrip>,
+    val routes: Map<String, RouteInfo>,
+    val stations: Map<String, StationInfo>,
+    val untimed: Int,
+)
 
 /**
  * Loads the trips of the regional routes that run on at least one day (see todo.md,
@@ -282,6 +309,7 @@ internal fun loadRegionalTrips(railDir: Path): RegionalInput {
     val trips = ArrayList<LoadedTrip>()
     var untimed = 0
     val stations = HashMap<String, StationInfo>()
+    val routes = HashMap<String, RouteInfo>()
     val excluded = agenciesOnOwnTracks.joinToString { "'${it.replace("'", "''")}'" }
     openDuckDb().use { db ->
         createTripGroupTable(db, railDir)
@@ -332,6 +360,13 @@ internal fun loadRegionalTrips(railDir: Path): RegionalInput {
                 (rs.getArray(7).array as Array<*>).map { it.toString() }.toSet(),
             )
         }
+        db.forEachRow("""
+            SELECT r.route_id, r.route_short_name, r.route_type, ag.agency_name
+            FROM ${p("routes")} r LEFT JOIN ${p("agency")} ag USING (agency_id)
+        """) { rs ->
+            val id = rs.getString(1)
+            routes[id] = RouteInfo(routeNameFixes[id] ?: rs.getString(2) ?: "", rs.getInt(3), rs.getString(4))
+        }
         // The coordinates of a station are those of its own stop or, if the data has none, the mean of its parts.
         db.forEachRow("""
             SELECT so.station_id, coalesce(any_value(n.station_name), so.station_id),
@@ -346,7 +381,8 @@ internal fun loadRegionalTrips(railDir: Path): RegionalInput {
             stations[rs.getString(1)] = StationInfo(rs.getString(2), double(3), double(4))
         }
     }
-    return RegionalInput(trips, stations, untimed)
+    val regional = trips.map { it.routeId }.toSet()
+    return RegionalInput(trips, routes.filterKeys { it in regional }, stations, untimed)
 }
 
 /** The parameters the network is derived with. */
@@ -408,10 +444,13 @@ internal class NetworkFile(
 internal const val NETWORK_FORMAT = "streckenauslastung-network"
 internal const val NETWORK_VERSION = 1
 
+/** The IDs of the nodes of [network] in their order in the network file: by name, then ID. */
+internal fun nodeIds(network: Network, stations: Map<String, StationInfo>): List<String> =
+    network.lines.flatMap { it.stations }.distinct().sortedWith(compareBy({ stations.getValue(it).name }, { it }))
+
 /** The network file of [network]; [stations] gives the names and coordinates. */
 internal fun networkFile(network: Network, stations: Map<String, StationInfo>, source: NetworkSource): NetworkFile {
-    val ids = network.lines.flatMap { it.stations }.distinct()
-        .sortedWith(compareBy({ stations.getValue(it).name }, { it }))
+    val ids = nodeIds(network, stations)
     val index = ids.withIndex().associate { (i, id) -> id to i }
 
     fun coordinate(degrees: Double?) = degrees?.let { (it * 100_000).roundToInt() }
@@ -473,10 +512,21 @@ internal fun gtfsMetadata(railDir: Path): JsonObject? {
 
 /**
  * Derives the regional network from the rail data in [railDir] and writes it to [outFile] (see
- * [NetworkFile]) and its warnings to [warningsFile] (see [warningsCsv]).
+ * [NetworkFile]), the routes on it to [servicesFile] (see [ServicesFile]) and the warnings about both to
+ * [warningsFile] (see [warningsCsv]). [pathCandidates] is the number of ways searched per hop.
  */
-fun network(railDir: Path, outFile: Path, warningsFile: Path, rule: SpanRule = SpanRule(), minDates: Int = 10) {
-    for (f in listOf(outFile, warningsFile)) f.toAbsolutePath().parent?.let { Files.createDirectories(it) }
+fun network(
+    railDir: Path,
+    outFile: Path,
+    servicesFile: Path,
+    warningsFile: Path,
+    rule: SpanRule = SpanRule(),
+    minDates: Int = 10,
+    pathCandidates: Int = 5,
+) {
+    for (f in listOf(outFile, servicesFile, warningsFile)) {
+        f.toAbsolutePath().parent?.let { Files.createDirectories(it) }
+    }
     val input = loadRegionalTrips(railDir)
     val patterns = stopPatterns(input.trips, minDates)
 
@@ -491,8 +541,14 @@ fun network(railDir: Path, outFile: Path, warningsFile: Path, rule: SpanRule = S
         rule.stopAllowanceSecs,
         rule.extraSecs,
     )
+    val services = deriveServices(input, patterns, network, PathFinder(network, rule, pathCandidates))
+    val warnings = (network.warnings + services.warnings)
+        .sortedWith(compareBy<NetworkWarning> { it.kind }.thenBy(stationOrder(::name)) { it.stations })
     Files.writeString(outFile, Json.encodeToString(networkFile(network, input.stations, source)) + "\n")
-    Files.writeString(warningsFile, warningsCsv(network.warnings, ::name))
+    val servicesSource = ServicesSource(pathCandidates, network.passSavingSecs)
+    val ids = nodeIds(network, input.stations)
+    Files.writeString(servicesFile, Json.encodeToString(servicesFile(services, ids, servicesSource)) + "\n")
+    Files.writeString(warningsFile, warningsCsv(warnings, ::name))
 
     val routes = input.trips.map { it.routeId }.toSet()
     val keptRoutes = patterns.map { it.routeId }.toSet()
@@ -521,22 +577,41 @@ fun network(railDir: Path, outFile: Path, warningsFile: Path, rule: SpanRule = S
         ),
     )
     println("%,d lines -> %s".format(network.lines.size, outFile))
-    println("%,d warnings -> %s".format(network.warnings.size, warningsFile))
-    for ((kind, ofKind) in network.warnings.groupBy { it.kind }) {
+    println("%d s saved per station passed without stopping".format(network.passSavingSecs))
+    println("hops of stop patterns and route cores by how their path was found:")
+    for (outcome in PathOutcome.entries) {
+        println("  %,6d %s".format(services.outcomes[outcome] ?: 0, outcome.text))
+    }
+    val nodes = ids.toSet()
+    val summary = "%,d routes, %,d route cores (%,d without a path), %,d regional hub stations (%,d of them no node)"
+    println(
+        "$summary -> %s".format(
+            services.routes.size,
+            services.cores.size,
+            services.cores.count { it.path == null },
+            services.hubs.size,
+            services.hubs.count { it.stationId !in nodes },
+            servicesFile,
+        ),
+    )
+    println("%,d warnings -> %s".format(warnings.size, warningsFile))
+    for ((kind, ofKind) in warnings.groupBy { it.kind }) {
         println("  %,6d %s: %s".format(ofKind.size, kind.label, kind.text))
     }
 }
 
 fun main(args: Array<String>) {
-    require(args.size == 7) {
-        "usage: Network <rail-parquet-dir> <out-json> <warnings-csv> " +
-            "<stop-allowance-secs> <detour-factor> <extra-allowance-secs> <min-dates>"
+    require(args.size == 9) {
+        "usage: Network <rail-parquet-dir> <out-json> <services-json> <warnings-csv> " +
+            "<stop-allowance-secs> <detour-factor> <extra-allowance-secs> <min-dates> <path-candidates>"
     }
     network(
         Path.of(args[0]),
         Path.of(args[1]),
         Path.of(args[2]),
-        SpanRule(args[4].toDouble(), args[3].toLong(), args[5].toLong()),
-        args[6].toInt(),
+        Path.of(args[3]),
+        SpanRule(args[5].toDouble(), args[4].toLong(), args[6].toLong()),
+        args[7].toInt(),
+        args[8].toInt(),
     )
 }

@@ -436,7 +436,15 @@ class PipelineTest {
         filterRail(gtfs, tmp.resolve("rail"))
         val out = tmp.resolve("network.json")
         val warnings = tmp.resolve("network_warnings.csv")
-        network(tmp.resolve("rail"), out, warnings)
+        val servicesOut = tmp.resolve("services.json")
+        network(tmp.resolve("rail"), out, servicesOut, warnings)
+        val services = Json.decodeFromString<ServicesFile>(servicesOut.readText())
+        assertEquals(listOf("RE1"), services.routes.shortName)
+        assertEquals(listOf(listOf(0, 0, 2)), services.routes.coverage)
+        // The route core Aheim – Cstadt stops at Bdorf; T3 skips it.
+        assertEquals(listOf(listOf<Int?>(0, 1, 2)), services.routeCores.stops)
+        assertEquals(listOf(listOf(0, 0, 2)), services.routeCores.path)
+        assertEquals(emptyList(), services.hubs.node)
         val file = Json.decodeFromString<NetworkFile>(out.readText())
         assertEquals(listOf("Aheim Hbf", "Bdorf", "Cstadt"), file.nodes.name)
         assertEquals(listOf(5200000, 5210000, 5220000), file.nodes.lat)
@@ -554,6 +562,89 @@ class PipelineTest {
         )
         assertEquals(listOf("AB", "AD", "AE"), stopPatterns(trips, 10).map { it.stations.joinToString("") })
         assertEquals(4, stopPatterns(trips, 9).size)
+    }
+
+    @Test
+    fun `PathFinder takes sections, matches the travel time and reports ambiguous ways and detours`() {
+        // Three lines between the junctions J and K: via P (10 min), via S (10 min 10 s), via Q and R (20 min).
+        val patterns = listOf(
+            pattern("TJPKU", 0, 300, 600, 900, 1200),
+            pattern("TJSKU", 0, 300, 610, 910, 1210),
+            pattern("TJQRKU", 0, 300, 700, 1100, 1500, 1800),
+            pattern("YZ", 0, 100),
+        )
+        val network = deriveNetwork(patterns, { it }, SpanRule())
+        assertEquals(
+            listOf("JPK", "JQRK", "JSK", "JT", "KU", "YZ"),
+            network.lines.map { it.stations.joinToString("") },
+        )
+        val finder = PathFinder(network, SpanRule(), 5)
+        assertEquals(
+            listOf("JPK" to 600L, "JSK" to 610L, "JQRK" to 1200L),
+            finder.candidates("J", "K").map { it.stations.joinToString("") to it.secs },
+        )
+
+        fun path(x: String, y: String, secs: Long) = finder.path(x, y, secs).let { it.outcome to it.way?.runs }
+        assertEquals(PathOutcome.SECTION to listOf(LineRun(0, 2, 1)), path("K", "P", 300))
+        assertEquals(PathOutcome.AMBIGUOUS to listOf(LineRun(0, 0, 2)), path("J", "K", 600))
+        assertEquals(PathOutcome.MATCHED to listOf(LineRun(1, 3, 0)), path("K", "J", 1100))
+        // Even the shortest way takes far longer than the span rule allows.
+        assertEquals(PathOutcome.DETOUR to listOf(LineRun(0, 0, 2)), path("J", "K", 100))
+        assertEquals(PathOutcome.UNCONNECTABLE to null, path("J", "Z", 100))
+        assertEquals(
+            listOf(LineRun(3, 1, 0), LineRun(0, 0, 2), LineRun(4, 0, 1)),
+            path("T", "U", 1200).second,
+        )
+    }
+
+    @Test
+    fun `joinRuns merges neighbouring runs along the same line in the same direction`() {
+        assertEquals(
+            listOf(LineRun(0, 0, 3), LineRun(0, 3, 1), LineRun(1, 0, 2)),
+            joinRuns(listOf(LineRun(0, 0, 1), LineRun(0, 1, 3), LineRun(0, 3, 1), LineRun(1, 0, 1), LineRun(1, 1, 2))),
+        )
+    }
+
+    @Test
+    fun `deriveServices finds the paths of route cores, the coverage of routes and the regional hubs`() {
+        fun trip(route: String, stations: String, days: Long, vararg dates: Int): LoadedTrip {
+            val secs = stations.indices.map { 300L * it }
+            val times = TimedTrip(secs, secs, days)
+            val weekly = dates.isEmpty()
+            return LoadedTrip(
+                route,
+                stations.map {
+                    it.toString()
+                },
+                times,
+                weekly,
+                dates.map { "202611%02d".format(it) }.toSet(),
+            )
+        }
+        val trips = listOf(
+            trip("r1", "ABCD", 100),
+            trip("r1", "BC", 10),
+            trip("r2", "CE", 10),
+            // The route core of RB2 runs on too few dates for the network, beyond E to H.
+            trip("r2", "CEH", 50, 1, 2, 3),
+        )
+        val stations = "ABCDEH".map { it.toString() }.associateWith { StationInfo(it, 52.0, 13.0) }
+        val routes = mapOf("r1" to RouteInfo("RB1", 106, "DB"), "r2" to RouteInfo("RB2", 106, null))
+        val input = RegionalInput(trips, routes, stations, 0)
+        val patterns = stopPatterns(trips, 10)
+        val network = deriveNetwork(patterns, { it }, SpanRule())
+        assertEquals(listOf("ABC", "CD", "CE"), network.lines.map { it.stations.joinToString("") })
+        val services = deriveServices(input, patterns, network, PathFinder(network, SpanRule(), 5))
+        val file = servicesFile(services, nodeIds(network, stations), ServicesSource(5, network.passSavingSecs))
+
+        assertEquals(listOf(listOf(0, 0, 2, 1, 0, 1), listOf(2, 0, 1)), file.routes.coverage)
+        assertEquals(listOf(listOf(0, 1, 2, 3), listOf(2, 4, null)), file.routeCores.stops)
+        assertEquals(listOf(listOf(0, 0, 2, 1, 0, 1), null), file.routeCores.path)
+        assertEquals(listOf(2), file.hubs.node)
+        assertEquals(
+            listOf(WarningKind.UNCONNECTABLE to listOf("E", "H"), WarningKind.CORE_LEFT_OUT to listOf("C", "H")),
+            services.warnings.map { it.kind to it.stations },
+        )
     }
 
     /** The page without the line breaks and indentation between its tags. */

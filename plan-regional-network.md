@@ -43,8 +43,9 @@ My reading of the spec, as the `network` step will implement it:
     between. (The rule itself is no bound for the search: its allowance per stop exceeds the time of many
     sections.)
   - Of these, the path whose estimated time matches the hop's median best. The estimate is the sum of the section
-    medians minus a saving for each station passed without stopping. The step measures that saving as the median
-    of (span − hop) / stops between over the consistent spans, and prints it.
+    medians minus a saving for each station passed without stopping, but at least half of that sum (otherwise ways
+    of many one-minute sections come out about as fast as a direct section). The step measures that saving as the
+    median of (span − hop) / stops between over the consistent spans, and prints it: 75 s on the current data.
   - The hop's median is taken per stop pattern, so that two routes running non-stop between the same stations on
     different lines each get their own line; the candidates are computed once per hop.
 - **Checks**: every line section is the path of at least one hop (itself); if not, the step fails.
@@ -56,10 +57,12 @@ My reading of the spec, as the `network` step will implement it:
     - *unconnectable*: no path between the ends of a hop; the path of its route core is `null`, and the hop adds
       nothing to the coverage of its route. Expected only for route cores, whose trips may be left out of the
       network by the 10-date rule.
-    - *ambiguous*: the two best candidates use different lines and their estimates are within 60 s or 10 % of
-      each other.
+    - *ambiguous*: the two best candidates use different lines and match the hop equally well within 60 s or
+      10 % of its time. The report lists the allowed candidates, best (taken) first.
     - *detour*: no candidate is allowed by the span rule; the shortest one is taken.
-    - *reversal*: a path uses a line section twice, for example into a branch and back.
+    - *reversal*: a path uses a line section twice, for example into a branch and back; the warning names that
+      section. Most come from non-stop hops that stayed line sections, which send the path back over a stop
+      (Urbach – Schorndorf).
     - *route core left out*: the typical stop sequence of a route core is in no stop pattern kept by the
       10-date rule.
   - The summary also counts the hops pathed directly, by search, ambiguous and as detour.
@@ -186,8 +189,10 @@ Where it lives and its stack: see `todo.md`, "Frontend project".
    which compares with the fastest trip and counts the stop at the end as well.
 2. **Review the warnings** on the real data: duplicate station IDs into `stationParts`, tune the two numbers of the
    rule. Findings go to `pipeline/gtfs_findings.md`.
-3. **Services**: routes with their coverage, route cores with their paths, regional hub stations in `services.json`; tests for the path
-   search and the regional hub stations.
+3. **Services**: routes with their coverage, route cores with their paths, regional hub stations in `services.json`;
+   tests for the path search and the regional hub stations. Done (`Paths.kt`, `Services.kt`); on the current data:
+   844 routes, 1,115 route cores (one without a path), 440 regional hub stations, 220 KB. The path warnings join
+   the review of increment 2.
 4. **Frontend scaffold**: checks, CI, Pages, Dependabot; decoder and indexes
    with tests against the JSON written from `mini_gtfs`.
 5. **Viewer**: hub selection, drawing, fitting, labels.
