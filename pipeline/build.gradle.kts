@@ -146,7 +146,7 @@ registerStep(
         (findProperty("warnings") ?: "data/reports/network_warnings.csv").toString(),
         (findProperty("stopAllowance") ?: "180").toString(),
         (findProperty("detourFactor") ?: "1.33").toString(),
-        (findProperty("extraAllowance") ?: "120").toString(),
+        (findProperty("extraAllowance") ?: "90").toString(),
         (findProperty("minDates") ?: "10").toString(),
     )
 }
