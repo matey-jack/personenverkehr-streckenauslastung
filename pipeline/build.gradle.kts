@@ -11,7 +11,7 @@ repositories {
 }
 
 dependencies {
-    implementation("org.duckdb:duckdb_jdbc:2.0.0.1")
+    implementation("org.duckdb:duckdb_jdbc:2.0.1.0")
     implementation("org.jetbrains.kotlinx:kotlinx-html-jvm:0.12.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.13.0")
 
